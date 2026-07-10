@@ -1,0 +1,93 @@
+# iframe
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`<iframe>` embeds another browsing context (page, PDF, map, video player). Powerful but costly for performance and security — sandbox aggressively, size explicitly, and prefer lighter embeds when possible. Use `title` for accessibility.
+
+## 🔧 Core concepts
+
+| Attribute | Role |
+| --- | --- |
+| `src` | embedded URL |
+| `srcdoc` | inline HTML document |
+| `title` | accessible name (required in practice) |
+| `width` / `height` | layout size |
+| `allow` | Permissions Policy features |
+| `sandbox` | restrictions token list |
+| `loading` | `lazy` / `eager` |
+| `referrerpolicy` | referrer sent to embed |
+| `allowfullscreen` | legacy; prefer `allow="fullscreen"` |
+
+- Cross-origin frames limit DOM access (same-origin policy).
+- Communicate via `postMessage`.
+
+```html
+<iframe
+  title="Map of office location"
+  src="https://maps.example.com/embed?..."
+  width="600"
+  height="400"
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  allow="geolocation 'none'"
+></iframe>
+```
+
+## 💡 Examples
+
+```html
+<!-- Sandboxed untrusted HTML -->
+<iframe
+  title="User preview"
+  sandbox="allow-scripts"
+  srcdoc="<p>Hello</p>"
+></iframe>
+
+<!-- Strict sandbox (no scripts/forms) -->
+<iframe title="Static preview" sandbox src="/preview.html"></iframe>
+
+<!-- YouTube-style -->
+<iframe
+  title="Product demo video"
+  src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+  loading="lazy"
+></iframe>
+
+<!-- postMessage -->
+<script>
+  frame.contentWindow.postMessage({ type: "ping" }, "https://trusted.example");
+  window.addEventListener("message", (e) => {
+    if (e.origin !== "https://trusted.example") return;
+    console.log(e.data);
+  });
+</script>
+```
+
+```html
+<!-- Aspect ratio wrapper -->
+<div class="frame" style="aspect-ratio:16/9">
+  <iframe title="Demo" src="..." style="width:100%;height:100%;border:0"></iframe>
+</div>
+```
+
+## ⚠️ Pitfalls
+
+- Missing `sandbox` on untrusted content is dangerous (`allow-scripts` + `allow-same-origin` together can escape sandbox).
+- Each iframe is expensive (memory/network) — lazy-load offscreen ones.
+- Empty or missing `title` fails a11y checks.
+- Assuming you can read `iframe.contentDocument` cross-origin throws.
+- CSP `frame-src` / `child-src` may block embeds — coordinate headers.
+
+## 🔗 Related
+
+- [embedding.md](./embedding.md) — embed/object
+- [video_audio.md](./video_audio.md) — native media
+- [accessibility.md](./accessibility.md) — titles
+- [../Javascript/web_workers.md](../Javascript/web_workers.md) — other isolation
+- [../CSS/aspect_ratio.md](../CSS/aspect_ratio.md) — responsive frames

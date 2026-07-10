@@ -1,0 +1,75 @@
+# forwardRef
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`forwardRef` lets a parent pass a `ref` through to a child function component (usually a DOM node or imperative handle). In React 19, `ref` can be a regular prop on function components; `forwardRef` remains common in existing code and libraries.
+
+## 🔧 Core concepts
+
+- **Classic** — `forwardRef((props, ref) => ...)`.
+- **React 19** — `function Input({ ref, ...props })` may work without forwardRef.
+- **`useImperativeHandle`** — expose a custom instance API instead of the raw DOM node.
+- **Typing** — `forwardRef<HTMLInputElement, Props>(...)`.
+
+## 💡 Examples
+
+```tsx
+import { forwardRef, useImperativeHandle, useRef } from "react";
+
+type Props = { label: string };
+
+export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
+  { label },
+  ref,
+) {
+  return (
+    <label>
+      {label}
+      <input ref={ref} />
+    </label>
+  );
+});
+```
+
+**Imperative handle:**
+
+```tsx
+type Handle = { focus: () => void; clear: () => void };
+
+export const FancyInput = forwardRef<Handle, object>(function FancyInput(_, ref) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    clear: () => {
+      if (inputRef.current) inputRef.current.value = "";
+    },
+  }));
+  return <input ref={inputRef} />;
+});
+```
+
+**Usage:**
+
+```tsx
+const ref = useRef<HTMLInputElement>(null);
+<TextField ref={ref} label="Email" />;
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting to attach `ref` to a real host component.
+- Exposing entire component internals via imperative handles—prefer props.
+- Breaking memoization by wrapping inconsistently.
+- Type mismatches between `ref` and DOM element.
+
+## 🔗 Related
+
+- [useRef.md](./useRef.md) — refs
+- [forms.md](./forms.md) — focus management
+- [component.md](./component.md) — components
+- [hooks.md](./hooks.md) — useImperativeHandle
+- [memo.md](./memo.md) — composed components

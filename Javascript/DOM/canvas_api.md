@@ -1,0 +1,89 @@
+# Canvas API
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The Canvas 2D API draws shapes, text, images, and pixels onto a `<canvas>` bitmap via `getContext("2d")`. Great for charts, games, and effects. For retained-mode scene graphs prefer SVG; for 3D use WebGL. Always size the drawing buffer for DPR sharpness.
+
+## 🔧 Core concepts
+
+- **Context**: `const ctx = canvas.getContext("2d", { alpha, desynchronized })`.
+- **Drawing buffer**: `canvas.width` / `height` (attributes) ≠ CSS size.
+- **State**: `save` / `restore`, transforms, styles (`fillStyle`, `strokeStyle`, `lineWidth`).
+- **Paths**: `beginPath`, `moveTo`, `lineTo`, `arc`, `rect`, `fill`, `stroke`, `clip`.
+- **Images**: `drawImage`, `getImageData` / `putImageData`.
+- **Text**: `font`, `fillText`, `measureText`.
+- **Hit testing**: custom math or `isPointInPath`.
+
+```js
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+ctx.fillStyle = "#3366ff";
+ctx.fillRect(10, 10, 100, 60);
+```
+
+## 💡 Examples
+
+```js
+// HiDPI setup
+function fitCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// Path
+ctx.beginPath();
+ctx.arc(50, 50, 40, 0, Math.PI * 2);
+ctx.fill();
+
+// Transform
+ctx.save();
+ctx.translate(100, 100);
+ctx.rotate(Math.PI / 4);
+ctx.fillRect(-25, -25, 50, 50);
+ctx.restore();
+
+// Image
+const img = new Image();
+img.onload = () => ctx.drawImage(img, 0, 0, 200, 120);
+img.src = "/photo.jpg";
+
+// Pixels
+const data = ctx.getImageData(0, 0, w, h);
+for (let i = 0; i < data.data.length; i += 4) {
+  data.data[i] = 255 - data.data[i]; // R invert
+}
+ctx.putImageData(data, 0, 0);
+
+// Animation
+function frame(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  draw(t);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+```
+
+## ⚠️ Pitfalls
+
+- Setting `width`/`height` resets the context state and clears the bitmap.
+- CSS scaling without DPR adjustment blurs drawings.
+- `getImageData` is expensive and taints canvas if cross-origin images lack CORS.
+- Canvas is inaccessible by default — provide fallback text / ARIA when needed.
+- Clearing with `clearRect` each frame; forgetting it leaves trails.
+
+## 🔗 Related
+
+- [../Html/canvas.md](../../Html/canvas.md) — canvas element
+- [../typed_arrays.md](../typed_arrays.md) — ImageData buffers
+- [../timers.md](../timers.md) — rAF loops
+- [resize_observer.md](./resize_observer.md) — responsive canvas
+- [../performance.md](../performance.md) — draw cost

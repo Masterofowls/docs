@@ -1,0 +1,65 @@
+# useContext
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useContext(MyContext)` reads the nearest `MyContext.Provider` value and re-renders when that value changes. Prefer context for cross-tree data (theme, auth, locale)—not for high-frequency updates that should stay local or use a store.
+
+## 🔧 Core concepts
+
+- **Create** — `const Ctx = createContext(defaultValue)`.
+- **Provide** — `<Ctx.Provider value={...}>`.
+- **Consume** — `const value = useContext(Ctx)`.
+- **Default** — used only when no Provider is above.
+- **Bail out** — same `Object.is` value skips re-render (React 19 / compiler may help further).
+
+## 💡 Examples
+
+```tsx
+import { createContext, useContext, useState, type ReactNode } from "react";
+
+type Theme = "light" | "dark";
+const ThemeContext = createContext<Theme>("light");
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("light");
+  return (
+    <ThemeContext.Provider value={theme}>
+      <button type="button" onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}>
+        Toggle
+      </button>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function ThemedBox() {
+  const theme = useContext(ThemeContext);
+  return <div data-theme={theme}>Hello</div>;
+}
+```
+
+**Split value + setter to limit re-renders:**
+
+```tsx
+const ThemeValueCtx = createContext<Theme>("light");
+const ThemeSetCtx = createContext<(t: Theme) => void>(() => {});
+```
+
+## ⚠️ Pitfalls
+
+- New object/array in `value={{ theme, setTheme }}` every render → all consumers re-render; memoize or split contexts.
+- Using context as a global Redux replacement for rapidly changing data.
+- Reading context in a parent that doesn’t need it—push consumers down.
+- Forgetting a Provider in tests/stories.
+
+## 🔗 Related
+
+- [context.md](./context.md) — Provider patterns
+- [hooks.md](./hooks.md) — rules of hooks
+- [useMemo.md](./useMemo.md) — stabilize values
+- [performance.md](./performance.md) — re-render control
+- [custom_hooks.md](./custom_hooks.md) — `useTheme()` wrappers

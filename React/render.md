@@ -1,0 +1,59 @@
+# Render
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Rendering is React turning component output into the UI. Function components **return** JSX; React reconciles changes and updates the DOM. Class components use a `render()` method (legacy).
+
+## 🔧 Core concepts
+
+- **Return value** — element, fragment, string/number, `null`/`false`/`undefined` (nothing).
+- **Re-render** — state/props/context change schedules an update.
+- **Reconciliation** — keys help match list items across updates.
+- **Class `render()`** — pure method; no side effects (legacy).
+
+## 💡 Examples
+
+```tsx
+export function Status({ ok }: { ok: boolean }) {
+  if (!ok) return null;
+  return <span className="ok">Ready</span>;
+}
+```
+
+```jsx
+function List({ items }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>{item.label}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+```jsx
+// Legacy class
+class Badge extends React.Component {
+  render() {
+    return <span>{this.props.label}</span>;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Side effects during render (subscriptions, fetches) — use `useEffect`.
+- Unstable list keys (`index` when order changes) cause wrong state reuse.
+- Returning `undefined` accidentally (missing `return`) shows nothing / warnings.
+
+## 🔗 Related
+
+- [component.md](./component.md) — what returns JSX
+- [root.md](./root.md) — initial mount
+- [jsx.md](./jsx.md) — JSX output
+- [useState.md](./useState.md) — triggers re-render

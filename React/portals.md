@@ -1,0 +1,75 @@
+# Portals
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`createPortal(child, domNode)` renders children into a DOM node outside the parent hierarchy while preserving React context and event bubbling in the React tree. Use for modals, tooltips, and toasts that must escape `overflow: hidden` or stacking contexts.
+
+## 🔧 Core concepts
+
+- **API** — `createPortal(reactNode, container, key?)`.
+- **Events** — bubble through React parents, not necessarily DOM parents.
+- **Context** — still sees the React tree Providers.
+- **SSR** — ensure the target node exists or gate on client.
+- **Cleanup** — unmount removes portal children; manage container lifetime.
+
+## 💡 Examples
+
+```tsx
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
+export function Modal({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  if (!open) return null;
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        display: "grid",
+        placeItems: "center",
+      }}
+      onClick={onClose}
+    >
+      <div onClick={(e) => e.stopPropagation()}>{children}</div>
+    </div>,
+    document.body,
+  );
+}
+```
+
+**Dedicated mount node:**
+
+```tsx
+const el = document.getElementById("modal-root");
+return el ? createPortal(content, el) : null;
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting focus trap / `Escape` / `aria-modal` for dialogs.
+- Portal target missing during SSR/hydration.
+- Relying on DOM parent CSS (inheritance) that no longer applies.
+- Stopping propagation incorrectly so overlay clicks don’t close.
+
+## 🔗 Related
+
+- [jsx.md](./jsx.md) — rendering
+- [events.md](./events.md) — bubbling
+- [context.md](./context.md) — context still works
+- [useEffect.md](./useEffect.md) — lock body scroll
+- [fragments.md](./fragments.md) — grouping without nodes

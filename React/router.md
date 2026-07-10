@@ -1,0 +1,88 @@
+# Router
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Client-side routing maps URLs to components. In React apps, **React Router** (v6/v7) is the common SPA choice; Next.js / Remix use file-based routers. Core ideas: route config, nested layouts, loaders/actions (data routers), and links that don’t full-reload.
+
+## 🔧 Core concepts
+
+| Concept | Role |
+| --- | --- |
+| `BrowserRouter` / `RouterProvider` | History + route tree |
+| `Routes` / `Route` | Match path → element |
+| `Link` / `NavLink` | Declarative navigation |
+| `useNavigate` / `useParams` | Imperative / params |
+| Nested routes | Layout + `<Outlet />` |
+| Loaders | Data before render (data APIs) |
+
+Prefer path params and search params over ad-hoc global state for shareable URLs.
+
+## 💡 Examples
+
+```tsx
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Link,
+  Outlet,
+  useParams,
+} from "react-router-dom";
+
+function RootLayout() {
+  return (
+    <div>
+      <nav>
+        <Link to="/">Home</Link>
+        <Link to="/posts/1">Post</Link>
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+
+function Post() {
+  const { id } = useParams();
+  return <h1>Post {id}</h1>;
+}
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <p>Home</p> },
+      { path: "posts/:id", element: <Post /> },
+    ],
+  },
+]);
+
+export function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+**Navigate:**
+
+```tsx
+const navigate = useNavigate();
+navigate("/login", { replace: true });
+```
+
+## ⚠️ Pitfalls
+
+- Using `<a href>` for in-app routes → full reload.
+- Forgetting nested `<Outlet />`.
+- Matching order / missing splat routes for 404.
+- Putting auth redirects only in UI without loader/guard protection.
+
+## 🔗 Related
+
+- [suspense.md](./suspense.md) — lazy routes
+- [layout.md](./layout.md) — nested layouts
+- [pages.md](./pages.md) — page components
+- [error_boundaries.md](./error_boundaries.md) — route errors
+- [performance.md](./performance.md) — code splitting

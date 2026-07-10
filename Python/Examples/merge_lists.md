@@ -1,0 +1,85 @@
+# Merge lists
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Combine lists by concatenation, extension, or set-like union while controlling duplicates and order. Choose the approach based on whether you need stable order, uniqueness, or pairwise zipping.
+
+## 🔧 Core concepts
+
+| Goal | Approach |
+| --- | --- |
+| Concatenate | `a + b`, `[*a, *b]` |
+| Extend in place | `a.extend(b)` |
+| Unique preserve order | `dict.fromkeys(a + b)` |
+| Set union | `list(set(a) \| set(b))` (unordered) |
+| Interleave / pair | `zip`, nested loops |
+| Deep merge objects | Custom logic / dict merge |
+
+## 💡 Examples
+
+**Concatenate and unique (order preserved):**
+
+```python
+a = [1, 2, 3, 2]
+b = [3, 4, 5]
+
+merged = a + b
+unique = list(dict.fromkeys(merged))
+print(merged)  # [1, 2, 3, 2, 3, 4, 5]
+print(unique)  # [1, 2, 3, 4, 5]
+```
+
+**Extend vs new list:**
+
+```python
+a = [1, 2]
+b = [3, 4]
+a.extend(b)       # mutates a → [1, 2, 3, 4]
+c = [*a, *b]      # new list (here a already includes b)
+```
+
+**Merge list of dicts by key:**
+
+```python
+from typing import Any
+
+def merge_by_id(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_id: dict[Any, dict[str, Any]] = {}
+    for group in groups:
+        for row in group:
+            key = row["id"]
+            by_id[key] = {**by_id.get(key, {}), **row}
+    return list(by_id.values())
+
+left = [{"id": 1, "name": "Ada"}, {"id": 2, "name": "Bob"}]
+right = [{"id": 2, "role": "admin"}, {"id": 3, "name": "Cary"}]
+print(merge_by_id(left, right))
+```
+
+**Flatten nested lists:**
+
+```python
+nested = [[1, 2], [3], [4, 5]]
+flat = [x for group in nested for x in group]
+print(flat)  # [1, 2, 3, 4, 5]
+```
+
+## ⚠️ Pitfalls
+
+- `a += b` mutates `a`; `a = a + b` allocates a new list.
+- `set` union drops order and requires hashable elements.
+- Aliasing: `c = a; c.extend(b)` also changes `a`.
+- Nested mutable elements are shared after shallow merges.
+
+## 🔗 Related
+
+- [List to dict](list_to_dict.md)
+- [Convert files](convert_files.md)
+- [../loops.md](../loops.md)
+- [../dictionaries.md](../dictionaries.md)
+- [../types.md](../types.md)
+- [../kwags.md](../kwags.md)

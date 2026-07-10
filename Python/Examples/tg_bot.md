@@ -1,0 +1,111 @@
+# Telegram bot
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Build a simple Telegram bot with long polling using `httpx`/`requests` against Bot API, or the popular `python-telegram-bot` library. Store the bot token in an environment variable. Start with echo/commands; add webhooks when you deploy behind HTTPS.
+
+## 🔧 Core concepts
+
+| Piece | Detail |
+| --- | --- |
+| Token | From [@BotFather](https://t.me/BotFather); `TELEGRAM_BOT_TOKEN` |
+| getUpdates | Long polling for local/dev |
+| sendMessage | Reply to `chat.id` |
+| Commands | Messages starting with `/` |
+| Webhook | Production: HTTPS endpoint receives updates |
+| Library | `pip install python-telegram-bot` |
+
+## 💡 Examples
+
+**Minimal echo with `python-telegram-bot` (v21+ async):**
+
+```python
+import os
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    assert update.effective_message
+    await update.effective_message.reply_text("Hi! Send me any text.")
+
+
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    assert update.effective_message and update.effective_message.text
+    await update.effective_message.reply_text(update.effective_message.text)
+
+
+def main() -> None:
+    token = os.environ["TELEGRAM_BOT_TOKEN"]
+    app = Application.builder().token(token).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Raw Bot API long poll (stdlib + urllib):**
+
+```python
+import json
+import os
+import urllib.parse
+import urllib.request
+
+TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+API = f"https://api.telegram.org/bot{TOKEN}"
+
+
+def call(method: str, **params):
+    data = urllib.parse.urlencode(params).encode()
+    with urllib.request.urlopen(f"{API}/{method}", data=data, timeout=60) as resp:
+        return json.loads(resp.read().decode())
+
+
+def main() -> None:
+    offset = 0
+    while True:
+        payload = call("getUpdates", offset=offset, timeout=30)
+        for upd in payload.get("result", []):
+            offset = upd["update_id"] + 1
+            msg = upd.get("message") or {}
+            text = msg.get("text")
+            chat = msg.get("chat") or {}
+            chat_id = chat.get("id")
+            if text and chat_id:
+                call("sendMessage", chat_id=chat_id, text=f"echo: {text}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Run:**
+
+```bash
+set TELEGRAM_BOT_TOKEN=123456:ABC...
+python bot.py
+```
+
+## ⚠️ Pitfalls
+
+- Committing tokens to git—rotate immediately if leaked.
+- Two pollers with the same token fight over updates.
+- Network timeouts: use reasonable `timeout` and retry with backoff.
+- Webhooks require valid TLS; local dev usually uses polling.
+
+## 🔗 Related
+
+- [Server](server.md)
+- [Encrypt](encrypt.md)
+- [Manage files](manage_files.md)
+- [../async.md](../async.md)
+- [../import_export.md](../import_export.md)
+- [../kwags.md](../kwags.md)

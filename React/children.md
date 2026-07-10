@@ -1,0 +1,65 @@
+# Children
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`children` is the special prop for nested content between a component’s opening and closing tags. Prefer composition with `children` over prop-drilling UI fragments.
+
+## 🔧 Core concepts
+
+- **Implicit prop** — JSX between tags becomes `props.children`.
+- **Any type** — string, number, element, array, `null`/`undefined`/`false` (render nothing).
+- **`Children` helpers** — `Children.map`, `toArray`, `count`, `only` (use sparingly; prefer explicit arrays).
+- **Slots** — multiple named slots via props (`header`, `footer`) when one `children` is not enough.
+
+## 💡 Examples
+
+```jsx
+function Card({ title, children }) {
+  return (
+    <section className="card">
+      <h2>{title}</h2>
+      <div className="card-body">{children}</div>
+    </section>
+  );
+}
+
+<Card title="Hello">
+  <p>Nested content</p>
+  <button type="button">Action</button>
+</Card>
+```
+
+```tsx
+import { Children, type ReactNode } from "react";
+
+type ListProps = { children: ReactNode };
+
+function List({ children }: ListProps) {
+  const items = Children.toArray(children);
+  return (
+    <ul>
+      {items.map((child, i) => (
+        <li key={i}>{child}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Don’t mutate `children`; treat as opaque.
+- Avoid `Children.only` unless you truly require a single element.
+- Keys belong on the elements you create, not on `children` itself.
+- Conditional children: `{ cond && <X /> }` can leave `false` in the tree — usually fine, but prefer ternaries for clarity.
+
+## 🔗 Related
+
+- [component.md](./component.md) — function components
+- [props.md](./props.md) — passing data
+- [jsx.md](./jsx.md) — JSX nesting
+- [render.md](./render.md) — what gets rendered

@@ -1,0 +1,90 @@
+# Transitions
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Transitions interpolate property changes over time when a value changes (hover, class toggle, JS). Prefer transitions for simple state changes; use `@keyframes` animations for looping or multi-step sequences. Respect `prefers-reduced-motion`.
+
+## 🔧 Core concepts
+
+- **Shorthand**: `transition: property duration easing delay`.
+- **Longhands**: `transition-property`, `-duration`, `-timing-function`, `-delay`, `-behavior`.
+- **Properties**: animatable values (colors, lengths, opacity, transforms…). Discrete props flip (with `transition-behavior: allow-discrete` for some).
+- **Easing**: `ease`, `linear`, `ease-in-out`, `cubic-bezier()`, `steps()`.
+- **`transitionend` / `transitioncancel`**: JS hooks.
+- **Best perf**: `transform` and `opacity` (compositor-friendly).
+
+```css
+.button {
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.button:hover {
+  transform: translateY(-1px);
+}
+```
+
+## 💡 Examples
+
+```css
+/* Multiple */
+.card {
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+/* Delay for staggered menus */
+.menu a {
+  transition: opacity 120ms ease;
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* Height auto — modern interpolate-size / grid trick */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease;
+}
+.panel.open {
+  grid-template-rows: 1fr;
+}
+.panel > * {
+  overflow: hidden;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+```js
+el.addEventListener("transitionend", (e) => {
+  if (e.propertyName === "opacity") el.hidden = true;
+});
+```
+
+## ⚠️ Pitfalls
+
+- `transition: all` is convenient but can animate expensive properties unintentionally.
+- Cannot smoothly transition to/from `height: auto` in older engines — use grid/max-height hacks or new CSS features.
+- Changing `transition` itself mid-flight can cancel — set transition on base rule, change property on state.
+- Display `none` ↔ visible needs care (`allow-discrete` / `@starting-style`).
+- Too-long transitions feel sluggish — UI micro-interactions often 100–200ms.
+
+## 🔗 Related
+
+- [animation.md](./animation.md) — keyframes
+- [transform.md](./transform.md) — transform props
+- [effects.md](./effects.md) — shadows/filters
+- [hover.md](./hover.md) — hover triggers
+- [dark_mode.md](./dark_mode.md) — theme transitions

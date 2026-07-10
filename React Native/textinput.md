@@ -1,0 +1,88 @@
+# TextInput
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`TextInput` is the core text entry component. Controlled via `value` + `onChangeText`. Tune keyboard (`keyboardType`, `autoCapitalize`, `secureTextEntry`), and handle focus with refs. Pair with labels for accessibility.
+
+## 🔧 Core concepts
+
+| Prop | Role |
+| --- | --- |
+| `value` / `onChangeText` | Controlled text |
+| `defaultValue` | Uncontrolled start |
+| `placeholder` | Hint |
+| `secureTextEntry` | Password |
+| `keyboardType` | email/number/… |
+| `multiline` / `numberOfLines` | Text area |
+| `returnKeyType` / `onSubmitEditing` | Keyboard action |
+| `editable` | Disable |
+
+Use `autoComplete` / `textContentType` for password managers.
+
+## 💡 Examples
+
+```tsx
+import { useRef, useState } from "react";
+import { TextInput, Pressable, Text, StyleSheet } from "react-native";
+
+export function LoginFields() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const passwordRef = useRef<TextInput>(null);
+
+  return (
+    <>
+      <Text nativeID="emailLabel">Email</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+        accessibilityLabelledBy="emailLabel"
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
+      />
+      <TextInput
+        ref={passwordRef}
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoComplete="password"
+        accessibilityLabel="Password"
+      />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Controlled input without updating `value` → can’t type.
+- Wrapping in a scroll view without `keyboardShouldPersistTaps`.
+- Tiny touch targets / missing labels.
+- Android `underlineColorAndroid` surprises—set transparent if needed.
+
+## 🔗 Related
+
+- [keyboard.md](./keyboard.md) — avoid/cover
+- [scrollview.md](./scrollview.md) — forms
+- [pressable.md](./pressable.md) — submit buttons
+- [accesebility.md](./accesebility.md) — labels
+- [touchable.md](./touchable.md) — press handling

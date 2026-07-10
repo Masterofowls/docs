@@ -1,0 +1,76 @@
+# ARIA
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+ARIA (Accessible Rich Internet Applications) adds roles, states, and properties when native HTML can’t express behavior. First rule: **don’t use ARIA if a native element works**. Bad ARIA is worse than none. Focus on accessible name, role, and value.
+
+## 🔧 Core concepts
+
+| Category | Examples |
+| --- | --- |
+| Roles | `button` `dialog` `listbox` `tab` `switch` (prefer native when possible) |
+| Names | `aria-label` `aria-labelledby` `aria-describedby` |
+| Widgets | `aria-expanded` `aria-selected` `aria-checked` `aria-pressed` `aria-controls` |
+| Live | `aria-live` `aria-atomic` `aria-relevant` `role="status|alert"` |
+| Hidden | `aria-hidden` (never on focusable content) |
+
+- **Naming precedence**: `aria-labelledby` > `aria-label` > content > `title` (roughly).
+- **Relationships**: `aria-controls`, `aria-owns`, `aria-activedescendant`.
+- **HTML parity**: prefer `<button>`, `<dialog>`, `<input>` over role clones.
+
+```html
+<button type="button" aria-expanded="false" aria-controls="panel">
+  Filters
+</button>
+<div id="panel" hidden>...</div>
+```
+
+## 💡 Examples
+
+```html
+<!-- Labelledby -->
+<div role="dialog" aria-modal="true" aria-labelledby="t" aria-describedby="d">
+  <h2 id="t">Confirm</h2>
+  <p id="d">This cannot be undone.</p>
+</div>
+
+<!-- Tabs (simplified) -->
+<div role="tablist" aria-label="Sections">
+  <button role="tab" aria-selected="true" aria-controls="p1" id="t1">One</button>
+  <button role="tab" aria-selected="false" aria-controls="p2" id="t2">Two</button>
+</div>
+<div role="tabpanel" id="p1" aria-labelledby="t1">...</div>
+<div role="tabpanel" id="p2" aria-labelledby="t2" hidden>...</div>
+
+<!-- Live region -->
+<div role="status" aria-live="polite" id="save-status"></div>
+
+<!-- Switch (or use checkbox) -->
+<button type="button" role="switch" aria-checked="false">Notifications</button>
+```
+
+```html
+<!-- Anti-pattern -->
+<div role="button" onclick="...">Save</div>
+<!-- Use <button> -->
+```
+
+## ⚠️ Pitfalls
+
+- Changing role without keyboard behavior (e.g. `role="button"` on div without Enter/Space) fails a11y.
+- `aria-hidden="true"` on a parent hides all descendants from AT — dangerous with focusable kids.
+- Redundant ARIA (`<button role="button">`) adds noise.
+- `aria-label` overrides visible text for AT — keep them in sync.
+- Don’t use ARIA to “fix” invalid HTML structure.
+
+## 🔗 Related
+
+- [accessibility.md](./accessibility.md) — a11y principles
+- [semantic.md](./semantic.md) — native first
+- [button.md](./button.md) — native controls
+- [dialog.md](./dialog.md) — native dialog
+- [../Javascript/DOM/focus_blur.md](../Javascript/DOM/focus_blur.md) — focus patterns

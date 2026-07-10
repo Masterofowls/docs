@@ -1,0 +1,75 @@
+# Linking
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`Linking` opens URLs (https, tel, mailto, custom schemes) and listens for deep links that open the app. Configure schemes in native projects / `app.json`. For navigation integration, use React Navigation linking config or Expo Router.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `openURL` | Open external / custom URL |
+| `canOpenURL` | Check handler (iOS LS queries) |
+| `getInitialURL` | Cold-start link |
+| `addEventListener('url')` | Warm links |
+| `openSettings` | App settings |
+
+Universal Links / App Links need domain association files.
+
+## 💡 Examples
+
+```tsx
+import { Linking, Pressable, Text, Alert } from "react-native";
+
+async function openSupport() {
+  const url = "mailto:support@example.com?subject=Help";
+  const ok = await Linking.canOpenURL(url);
+  if (!ok) {
+    Alert.alert("No mail app available");
+    return;
+  }
+  await Linking.openURL(url);
+}
+
+export function SupportLink() {
+  return (
+    <Pressable onPress={openSupport}>
+      <Text>Email support</Text>
+    </Pressable>
+  );
+}
+```
+
+**Listen for URLs:**
+
+```tsx
+import { useEffect } from "react";
+import { Linking } from "react-native";
+
+useEffect(() => {
+  Linking.getInitialURL().then((url) => {
+    if (url) handleUrl(url);
+  });
+  const sub = Linking.addEventListener("url", ({ url }) => handleUrl(url));
+  return () => sub.remove();
+}, []);
+```
+
+## ⚠️ Pitfalls
+
+- iOS `canOpenURL` requires declared schemes in `LSApplicationQueriesSchemes`.
+- Not handling both cold and warm start.
+- Custom scheme collisions with other apps.
+- Using Linking alone without mapping to navigation routes.
+
+## 🔗 Related
+
+- [deeplinking.md](./deeplinking.md) — deep link setup
+- [navigation.md](./navigation.md) — route mapping
+- [Expo linking_expo](./Expo/linking_expo.md) — Expo helpers
+- [permissions.md](./permissions.md) — settings
+- [pressable.md](./pressable.md) — buttons

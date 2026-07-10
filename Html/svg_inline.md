@@ -1,0 +1,83 @@
+# Inline SVG
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Inline SVG embeds vector graphics directly in HTML for crisp icons, illustrations, and charts. You can style with CSS, animate, and expose titles for accessibility. Prefer `<img src="*.svg">` or `<use>` sprites when you don’t need per-path styling.
+
+## 🔧 Core concepts
+
+- **Root**: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">`.
+- **`viewBox`**: coordinate system; scales independently of `width`/`height`.
+- **Shapes**: `path` `rect` `circle` `line` `polyline` `polygon` `text` `g`.
+- **CSS**: `fill`, `stroke`, `currentColor` for themeable icons.
+- **A11y**: decorative → `aria-hidden="true"`; meaningful → `<title>` + `role="img"` / `aria-label`.
+- **Sprites**: `<use href="/icons.svg#check">` (external `use` has CORS limits).
+
+```html
+<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+</svg>
+```
+
+## 💡 Examples
+
+```html
+<!-- Meaningful graphic -->
+<svg role="img" aria-labelledby="salesTitle" viewBox="0 0 100 40" width="300">
+  <title id="salesTitle">Sales rising from 10 to 40</title>
+  <polyline
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    points="0,30 30,22 60,18 100,5"
+  />
+</svg>
+
+<!-- Icon button -->
+<button type="button" aria-label="Settings">
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20">
+    <path fill="currentColor" d="..." />
+  </svg>
+</button>
+
+<!-- Style -->
+<style>
+  .icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: block;
+  }
+  .icon-danger {
+    color: crimson;
+  }
+</style>
+
+<!-- Sprite use -->
+<svg class="icon" aria-hidden="true" focusable="false">
+  <use href="/sprite.svg#arrow" />
+</svg>
+```
+
+```html
+<!-- Prefer currentColor over hardcoded fills for theming -->
+```
+
+## ⚠️ Pitfalls
+
+- Huge inline SVGs bloat HTML — externalize complex art.
+- Missing `viewBox` breaks scaling.
+- Interactive SVG needs keyboard support if it acts like a control — wrap in `button`/`a` instead.
+- `focusable="false"` helps older IE/Edge; still set `aria-hidden` on decorative icons.
+- XSS: never inline unsanitized SVG from users (`<script>`, event handlers).
+
+## 🔗 Related
+
+- [images.md](./images.md) — raster images
+- [canvas.md](./canvas.md) — canvas alternative
+- [accessibility.md](./accessibility.md) — graphics a11y
+- [../CSS/icon.md](../CSS/icon.md) — icon CSS
+- [embedding.md](./embedding.md) — object/embed

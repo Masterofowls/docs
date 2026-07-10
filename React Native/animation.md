@@ -1,0 +1,68 @@
+# Animation
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Animate with the built-in `Animated` API, `LayoutAnimation`, or libraries like **Reanimated**. Prefer the UI thread (Reanimated / native driver) for smooth 60fps motion.
+
+## 🔧 Core concepts
+
+- **`Animated.Value`** — drive opacity, transform, color interpolations.
+- **`useNativeDriver: true`** — opacity/transform only; offloads to native.
+- **`Animated.timing` / `spring` / `parallel` / `sequence`**.
+- **Reanimated** — `useSharedValue`, `withTiming`, `useAnimatedStyle` for gestures + UI thread.
+- **`LayoutAnimation`** — simple layout transitions (Android needs `UIManager` flag on older RN).
+
+## 💡 Examples
+
+```tsx
+import { useRef, useEffect } from "react";
+import { Animated, View } from "react-native";
+
+export function FadeIn({ children }: { children: React.ReactNode }) {
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [opacity]);
+
+  return <Animated.View style={{ opacity }}>{children}</Animated.View>;
+}
+```
+
+```tsx
+import Animated, { useSharedValue, withSpring, useAnimatedStyle } from "react-native-reanimated";
+
+export function Bounce() {
+  const scale = useSharedValue(1);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return (
+    <Animated.View
+      style={style}
+      onTouchEnd={() => {
+        scale.value = withSpring(1.2);
+      }}
+    />
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- `useNativeDriver: true` with `width`/`height`/`top` — not supported; use Reanimated or layout anims.
+- Starting animations every render without deps.
+- Fighting the navigator’s own transition configs.
+
+## 🔗 Related
+
+- [transition.md](./transition.md) — screen transitions
+- [gesture.md](./gesture.md) — gesture-driven motion
+- [layout.md](./layout.md) — layout props
+- [touchable.md](./touchable.md) — press feedback

@@ -1,0 +1,81 @@
+# Notifications (Expo)
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**`expo-notifications`** handles local notifications, push permission, device push tokens, and listeners. Push delivery uses Expo push service or raw FCM/APNs. Configure icons/sounds via config plugin; request permissions at a sensible moment.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Permissions | `requestPermissionsAsync` |
+| Device token | `getExpoPushTokenAsync` |
+| Local schedule | `scheduleNotificationAsync` |
+| Listeners | received / response (tap) |
+| Channels | Android notification channels |
+| Plugin | `expo-notifications` in `app.json` |
+
+Physical device required for remote push.
+
+## 💡 Examples
+
+```tsx
+import { useEffect, useRef } from "react";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export async function registerForPush() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") return null;
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+  const projectId =
+    Constants.expoConfig?.extra?.eas?.projectId ??
+    Constants.easConfig?.projectId;
+  return Notifications.getExpoPushTokenAsync({ projectId });
+}
+
+export function useNotificationObserver() {
+  const responseListener = useRef<Notifications.EventSubscription | null>(null);
+  useEffect(() => {
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response.notification.request.content.data);
+      });
+    return () => responseListener.current?.remove();
+  }, []);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Testing push on simulator/emulator without support.
+- Missing EAS `projectId` for Expo tokens.
+- Not creating Android channels → silent/wrong importance.
+- Asking permission on first launch without context.
+
+## 🔗 Related
+
+- [config.md](./config.md) — plugin / projectId
+- [../notification.md](../notification.md) — general notes
+- [../permissions.md](../permissions.md) — permission UX
+- [linking_expo.md](./linking_expo.md) — open from tap
+- [constants.md](./constants.md) — project config

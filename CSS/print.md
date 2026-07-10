@@ -1,0 +1,106 @@
+# Print Styles
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Print CSS adapts layouts for paper and PDF via `@media print` and paged properties (`page-break_*` / `break-*`). Hide chrome, expand links, avoid wasted ink, and control breaks inside articles. Test with the browser’s print preview.
+
+## 🔧 Core concepts
+
+- **Query**: `@media print { ... }`.
+- **Breaks**: `break-before/after/inside`, legacy `page-break-*`.
+- **`@page`**: size, margin — `@page { margin: 1.5cm; }`.
+- **Widows/orphans**: `orphans`, `widows` line counts.
+- **Colors**: `print-color-adjust: exact` when backgrounds must print.
+- **Units**: `cm`, `in`, `pt` useful for paper.
+
+```css
+@media print {
+  nav,
+  .ads,
+  .no-print {
+    display: none !important;
+  }
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+  body {
+    color: #000;
+    background: #fff;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+@page {
+  size: A4;
+  margin: 16mm;
+}
+
+@media print {
+  .page {
+    break-after: page;
+  }
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  pre,
+  table,
+  figure {
+    break-inside: avoid;
+  }
+  img {
+    max-width: 100% !important;
+  }
+  .shadow-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  a {
+    text-decoration: underline;
+  }
+  /* optional: only external URLs */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+  }
+}
+
+/* Screen-only */
+@media screen {
+  .print-only {
+    display: none;
+  }
+}
+```
+
+```css
+@media print {
+  .brand-bar {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Fixed/sticky headers often repeat awkwardly — hide or static them for print.
+- Dark themes waste ink and reduce contrast on paper — force light print colors.
+- `position: fixed` elements can overlay every page — neutralize.
+- Very long URLs in `::after` can overflow — consider shortening or omitting internals.
+- Flex/grid print support is better than before but still verify complex dashboards.
+
+## 🔗 Related
+
+- [media_queries.md](./media_queries.md) — @media
+- [overflow.md](./overflow.md) — clipping
+- [background.md](./background.md) — print backgrounds
+- [text.md](./text.md) — typography
+- [reset_normalize.md](./reset_normalize.md) — base styles

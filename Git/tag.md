@@ -1,0 +1,57 @@
+# tag
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Tags mark specific commits (releases, milestones). Lightweight tags are refs; annotated tags store message, author, and date (preferred for releases). Push tags explicitly to remotes.
+
+## 🔧 Core concepts
+
+- **Lightweight** — `git tag v1.0.0` → pointer only.
+- **Annotated** — `git tag -a v1.0.0 -m "…"` → full object (signing with `-s`).
+- **List / show** — `git tag -l`, `git show v1.0.0`.
+- **Move** — delete + recreate, or `-f` (force) carefully.
+- **Remote** — tags don’t push by default; `git push origin v1.0.0` or `--tags`.
+
+## 💡 Examples
+
+```bash
+git tag v1.2.0
+git tag -a v1.2.0 -m "Release 1.2.0"
+git tag -a v1.2.0 abcdef1 -m "Release 1.2.0"
+
+git tag -l "v1.2.*"
+git show v1.2.0
+
+# Push one / all
+git push origin v1.2.0
+git push origin --tags
+
+# Delete local + remote
+git tag -d v1.2.0
+git push origin :refs/tags/v1.2.0
+# or: git push origin --delete v1.2.0
+
+# Checkout (detached)
+git switch --detach v1.2.0
+```
+
+## ⚠️ Pitfalls
+
+- Moving a published tag confuses CI/CD and consumers — treat as immutable.
+- `git push --tags` can push unintended local tags — push named tags instead.
+- Lightweight tags lack metadata — use annotated for releases.
+- Tagging the wrong commit — verify with `git log -1` before tagging.
+- Signed tags need GPG/SSH signing configured.
+
+## 🔗 Related
+
+- [log.md](./log.md)
+- [commit.md](./commit.md)
+- [push.md](./push.md)
+- [remote.md](./remote.md)
+- [branch.md](./branch.md)
+- [checkout via branch.md](./branch.md)

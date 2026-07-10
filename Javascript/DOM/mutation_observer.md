@@ -1,0 +1,92 @@
+# Mutation Observer
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`MutationObserver` notifies you of DOM tree changes: child lists, attributes, and character data. Prefer it over deprecated mutation events. Ideal for integrating with third-party widgets, reacting to SPA renders, and building developer tools — use sparingly in hot paths.
+
+## 🔧 Core concepts
+
+- **Create**: `new MutationObserver(callback)`.
+- **`observe(target, options)`**: start watching.
+- **Options**: `childList`, `attributes`, `characterData`, `subtree`, `attributeFilter`, `attributeOldValue`, `characterDataOldValue`.
+- **Records**: `type`, `target`, `addedNodes`, `removedNodes`, `attributeName`, `oldValue`, etc.
+- **`disconnect()`** / **`takeRecords()`**: stop or flush queue.
+- Delivered as microtasks after mutations settle.
+
+```js
+const mo = new MutationObserver((records) => {
+  for (const r of records) console.log(r.type, r.target);
+});
+mo.observe(document.body, { childList: true, subtree: true });
+```
+
+## 💡 Examples
+
+```js
+// Watch attribute changes on one element
+mo.observe(el, {
+  attributes: true,
+  attributeFilter: ["class", "aria-expanded"],
+  attributeOldValue: true,
+});
+
+// React when a node appears
+function whenAdded(selector, root = document.body) {
+  return new Promise((resolve) => {
+    const found = root.querySelector(selector);
+    if (found) return resolve(found);
+    const obs = new MutationObserver(() => {
+      const el = root.querySelector(selector);
+      if (el) {
+        obs.disconnect();
+        resolve(el);
+      }
+    });
+    obs.observe(root, { childList: true, subtree: true });
+  });
+}
+
+// Sanitize added nodes
+const sanitizer = new MutationObserver((records) => {
+  for (const r of records) {
+    r.addedNodes.forEach((node) => {
+      if (node.nodeType === 1) scrub(node);
+    });
+  }
+});
+sanitizer.observe(container, { childList: true, subtree: true });
+
+// Character data
+mo.observe(textNode, { characterData: true, characterDataOldValue: true });
+```
+
+```js
+// Avoid feedback loops
+let applying = false;
+const obs = new MutationObserver(() => {
+  if (applying) return;
+  applying = true;
+  sync();
+  applying = false;
+});
+```
+
+## ⚠️ Pitfalls
+
+- Observing `document` with `subtree: true` can flood callbacks — narrow the root/filter.
+- Mutations you make inside the callback can re-trigger — guard with flags or disconnect temporarily.
+- Does not observe computed style / resize — use ResizeObserver / IntersectionObserver.
+- `attributeFilter` is ignored unless `attributes: true`.
+- Memory: disconnect when components unmount.
+
+## 🔗 Related
+
+- [intersection_observer.md](./intersection_observer.md) — visibility
+- [resize_observer.md](./resize_observer.md) — size
+- [mutation_methods.md](./mutation_methods.md) — DOM mutations
+- [create_add_remove.md](./create_add_remove.md) — creating nodes
+- [../event_loop.md](../event_loop.md) — microtask delivery

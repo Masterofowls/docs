@@ -1,0 +1,102 @@
+# Custom admin
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Customize Admin beyond basic `ModelAdmin` options: actions, custom forms/widgets, computed columns, filters, permissions, and alternate `AdminSite` instances. Keep business logic in models/services; admin should orchestrate display and safe edits.
+
+## 🔧 Core concepts
+
+| Technique | Use |
+| --- | --- |
+| Admin actions | Bulk operations on selected rows |
+| `form` / `fieldsets` | Layout and validation |
+| `@admin.display` | Annotated list columns (Django 3.2+) |
+| Custom filters | `SimpleListFilter` |
+| Overrides | `save_model`, `get_queryset`, `has_*_permission` |
+| Custom templates | `change_list_template`, app templates under `admin/` |
+| Multiple sites | Subclass `AdminSite` |
+
+## 💡 Examples
+
+**Action and display:**
+
+```python
+from django.contrib import admin, messages
+from .models import Article
+
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ("title", "word_count", "is_published")
+    actions = ("publish_selected",)
+
+    @admin.display(description="Words")
+    def word_count(self, obj: Article) -> int:
+        return len(obj.body.split())
+
+    @admin.action(description="Mark selected as published")
+    def publish_selected(self, request, queryset):
+        updated = queryset.update(is_published=True)
+        self.message_user(request, f"Published {updated} articles.", messages.SUCCESS)
+```
+
+**Restrict queryset and save:**
+
+```python
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+```
+
+**Custom list filter:**
+
+```python
+from django.contrib import admin
+
+
+class PublishedFilter(admin.SimpleListFilter):
+    title = "publication"
+    parameter_name = "pub"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Published"), ("no", "Draft"))
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(is_published=True)
+        if self.value() == "no":
+            return queryset.filter(is_published=False)
+        return queryset
+```
+
+## ⚠️ Pitfalls
+
+- Admin actions should be idempotent and permission-checked.
+- Custom HTML in columns needs careful escaping (`format_html`).
+- Overriding `get_queryset` without `super()` can drop default optimizations.
+- Heavy work in `list_display` methods runs per row—annotate in `get_queryset`.
+
+## 🔗 Related
+
+- [Admin](admin.md)
+- [Models](models.md)
+- [Forms](forms.md)
+- [Authentication](authentication.md)
+- [Settings](settings.md)
+- [Views](views.md)

@@ -1,0 +1,89 @@
+# Truthiness
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+In boolean contexts (`if`, `while`, `and`/`or`, `bool(x)`), objects are truthy or falsy. Prefer explicit checks (`is None`, `len`, `==`) when zero/empty must be distinguished from missing.
+
+## 🔧 Core concepts
+
+| Falsy | Examples |
+| --- | --- |
+| Constants | `None`, `False` |
+| Numbers | `0`, `0.0`, `0j` |
+| Empty containers | `""`, `[]`, `()`, `{}`, `set()` |
+| Empty binary | `b""`, `bytearray()` |
+| Custom | `__bool__` → `False`, or `__len__` → `0` |
+
+Everything else is truthy by default — including `"0"`, `[0]`, and custom objects.
+
+## 💡 Examples
+
+**Typical checks:**
+
+```python
+name = ""
+items: list[int] = []
+
+if not name:
+    print("missing name")
+if items:
+    print("has items")
+```
+
+**None vs empty:**
+
+```python
+def title(value: str | None) -> str:
+    if value is None:
+        return "default"
+    if not value:
+        return "empty"
+    return value
+
+print(title(None), title(""), title("Hi"))
+```
+
+**and / or return operands:**
+
+```python
+print("" or "fallback")     # "fallback"
+print("hi" or "fallback")   # "hi"
+print("hi" and "there")     # "there"
+user = None
+print((user or {}).get("id"))
+```
+
+**Custom bool:**
+
+```python
+class Gate:
+    def __init__(self, open_: bool) -> None:
+        self.open = open_
+
+    def __bool__(self) -> bool:
+        return self.open
+
+g = Gate(False)
+print(bool(g), "yes" if g else "no")
+```
+
+## ⚠️ Pitfalls
+
+- `if xs` is False for empty lists — OK for "any items?", wrong for "was provided?".
+- `if count:` fails for `0` even when zero is valid.
+- NumPy arrays: truth value is ambiguous — use `.any()` / `.all()`.
+- Don't use `== True` / `== False`; use `is True` only for actual bools, else rely on truthiness carefully.
+- `__bool__` and `__len__` must be consistent if both exist.
+
+## 🔗 Related
+
+- [Conditionals](conditionals.md)
+- [Operators](operators.md)
+- [Lists](lists.md)
+- [Dictionaries](dictionaries.md)
+- [Magic methods](magic_methods.md)
+- [Types](types.md)

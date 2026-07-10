@@ -1,0 +1,106 @@
+# Closures
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A closure is a function plus the lexical environment where it was created. Inner functions keep access to outer variables even after the outer function has returned. Closures power private state, factories, event handlers, and partial application.
+
+## 🔧 Core concepts
+
+- **Lexical scope**: nested functions see bindings from enclosing scopes.
+- **Lifetime**: each call to the outer function creates a fresh environment.
+- **Mutable capture**: closed-over `let`/`const`/`var` bindings stay live — later mutations are visible.
+- **Module pattern**: IIFE or ES modules expose a public API while hiding internals.
+- **Factory**: return functions that share private state.
+
+```js
+function makeCounter() {
+  let n = 0;
+  return () => ++n;
+}
+const c = makeCounter();
+c(); // 1
+c(); // 2
+```
+
+## 💡 Examples
+
+```js
+// Private state
+function createBank(initial = 0) {
+  let balance = initial;
+  return {
+    deposit(amount) {
+      balance += amount;
+      return balance;
+    },
+    getBalance() {
+      return balance;
+    },
+  };
+}
+
+// Partial application
+function multiply(a) {
+  return (b) => a * b;
+}
+const triple = multiply(3);
+triple(4); // 12
+
+// Event handler captures element/id
+function bindOnce(el, type, handler) {
+  const wrapped = (e) => {
+    el.removeEventListener(type, wrapped);
+    handler(e);
+  };
+  el.addEventListener(type, wrapped);
+}
+
+// Loop pitfall fixed with let / factory
+const buttons = [];
+for (let i = 0; i < 3; i++) {
+  buttons.push(() => i);
+}
+buttons[0](); // 0 — each iteration has its own i
+
+// Memoization via closure
+function memoize(fn) {
+  const cache = new Map();
+  return (key) => {
+    if (cache.has(key)) return cache.get(key);
+    const value = fn(key);
+    cache.set(key, value);
+    return value;
+  };
+}
+```
+
+```js
+// Module-like IIFE
+const logger = (() => {
+  const levels = ["debug", "info", "warn", "error"];
+  return {
+    log(level, msg) {
+      if (levels.includes(level)) console[level]?.(msg);
+    },
+  };
+})();
+```
+
+## ⚠️ Pitfalls
+
+- Accidental retention: closures keep references alive and can delay GC (DOM nodes, large arrays).
+- `var` in loops shared one binding across iterations — use `let` or a factory.
+- Returning a method that uses `this` from a closure may lose `this` when detached — bind or use arrows carefully.
+- Closures over loop indices in `var` + async callbacks is a classic bug.
+
+## 🔗 Related
+
+- [functions.md](./functions.md) — function forms
+- [this_keyword.md](./this_keyword.md) — `this` vs lexical capture
+- [modules_commonjs.md](./modules_commonjs.md) — module scope
+- [oop.md](./oop.md) — private fields alternative
+- [event_loop.md](./event_loop.md) — async + closures

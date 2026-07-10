@@ -1,0 +1,70 @@
+# Git LFS
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Git Large File Storage (LFS) replaces large binaries in Git history with lightweight pointer files while storing blobs on an LFS server. Track patterns early — migrating after the fact requires history rewrite.
+
+## 🧩 Core concepts
+
+- **Pointers** — small text files in Git; real content fetched via LFS smudge/clean filters.
+- **`git lfs track`** — writes patterns into `.gitattributes`.
+- **Install** — `git lfs install` sets up local hooks/filters once per user machine.
+- **Fetch/pull** — LFS objects download on checkout; `git lfs pull` fetches explicitly.
+- **Locks** — optional file locking for non-mergeable binaries.
+- **Storage quotas** — hosts (GitHub, etc.) meter LFS bandwidth/storage.
+
+## 💡 Examples
+
+```bash
+# Install CLI (platform-specific) then enable filters
+git lfs install
+
+# Track file types (updates .gitattributes)
+git lfs track "*.psd"
+git lfs track "*.mp4"
+git lfs track "design/**/*.sketch"
+git add .gitattributes
+git commit -m "chore: track design assets with Git LFS"
+
+# Status / list
+git lfs status
+git lfs ls-files
+
+# Fetch LFS objects
+git lfs fetch --all
+git lfs pull
+
+# Migrate existing history (destructive — coordinate)
+git lfs migrate import --include="*.psd" --everything
+
+# Locking (if enabled on remote)
+git lfs lock path/to/file.psd
+git lfs unlock path/to/file.psd
+```
+
+Pointer file shape (what Git stores):
+
+```text
+version https://git-lfs.github.com/spec/v1
+oid sha256:…
+size 12345678
+```
+
+## ⚠️ Pitfalls
+
+- Tracking after files were committed still leaves blobs in history until migrate/rewrite.
+- Clones without LFS installed see pointer files instead of real assets.
+- CI must install Git LFS or checkouts will be incomplete.
+- Exceeding host LFS quotas breaks pushes — monitor usage and prune unused objects.
+
+## 🔗 Related
+
+- [Gitattributes](./gitattributes.md)
+- [Gitignore](./gitignore.md)
+- [Push](./push.md)
+- [Commit](./commit.md)
+- [GH CLI](./gh_cli.md)

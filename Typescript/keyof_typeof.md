@@ -1,0 +1,75 @@
+# keyof and typeof
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`typeof` (in type position) captures the type of a value. `keyof T` produces a union of `T`’s public property names. Together they type-safe key access, config maps, and derived APIs without duplicating shapes.
+
+## 🔧 Core concepts
+
+- **`typeof value`** — type query from a runtime value / import.
+- **`keyof T`** — `string | number | symbol` keys (often string literal unions).
+- **Indexed access** — `T[K]` where `K extends keyof T`.
+- **`keyof typeof obj`** — keys of a concrete object / const.
+- **Mapped types** — `{ [K in keyof T]: … }` transform properties.
+
+## 💡 Examples
+
+```ts
+const user = {
+  id: 1,
+  name: "Ada",
+  active: true,
+} as const;
+
+type User = typeof user;
+type UserKey = keyof typeof user; // "id" | "name" | "active"
+
+function getProp<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+getProp(user, "name"); // "Ada"
+// getProp(user, "email"); // error
+
+type Person = { name: string; age: number };
+type PersonKeys = keyof Person; // "name" | "age"
+type NameType = Person["name"]; // string
+
+// Enum-like object
+const Roles = {
+  Admin: "admin",
+  User: "user",
+} as const;
+type Role = (typeof Roles)[keyof typeof Roles]; // "admin" | "user"
+
+// typeof on functions / classes
+function createId(): string {
+  return crypto.randomUUID();
+}
+type IdFactory = typeof createId; // () => string
+```
+
+```ts
+type ReadonlyProps<T> = { readonly [K in keyof T]: T[K] };
+type OptionalProps<T> = { [K in keyof T]?: T[K] };
+```
+
+## ⚠️ Pitfalls
+
+- `typeof` in *value* position is JS runtime; in *type* position it’s erased.
+- `keyof` on arrays includes number-like keys and `"length"` / methods depending on type.
+- `keyof any` is `string | number | symbol` — avoid `any` bases.
+- String index signatures make `keyof` include `string`, weakening literals.
+- `typeof` imports need `import type` / value import depending on emit settings.
+
+## 🔗 Related
+
+- [mapped_types.md](./mapped_types.md)
+- [utility_types.md](./utility_types.md)
+- [const_assertions.md](./const_assertions.md)
+- [index_signatures.md](./index_signatures.md)
+- [literal_types.md](./literal_types.md)

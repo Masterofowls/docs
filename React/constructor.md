@@ -1,0 +1,64 @@
+# Constructor
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+In **class components**, `constructor` initializes state and binds methods. For new code, use **function components + `useState` / `useReducer`** instead — no constructor needed.
+
+## 🔧 Core concepts
+
+- **`super(props)`** — required before using `this` in a class constructor.
+- **Initial state** — `this.state = { ... }` only in the constructor (or as a class field).
+- **Binding** — `this.handler = this.handler.bind(this)` or class-field arrows.
+- **Modern alternative** — `useState(initial)` / `useReducer` in function components.
+
+## 💡 Examples
+
+```jsx
+// Legacy class constructor
+import { Component } from "react";
+
+class Form extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: props.initial ?? "" };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({ value: e.target.value });
+  }
+
+  render() {
+    return <input value={this.state.value} onChange={this.handleChange} />;
+  }
+}
+```
+
+```tsx
+// Preferred: function + hooks
+import { useState } from "react";
+
+export function Form({ initial = "" }: { initial?: string }) {
+  const [value, setValue] = useState(initial);
+  return (
+    <input value={value} onChange={(e) => setValue(e.target.value)} />
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Never call `setState` in the constructor; assign `this.state` directly.
+- Don’t fetch data in the constructor — use `componentDidMount` (legacy) or `useEffect`.
+- Copying props into state in the constructor often causes stale UI; derive or sync carefully.
+
+## 🔗 Related
+
+- [component.md](./component.md) — components overview
+- [useState.md](./useState.md) — modern state
+- [hooks.md](./hooks.md) — hooks rules
+- [render.md](./render.md) — render lifecycle

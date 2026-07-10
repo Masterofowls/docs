@@ -1,0 +1,105 @@
+# Effects
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Visual effects in CSS include `filter`, `backdrop-filter`, `box-shadow`, `text-shadow`, `mix-blend-mode`, and `opacity`. Use them for depth, glassmorphism, emphasis, and image treatment without editing assets. Prefer compositing-friendly effects and keep heavy filters off scrolling, full-viewport layers when performance matters.
+
+`filter` affects the element and its contents; `backdrop-filter` samples what is *behind* the element (requires semi-transparent background to see the result).
+
+## 🔧 Core concepts
+
+### Filter functions
+
+| Function | Role |
+| --- | --- |
+| `blur(r)` | Gaussian blur |
+| `brightness()` `contrast()` `saturate()` | Tonal adjustments |
+| `grayscale()` `sepia()` `hue-rotate()` | Color treatments |
+| `opacity()` | Filter-level opacity (separate from `opacity` property) |
+| `drop-shadow()` | Shadow that follows alpha shape (unlike `box-shadow`) |
+| `url(#svgFilter)` | Custom SVG filter reference |
+
+Chain with spaces: `filter: brightness(1.1) contrast(1.05)`.
+
+### Shadows & blending
+
+| Property | Notes |
+| --- | --- |
+| `box-shadow` | Shape follows border box; can be inset; multiple layers allowed |
+| `text-shadow` | Glyph shadows; no inset |
+| `mix-blend-mode` | Blend element with backdrop |
+| `background-blend-mode` | Blend background layers |
+| `isolation: isolate` | Create stacking context to contain blend modes |
+| `opacity` | Affects entire element including descendants |
+
+### Backdrop filter checklist
+
+1. Element needs a transparent or translucent background.
+2. Something visible must sit behind it.
+3. Often creates a containing stacking context; test overflow/positioning.
+
+## 💡 Examples
+
+### Soft elevation
+
+```css
+.card {
+  background: Canvas;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 8px 24px rgb(0 0 0 / 0.08);
+}
+```
+
+### Frosted glass panel
+
+```css
+.glass {
+  background: rgb(255 255 255 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.4);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+```
+
+### Image hover treatment
+
+```css
+.thumb img {
+  filter: grayscale(0.2) brightness(0.95);
+  transition: filter 200ms ease;
+}
+
+.thumb:hover img,
+.thumb:focus-within img {
+  filter: grayscale(0) brightness(1);
+}
+```
+
+### Drop shadow on transparent PNG/SVG
+
+```css
+.logo {
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.25));
+}
+```
+
+## ⚠️ Pitfalls
+
+- Applying large `blur()` or `backdrop-filter` on huge layers tanks scroll performance—limit size and animate sparingly.
+- Expecting `box-shadow` to follow irregular transparent image edges—use `drop-shadow()` in `filter` instead.
+- Setting `opacity` on a parent fades all children; prefer alpha on `background-color` / borders when only the surface should fade.
+- Forgetting vendor-prefixed `-webkit-backdrop-filter` where still required.
+- Using `mix-blend-mode` without `isolation`, causing unexpected blends with page chrome.
+
+## 🔗 Related
+
+- [Background](background.md)
+- [Hover](hover.md)
+- [Animation](animation.md)
+- [Images](image.md)

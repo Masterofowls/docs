@@ -1,0 +1,69 @@
+# Built-in functions
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+SQL provides scalar functions for strings, numbers, dates, JSON, and conditionals. Names and behavior differ across Postgres and MySQL — verify docs for edge cases (`ILIKE`, `DATE_TRUNC`, `IFNULL` vs `COALESCE`).
+
+## 🔧 Core concepts
+
+| Area | Common functions |
+| --- | --- |
+| String | `CONCAT`, `LENGTH`/`CHAR_LENGTH`, `SUBSTRING`, `TRIM`, `REPLACE`, `LOWER`/`UPPER` |
+| Numeric | `ABS`, `ROUND`, `CEIL`/`FLOOR`, `MOD`, `POWER` |
+| Date/time | `NOW`/`CURRENT_TIMESTAMP`, `DATE_TRUNC` (PG), `DATE_FORMAT` (MySQL), `AGE` |
+| Conditional | `COALESCE`, `NULLIF`, `CASE`, `GREATEST`/`LEAST` |
+| JSON | `->`/`->>` (PG), `JSON_EXTRACT` (MySQL) |
+| Cast | `CAST(x AS type)`, `x::type` (Postgres) |
+
+## 💡 Examples
+
+```sql
+SELECT
+  LOWER(email) AS email_norm,
+  CONCAT(first_name, ' ', last_name) AS full_name,
+  ROUND(price * 1.1, 2) AS with_tax,
+  COALESCE(nickname, first_name) AS label
+FROM users;
+
+-- Postgres dates
+SELECT DATE_TRUNC('day', created_at) AS day, COUNT(*)
+FROM events
+GROUP BY 1;
+
+-- MySQL dates
+SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(*)
+FROM events
+GROUP BY day;
+
+SELECT CASE
+  WHEN total >= 100 THEN 'gold'
+  WHEN total >= 50 THEN 'silver'
+  ELSE 'bronze'
+END AS tier
+FROM orders;
+
+-- Postgres JSON
+SELECT payload->>'userId' AS user_id FROM events;
+-- MySQL: JSON_UNQUOTE(JSON_EXTRACT(payload, '$.userId'))
+```
+
+## ⚠️ Pitfalls
+
+- `LENGTH` in Postgres is bytes for `bytea` / sometimes confusing with multibyte — prefer `CHAR_LENGTH` for characters.
+- Implicit casts hide type bugs — prefer explicit `CAST`.
+- Time zones: `TIMESTAMP` vs `TIMESTAMPTZ` (Postgres) — store UTC consciously.
+- MySQL `ONLY_FULL_GROUP_BY` interacts with select-list functions + aliases.
+- Non-immutable functions in indexes/generated columns may be disallowed.
+
+## 🔗 Related
+
+- [data_types.md](./data_types.md)
+- [aggregate.md](./aggregate.md)
+- [nulls.md](./nulls.md)
+- [select.md](./select.md)
+- [where_having.md](./where_having.md)
+- [window_functions.md](./window_functions.md)

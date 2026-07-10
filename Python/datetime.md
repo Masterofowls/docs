@@ -1,0 +1,84 @@
+# Datetime
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`datetime` handles dates, times, timedeltas, and timezones. Prefer **aware** datetimes (`tzinfo` set) over naive ones. Use `zoneinfo` (3.9+) for IANA timezones.
+
+## 🔧 Core concepts
+
+| Type | Role |
+| --- | --- |
+| `date` | Calendar date |
+| `time` | Time of day |
+| `datetime` | Date + time |
+| `timedelta` | Duration |
+| `timezone.utc` | Fixed UTC |
+| `zoneinfo.ZoneInfo` | IANA TZ |
+| `isoformat` / `fromisoformat` | ISO-8601 |
+
+Arithmetic: `datetime ± timedelta`. Comparing naive vs aware raises `TypeError`.
+
+## 💡 Examples
+
+**UTC now and ISO:**
+
+```python
+from datetime import datetime, timedelta, timezone
+
+now = datetime.now(timezone.utc)
+later = now + timedelta(hours=2)
+print(now.isoformat())
+print(datetime.fromisoformat("2024-07-10T12:00:00+00:00"))
+```
+
+**ZoneInfo:**
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+ny = ZoneInfo("America/New_York")
+local = datetime(2024, 7, 10, 9, 0, tzinfo=ny)
+utc = local.astimezone(ZoneInfo("UTC"))
+print(local, utc)
+```
+
+**Parsing common formats:**
+
+```python
+from datetime import datetime
+
+dt = datetime.strptime("10/07/2024 14:30", "%d/%m/%Y %H:%M")
+print(dt.strftime("%Y-%m-%d"))
+```
+
+**Date math:**
+
+```python
+from datetime import date, timedelta
+
+start = date(2024, 7, 10)
+print(start + timedelta(days=7))
+print((date.today() - start).days)
+```
+
+## ⚠️ Pitfalls
+
+- Naive `datetime.now()` is ambiguous — prefer `datetime.now(timezone.utc)`.
+- `utcnow()` is deprecated in 3.12 — use `now(timezone.utc)`.
+- DST transitions: local arithmetic can skip/repeat hours — convert via UTC.
+- `timestamp()` on naive assumes local time — be explicit.
+- Don't store local times without offset in databases when possible.
+
+## 🔗 Related
+
+- [JSON](json.md)
+- [Logging](logging.md)
+- [Types](types.md)
+- [F-strings](f-string.md)
+- [Examples: retry backoff](Examples/retry_backoff.md)
+- [Argparse](argparse.md)

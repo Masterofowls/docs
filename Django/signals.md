@@ -1,0 +1,85 @@
+# Signals
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Signals decouple senders from receivers: when something happens (save, delete, request finished), Django notifies connected handlers. Prefer explicit calls or service functions when coupling is local; use signals for cross-app side effects (cache bust, audit log, search index).
+
+## 🔧 Core concepts
+
+| Signal | When |
+| --- | --- |
+| `pre_save` / `post_save` | Before / after `Model.save()` |
+| `pre_delete` / `post_delete` | Before / after delete |
+| `m2m_changed` | M2M set/add/remove/clear |
+| `request_started` / `request_finished` | Request lifecycle |
+| `got_request_exception` | Unhandled exception |
+
+Connect with `@receiver` or `signal.connect`. Receivers live in `AppConfig.ready()` so they register once.
+
+## 💡 Examples
+
+**App config registration:**
+
+```python
+# apps.py
+from django.apps import AppConfig
+
+
+class BlogConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "blog"
+
+    def ready(self):
+        import blog.signals  # noqa: F401
+```
+
+**post_save receiver:**
+
+```python
+# signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+
+from .models import Profile
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+```
+
+**Disconnect / send custom:**
+
+```python
+from django.dispatch import Signal
+
+order_paid = Signal()  # providing_args deprecated; use kwargs
+
+def notify(sender, **kwargs):
+    print(kwargs["order_id"])
+
+order_paid.connect(notify)
+order_paid.send(sender=None, order_id=42)
+```
+
+## ⚠️ Pitfalls
+
+- Importing signals only from models can miss registration—use `AppConfig.ready()`.
+- `bulk_create` / `QuerySet.update` / `bulk_update` do **not** fire save signals.
+- Infinite loops: receiver calling `save()` on the same instance without guards.
+- Weak refs: keep a reference or use `weak=False` if the receiver is a local function.
+- Overusing signals hides control flow—harder to test and reason about.
+
+## 🔗 Related
+
+- [Models](models.md)
+- [Managers](managers.md)
+- [Transactions / ORM](transactions_orm.md)
+- [Caching](caching.md)
+- [Testing](testing.md)

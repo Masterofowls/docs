@@ -1,0 +1,81 @@
+# Zip, Enumerate, Map, Filter
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`enumerate`, `zip`, `map`, and `filter` are built-in iteration helpers. Prefer `enumerate`/`zip` and comprehensions in idiomatic Python; `map`/`filter` shine with existing callables.
+
+## 🔧 Core concepts
+
+| Built-in | Role |
+| --- | --- |
+| `enumerate(it, start=0)` | Index + value pairs |
+| `zip(*its, strict=False)` | Parallel iteration (3.10+ `strict`) |
+| `map(fn, it, ...)` | Apply fn lazily |
+| `filter(pred, it)` | Keep truthy pred |
+| `reversed` / `sorted` | Related helpers |
+
+All return iterators (except `sorted` → list). Consume once unless recreated.
+
+## 💡 Examples
+
+**enumerate and zip:**
+
+```python
+names = ["ada", "bob", "cy"]
+scores = [9, 7, 8]
+
+for i, name in enumerate(names, start=1):
+    print(i, name)
+
+for name, score in zip(names, scores, strict=True):
+    print(f"{name}: {score}")
+```
+
+**unzip:**
+
+```python
+pairs = [("a", 1), ("b", 2)]
+letters, nums = zip(*pairs)
+print(letters, nums)
+```
+
+**map / filter vs comps:**
+
+```python
+nums = [1, 2, 3, 4]
+print(list(map(str, nums)))
+print(list(filter(lambda n: n % 2 == 0, nums)))
+
+# Prefer:
+print([str(n) for n in nums])
+print([n for n in nums if n % 2 == 0])
+```
+
+**dict from parallel lists:**
+
+```python
+keys = ["host", "port"]
+vals = ["localhost", "8000"]
+cfg = dict(zip(keys, vals, strict=True))
+```
+
+## ⚠️ Pitfalls
+
+- `zip` stops at the shortest iterable unless `strict=True` (then errors on mismatch).
+- `map`/`filter` are lazy — wrap `list()` for reuse/debug.
+- `enumerate` on a dict iterates keys — use `.items()` when you need pairs.
+- Star-unzip `zip(*xs)` fails on empty `xs`.
+- Heavy `lambda` with map/filter is usually clearer as a comprehension.
+
+## 🔗 Related
+
+- [Loops](loops.md)
+- [Comprehensions](comprehensions.md)
+- [Lambda](lambda.md)
+- [Iterators](iterators.md)
+- [Unpacking](unpacking.md)
+- [Examples: list to dict](Examples/list_to_dict.md)

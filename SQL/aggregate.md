@@ -1,0 +1,61 @@
+# Aggregate functions
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Aggregates compute a single value from a set of rows: `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, plus dialect extras (`STRING_AGG` / `GROUP_CONCAT`, `BOOL_AND`). Combine with `GROUP BY` and filter groups with `HAVING`.
+
+## 🔧 Core concepts
+
+- **COUNT(*)** — rows; **COUNT(col)** — non-NULL values; **COUNT(DISTINCT col)**.
+- **NULL** — most aggregates ignore NULL inputs; `SUM` of no rows → NULL.
+- **GROUP BY** — one result row per group key.
+- **FILTER** — Postgres: `COUNT(*) FILTER (WHERE …)`.
+- **Window vs aggregate** — windows keep row detail; aggregates collapse rows.
+
+## 💡 Examples
+
+```sql
+SELECT
+  status,
+  COUNT(*) AS n,
+  COUNT(DISTINCT customer_id) AS customers,
+  SUM(total) AS revenue,
+  AVG(total) AS avg_total,
+  MIN(created_at) AS first_at,
+  MAX(created_at) AS last_at
+FROM orders
+GROUP BY status;
+
+-- Postgres FILTER
+SELECT
+  COUNT(*) FILTER (WHERE status = 'paid') AS paid,
+  COUNT(*) FILTER (WHERE status = 'refunded') AS refunded
+FROM orders;
+
+-- Postgres string agg / MySQL group_concat
+SELECT customer_id, STRING_AGG(sku, ', ' ORDER BY sku) AS skus   -- Postgres
+FROM order_items
+GROUP BY customer_id;
+-- MySQL: GROUP_CONCAT(sku ORDER BY sku SEPARATOR ', ')
+```
+
+## ⚠️ Pitfalls
+
+- `AVG` of integers may be integer division in some modes — cast to numeric/decimal.
+- `SUM`/`AVG` over empty set return NULL, not 0 — use `COALESCE`.
+- Mixing aggregated and non-aggregated columns without `GROUP BY` errors (strict modes).
+- `COUNT(DISTINCT …)` can be expensive on large tables.
+- Distinct aggregates + multiple distincts are costly — consider approximate methods.
+
+## 🔗 Related
+
+- [distinct_group_by.md](./distinct_group_by.md)
+- [where_having.md](./where_having.md)
+- [window_functions.md](./window_functions.md)
+- [nulls.md](./nulls.md)
+- [select.md](./select.md)
+- [functions_builtin.md](./functions_builtin.md)

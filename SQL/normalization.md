@@ -1,0 +1,67 @@
+# Normalization
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Normalization structures relational schemas to reduce redundancy and update anomalies (1NF → 2NF → 3NF / BCNF). Practical designs often normalize OLTP schemas and selectively denormalize for read-heavy analytics with clear sync rules.
+
+## 🔧 Core concepts
+
+| Form | Rule of thumb |
+| --- | --- |
+| 1NF | Atomic cells; no repeating groups |
+| 2NF | 1NF + no partial dependency on a composite key |
+| 3NF | 2NF + no transitive dependency on non-keys |
+| BCNF | Every determinant is a candidate key |
+| Denormalize | Controlled copies for performance / UX |
+
+- **Anomalies** — insert/update/delete anomalies from duplicated facts.
+- **Keys** — primary, candidate, foreign keys define dependencies.
+- **Join cost** — more normalization → more joins; index FKs.
+
+## 💡 Examples
+
+```text
+Bad (unnormalized orders):
+order_id | customer_name | customer_email | item1 | item2
+
+Better:
+customers(id, name, email)
+orders(id, customer_id, created_at)
+order_items(order_id, product_id, qty, price_cents)
+products(id, sku, title)
+```
+
+```sql
+-- 3NF-ish: status lookup instead of repeating labels everywhere
+CREATE TABLE order_statuses (
+  id TEXT PRIMARY KEY,          -- 'paid', 'shipped'
+  label TEXT NOT NULL
+);
+
+CREATE TABLE orders (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id),
+  status_id TEXT NOT NULL REFERENCES order_statuses(id)
+);
+```
+
+## ⚠️ Pitfalls
+
+- Over-normalization can make simple reads painful — balance with access patterns.
+- Denormalized caches drift without triggers/jobs/events to refresh them.
+- Storing JSON blobs for “flexibility” often recreates 1NF violations inside documents.
+- Composite keys without care lead to 2NF violations (attributes of only part of the key).
+- Surrogate keys don’t remove the need for unique business keys (`UNIQUE (sku)`).
+
+## 🔗 Related
+
+- [foreign_keys.md](./foreign_keys.md)
+- [constraints.md](./constraints.md)
+- [schemas.md](./schemas.md)
+- [data_types.md](./data_types.md)
+- [joins.md](./joins.md)
+- [create_alter_drop.md](./create_alter_drop.md)

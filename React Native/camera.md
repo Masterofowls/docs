@@ -1,0 +1,84 @@
+# Camera
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Camera access uses **`expo-camera`** (Expo) or `react-native-vision-camera` (bare/advanced). Request permission before preview; handle denied states. For still photos only, `expo-image-picker` may be enough.
+
+## 🔧 Core concepts
+
+| Topic | Notes |
+| --- | --- |
+| Permission | Camera (and mic for video) |
+| Preview | `<CameraView>` / VisionCamera |
+| Capture | `takePictureAsync` / photo callbacks |
+| Facing | front / back |
+| Barcode | Optional scanners |
+
+Background: pause camera when screen blurs (`useIsFocused`).
+
+## 💡 Examples
+
+```tsx
+import { useState, useRef, useEffect } from "react";
+import { View, Pressable, Text, StyleSheet } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
+
+export function CameraScreen() {
+  const [permission, requestPermission] = useCameraPermissions();
+  const ref = useRef<CameraView>(null);
+  const [facing, setFacing] = useState<"back" | "front">("back");
+
+  if (!permission) return <View />;
+  if (!permission.granted) {
+    return (
+      <Pressable onPress={requestPermission}>
+        <Text>Grant camera access</Text>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={styles.flex}>
+      <CameraView ref={ref} style={styles.flex} facing={facing} />
+      <Pressable
+        style={styles.btn}
+        onPress={async () => {
+          const photo = await ref.current?.takePictureAsync();
+          console.log(photo?.uri);
+        }}
+      >
+        <Text>Capture</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => setFacing((f) => (f === "back" ? "front" : "back"))}
+      >
+        <Text>Flip</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  btn: { padding: 16, backgroundColor: "#fff" },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Starting camera without permission UX.
+- Leaving camera running on blurred tabs—battery/heat.
+- Ignoring simulator limitations (no camera).
+- Storing captures without compression / cleanup.
+
+## 🔗 Related
+
+- [permissions.md](./permissions.md) — runtime perms
+- [Expo image_picker](./Expo/image_picker.md) — gallery/camera stills
+- [image.md](./image.md) — display
+- [navigation.md](./navigation.md) — focus cleanup
+- [appstate.md](./appstate.md) — background

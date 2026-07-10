@@ -1,0 +1,85 @@
+# Typed Arrays
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Typed arrays are array-like views over binary `ArrayBuffer` (and `SharedArrayBuffer`) memory. Use them for files, WebGL, WebAudio, WASM, network protocols, and precise integer/float layouts. They fix element types and sizes — no holes, no mixed types.
+
+## 🔧 Core concepts
+
+| Type | Bytes | Description |
+| --- | --- | --- |
+| `Int8Array` / `Uint8Array` / `Uint8ClampedArray` | 1 | 8-bit |
+| `Int16Array` / `Uint16Array` | 2 | 16-bit |
+| `Int32Array` / `Uint32Array` | 4 | 32-bit |
+| `Float32Array` / `Float64Array` | 4 / 8 | IEEE floats |
+| `BigInt64Array` / `BigUint64Array` | 8 | BigInt elements |
+
+- **`ArrayBuffer`**: raw bytes; **view** interprets them.
+- **`DataView`**: explicit endianness for mixed layouts.
+- **`buffer` / `byteOffset` / `byteLength`**: view window into buffer.
+- **Endianness**: typed arrays use platform endianness; DataView lets you choose.
+
+```js
+const buf = new ArrayBuffer(8);
+const view = new Uint32Array(buf);
+view[0] = 0xffffffff;
+```
+
+## 💡 Examples
+
+```js
+// From length / from array
+const a = new Uint8Array(4);
+const b = new Uint8Array([1, 2, 3, 4]);
+const c = new Uint8Array(b); // copy
+
+// Shared buffer, two views
+const buffer = new ArrayBuffer(16);
+const u8 = new Uint8Array(buffer);
+const f32 = new Float32Array(buffer);
+f32[0] = 1.5;
+u8.slice(0, 4); // bytes of that float
+
+// Subarray (view) vs slice (copy)
+const mid = u8.subarray(2, 6); // shares buffer
+const copy = u8.slice(2, 6); // new buffer
+
+// DataView for protocols
+const dv = new DataView(buffer);
+dv.setUint16(0, 0x1234, false); // big-endian
+dv.getUint16(0, false);
+
+// Bytes from string
+const enc = new TextEncoder().encode("hi");
+const dec = new TextDecoder().decode(enc);
+
+// Fetch as bytes
+const res = await fetch("/file.bin");
+const bytes = new Uint8Array(await res.arrayBuffer());
+```
+
+```js
+// Clamped for canvas ImageData
+const clamped = new Uint8ClampedArray([300, -1, 128]);
+// [255, 0, 128]
+```
+
+## ⚠️ Pitfalls
+
+- Out-of-range assigns wrap (or clamp for `Uint8ClampedArray`) — no throw.
+- `TypedArray` is not a real `Array` — no `push`/`pop`; some methods differ.
+- Endian bugs when exchanging binary across architectures — prefer DataView for wire formats.
+- Detached buffers (after `postMessage` transfer / WASM) throw on access.
+- Align `byteOffset` to element size for multi-byte typed arrays.
+
+## 🔗 Related
+
+- [bigint.md](./bigint.md) — BigInt64Array
+- [encode.md](./encode.md) — TextEncoder
+- [web_workers.md](./web_workers.md) — transferable buffers
+- [fetch.md](./fetch.md) — arrayBuffer bodies
+- [DOM/… canvas](../Html/canvas.md) — ImageData buffers

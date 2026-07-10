@@ -1,0 +1,84 @@
+# Strings
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+Strings are immutable UTF-16 sequences. Prefer template literals, `includes`/`startsWith`, and `replaceAll` over older index loops. For full Unicode graphemes, be aware of code units vs code points.
+
+## 🔧 Core concepts
+
+- **Create**: `'...'`, `"..."`, `` `template ${expr}` ``, `String.raw`.
+- **Length**: `str.length` counts UTF-16 code units.
+- **Access**: `str[i]`, `str.at(-1)`, `str.codePointAt(i)`.
+- **Search**: `includes`, `indexOf`, `startsWith`, `endsWith`, `match`, `matchAll`.
+- **Transform**: `slice`, `substring`, `split`, `trim`, `padStart`, `toUpperCase`, `normalize`.
+- **Replace**: `replace`, `replaceAll` (string or global regex).
+
+```js
+const name = "Ada";
+`Hello, ${name}!`;
+"file.js".endsWith(".js"); // true
+```
+
+## 💡 Examples
+
+```js
+const s = "  Hello, World  ";
+s.trim().toLowerCase(); // "hello, world"
+"a-b-c".split("-"); // ["a","b","c"]
+"na".repeat(3); // "nanana"
+"id".padStart(4, "0"); // "00id"
+"foo bar foo".replaceAll("foo", "baz");
+
+// Template multiline
+const html = `
+  <div class="card">
+    ${title}
+  </div>
+`.trim();
+
+// Code points iteration
+for (const ch of "A🙂B") console.log(ch);
+
+// matchAll
+const re = /\d+/g;
+for (const m of "a1 b23".matchAll(re)) {
+  console.log(m[0], m.index);
+}
+
+// Slice vs substring
+"abcdef".slice(1, -1); // "bcde"
+"abcdef".substring(1, 4); // "bcd"
+
+// Normalize Unicode
+"é".normalize("NFC");
+```
+
+```js
+// Safe HTML escape (minimal)
+function escapeHtml(str) {
+  return str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+```
+
+## ⚠️ Pitfalls
+
+- Strings are immutable — methods return new strings.
+- `replace` with string pattern replaces only the first match — use `replaceAll` or `/g`.
+- Surrogate pairs: `"🙂".length === 2`; prefer `for...of` / `codePointAt`.
+- `==` coerces; compare with `===`.
+- Building HTML via concatenation risks XSS — escape or use DOM APIs / frameworks.
+
+## 🔗 Related
+
+- [encode.md](./encode.md) — URI encoding
+- [boolean.md](./boolean.md) — empty string falsy
+- [arrays.md](./arrays.md) — split/join
+- [json.md](./json.md) — string escaping
+- [for_of.md](./for_of.md) — iterating characters
+- [DOM/content_methods.md](./DOM/content_methods.md) — text vs HTML

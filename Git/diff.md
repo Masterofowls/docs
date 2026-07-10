@@ -1,0 +1,59 @@
+# diff
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git diff` shows changes between worktree, index, commits, and branches. Use it before staging/committing and in code review. Word-diff and path filters help focus on signal.
+
+## 🔧 Core concepts
+
+- **Unstaged** — `git diff` (worktree vs index).
+- **Staged** — `git diff --staged` / `--cached` (index vs HEAD).
+- **Commits** — `git diff A B`, `git diff A..B`, `A...B` (merge-base).
+- **Stats** — `--stat`, `--numstat`, `--name-only`.
+- **Options** — `-w` ignore whitespace; `--word-diff`; `-M` renames.
+
+## 💡 Examples
+
+```bash
+git diff
+git diff --staged
+git diff HEAD
+git diff main...feature --stat
+
+git diff abcdef1 1234567 -- apps/web
+git diff --name-only origin/main
+
+# Word / whitespace
+git diff --word-diff
+git diff -w
+
+# Function context (C/JS often)
+git diff -W
+
+# Binary detection
+git diff --binary
+
+# Exit code for scripts (0 = no diff)
+git diff --quiet || echo "dirty"
+```
+
+## ⚠️ Pitfalls
+
+- `A..B` vs `A...B` differ for branch comparison — `...` uses merge-base (PR-style).
+- Line endings / CRLF can create noisy diffs — normalize with `.gitattributes`.
+- Generated files and lockfile churn drown real changes — pathspec filter.
+- `diff` of binary shows “Binary files differ” — use Git LFS or external tools.
+- Submodule diffs show SHA changes only unless you diff inside the submodule.
+
+## 🔗 Related
+
+- [status.md](./status.md)
+- [stage.md](./stage.md)
+- [log.md](./log.md)
+- [blame.md](./blame.md)
+- [gitattributes.md](./gitattributes.md)
+- [commit.md](./commit.md)

@@ -1,0 +1,62 @@
+# Player
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Media playback (audio/video) uses libraries such as `expo-av`, `expo-audio` / `expo-video` (newer Expo SDK splits), `react-native-video`, or `react-native-track-player` for background audio.
+
+## 🔧 Core concepts
+
+- **Load source** — local `require` or remote URI; handle buffering.
+- **Controls** — play / pause / seek / rate; keep UI in sync with status callbacks.
+- **Background** — audio session / foreground service; lock-screen controls need extra setup.
+- **Lifecycle** — unload on unmount to free decoders.
+- **Expo** — config plugins for background modes when needed.
+
+## 💡 Examples
+
+```tsx
+import { useEffect, useRef } from "react";
+import { Button } from "react-native";
+import { Audio } from "expo-av";
+
+export function SoundButton({ uri }: { uri: string }) {
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync();
+    };
+  }, []);
+
+  async function toggle() {
+    if (!soundRef.current) {
+      const { sound } = await Audio.Sound.createAsync({ uri });
+      soundRef.current = sound;
+      await sound.playAsync();
+      return;
+    }
+    const status = await soundRef.current.getStatusAsync();
+    if (status.isLoaded && status.isPlaying) await soundRef.current.pauseAsync();
+    else await soundRef.current.playAsync();
+  }
+
+  return <Button title="Play / Pause" onPress={toggle} />;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Not unloading players → memory / decoder leaks.
+- Autoplay policies and silent switch (iOS) — configure audio mode.
+- Large remote files without progress / error UI.
+
+## 🔗 Related
+
+- [permissions.md](./permissions.md) — mic / media access
+- [storage.md](./storage.md) — cached files
+- [Expo/plugins.md](./Expo/plugins.md) — native modules
+- [networking.md](./networking.md) — streaming URLs

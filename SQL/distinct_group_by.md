@@ -1,0 +1,56 @@
+# DISTINCT and GROUP BY
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`DISTINCT` removes duplicate result rows. `GROUP BY` collapses rows by key and pairs with aggregates. Don’t use `DISTINCT` to paper over bad joins — fix the join or group explicitly.
+
+## 🔧 Core concepts
+
+- **SELECT DISTINCT** — unique across the selected expression list.
+- **DISTINCT ON** — Postgres: first row per expressions (needs matching `ORDER BY`).
+- **GROUP BY** — group keys; other selected columns must be aggregated (strict SQL).
+- **Functional dependency** — Postgres may allow PK columns when grouping by PK.
+- **GROUPING SETS / ROLLUP / CUBE** — multiple groupings in one pass (dialect support varies).
+
+## 💡 Examples
+
+```sql
+SELECT DISTINCT country FROM users;
+
+SELECT customer_id, COUNT(*) AS orders
+FROM orders
+GROUP BY customer_id;
+
+-- Postgres DISTINCT ON (latest order per customer)
+SELECT DISTINCT ON (customer_id)
+  customer_id, id, created_at, total
+FROM orders
+ORDER BY customer_id, created_at DESC;
+
+-- MySQL equivalent pattern: window or join to max(created_at)
+
+SELECT region, status, COUNT(*)
+FROM orders
+GROUP BY ROLLUP (region, status);  -- Postgres; MySQL has WITH ROLLUP
+```
+
+## ⚠️ Pitfalls
+
+- `SELECT DISTINCT a, b` is not “distinct a” — uniqueness is on the whole row.
+- `ONLY_FULL_GROUP_BY` (MySQL) rejects ambiguous non-aggregated columns.
+- `DISTINCT` + `ORDER BY` expressions not in select list can error.
+- Using `DISTINCT` to fix row multiplication from joins hides cardinality bugs.
+- `COUNT(DISTINCT x)` vs `DISTINCT` then `COUNT` — different plans/costs.
+
+## 🔗 Related
+
+- [aggregate.md](./aggregate.md)
+- [where_having.md](./where_having.md)
+- [select.md](./select.md)
+- [order_limit.md](./order_limit.md)
+- [window_functions.md](./window_functions.md)
+- [joins.md](./joins.md)

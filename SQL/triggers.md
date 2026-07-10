@@ -1,0 +1,67 @@
+# Triggers
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Triggers run procedural logic on `INSERT`/`UPDATE`/`DELETE` (and some DDL). Use sparingly for auditing, derived columns, or enforcing rules that constraints can’t express. Prefer application transactions + constraints when possible — triggers are easy to overlook.
+
+## 🔧 Core concepts
+
+- **Timing** — `BEFORE` / `AFTER` (Postgres also `INSTEAD OF` on views).
+- **Granularity** — `FOR EACH ROW` vs `FOR EACH STATEMENT`.
+- **Transition rows** — `NEW` / `OLD` (row triggers).
+- **Function body** — Postgres: trigger functions in PL/pgSQL; MySQL: inline `BEGIN … END`.
+- **When** — optional `WHEN (condition)` (Postgres).
+
+## 💡 Examples
+
+```sql
+-- Postgres
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at := NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_users_updated
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();  -- PG14+: EXECUTE FUNCTION; older: EXECUTE PROCEDURE
+
+-- Audit log
+CREATE TRIGGER trg_orders_audit
+AFTER UPDATE ON orders
+FOR EACH ROW
+WHEN (OLD.status IS DISTINCT FROM NEW.status)
+EXECUTE FUNCTION log_order_status_change();
+```
+
+```sql
+-- MySQL
+CREATE TRIGGER trg_users_updated
+BEFORE UPDATE ON users
+FOR EACH ROW
+SET NEW.updated_at = CURRENT_TIMESTAMP;
+```
+
+## ⚠️ Pitfalls
+
+- Hidden side effects surprise developers — document triggers next to the table.
+- Mutating the same table in a row trigger can cause recursion / errors.
+- Statement vs row triggers fire differently for multi-row SQL.
+- Disabling triggers for bulk loads can leave data inconsistent if forgotten.
+- Replication / logical decoding may need trigger design awareness.
+
+## 🔗 Related
+
+- [stored_procedures.md](./stored_procedures.md)
+- [constraints.md](./constraints.md)
+- [transactions.md](./transactions.md)
+- [create_alter_drop.md](./create_alter_drop.md)
+- [insert_update_delete.md](./insert_update_delete.md)
+- [foreign_keys.md](./foreign_keys.md)

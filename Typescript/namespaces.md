@@ -1,0 +1,74 @@
+# Namespaces
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Namespaces (`namespace` / legacy `module`) group types and values in a named scope. Prefer ES modules for new code. Namespaces remain useful for declaration merging with classes/functions and for typing older UMD libraries.
+
+## 🔧 Core concepts
+
+- **`namespace N { export … }`** — nested scopes; need `export` for outer visibility.
+- **Merging** — multiple `namespace` blocks with the same name merge.
+- **Class + namespace** — add static-like nested types (`class C {}; namespace C { … }`).
+- **`declare namespace`** — ambient types for globals.
+- **Aliases** — `import N = require("…")` / `import N = NS.Inner` (legacy).
+
+## 💡 Examples
+
+```ts
+namespace Geometry {
+  export interface Point {
+    x: number;
+    y: number;
+  }
+  export function distance(a: Point, b: Point) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+  export namespace Polar {
+    export type Coord = { r: number; theta: number };
+  }
+}
+
+const p: Geometry.Point = { x: 0, y: 1 };
+
+// Merge class + namespace (factory pattern)
+class Alert {
+  constructor(public msg: string) {}
+}
+namespace Alert {
+  export function success(msg: string) {
+    return new Alert(`✓ ${msg}`);
+  }
+}
+Alert.success("saved");
+
+// Ambient
+declare namespace Chrome {
+  function runtimeSend(msg: unknown): void;
+}
+```
+
+```ts
+// Prefer ES modules today
+// export interface Point { … }
+// export function distance(…) { … }
+```
+
+## ⚠️ Pitfalls
+
+- Namespaces don’t map cleanly to bundlers / tree-shaking like ES modules.
+- `namespace` + `"module": "ESNext"` can confuse tooling — prefer files as modules.
+- Forgetting `export` inside a namespace hides members.
+- Avoid new namespaces in app code; keep them for `.d.ts` augmentation patterns.
+- Name collisions with merging can silently expand public API surface.
+
+## 🔗 Related
+
+- [module.md](./module.md)
+- [declaration_files.md](./declaration_files.md)
+- [enums.md](./enums.md)
+- [class.md](./class.md)
+- [config.md](./config.md)

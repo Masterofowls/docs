@@ -1,0 +1,98 @@
+# Details & Summary
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`<details>` creates a disclosure widget; `<summary>` is the visible toggle label. Native, keyboard-accessible expand/collapse without JS. Use for FAQs, optional advanced settings, and progressive disclosure. The `open` attribute controls expanded state.
+
+## 🔧 Core concepts
+
+- **Structure**: `<details>` wraps `<summary>` plus any content.
+- **`open`**: present when expanded; toggle via UI or JS property `details.open`.
+- **Events**: `toggle` fires after open state changes.
+- **Name grouping**: `name` attribute on multiple details makes an exclusive accordion (modern browsers).
+- **Styling**: limited marker styling via `::marker` / `summary::-webkit-details-marker`.
+- Only one summary per details.
+
+```html
+<details>
+  <summary>Shipping times</summary>
+  <p>Orders ship in 2–3 business days.</p>
+</details>
+```
+
+## 💡 Examples
+
+```html
+<!-- FAQ -->
+<details>
+  <summary>What is your refund policy?</summary>
+  <p>Full refunds within 30 days.</p>
+</details>
+
+<!-- Open by default -->
+<details open>
+  <summary>Release notes</summary>
+  <ul>
+    <li>Bug fixes</li>
+  </ul>
+</details>
+
+<!-- Accordion via name -->
+<details name="faq">
+  <summary>A</summary>
+  <p>...</p>
+</details>
+<details name="faq">
+  <summary>B</summary>
+  <p>...</p>
+</details>
+
+<!-- Styled -->
+<style>
+  details {
+    border: 1px solid #ddd;
+    padding: 0.5rem 0.75rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  details[open] summary {
+    margin-bottom: 0.5rem;
+  }
+</style>
+
+<script>
+  document.querySelector("details").addEventListener("toggle", (e) => {
+    console.log(e.target.open);
+  });
+</script>
+```
+
+```html
+<!-- summary can contain heading -->
+<details>
+  <summary><h3>Advanced</h3></summary>
+  ...
+</details>
+```
+
+## ⚠️ Pitfalls
+
+- Don’t put interactive content that fights the summary click target poorly — keep summary clear.
+- Search engines / AT support is good but content in closed details may be less discoverable visually — don’t hide critical legal text only there without care.
+- Exclusive `name` accordion support is newer — test targets.
+- Animating open height still needs CSS tricks; `open` is discrete.
+- Missing `summary` yields UA default “Details” label — always provide one.
+
+## 🔗 Related
+
+- [semantic.md](./semantic.md) — structure
+- [accessibility.md](./accessibility.md) — disclosures
+- [dialog.md](./dialog.md) — modals vs disclosures
+- [button.md](./button.md) — custom toggles
+- [../CSS/pseudo_elements.md](../CSS/pseudo_elements.md) — markers

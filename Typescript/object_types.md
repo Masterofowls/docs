@@ -1,0 +1,68 @@
+# Object Types
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Object types describe property names, optionality, readonly-ness, index signatures, and call/construct signatures. Use `interface` or `type` for named shapes; anonymous object types work inline.
+
+## 🧩 Core concepts
+
+- **Properties** — required by default; `?` makes optional; `readonly` prevents reassignment.
+- **Index signatures** — `[key: string]: T` / `[key: number]: T` for dynamic keys.
+- **Excess property checks** — apply to fresh object literals assigned to typed targets.
+- **Intersection (`&`)** — combine shapes; conflicting properties become `never` when incompatible.
+- **`Record<K, V>`** — mapped object with keys `K` and values `V`.
+- **`object` vs `{}` vs `Record<string, unknown>`** — prefer explicit shapes; `object` means non-primitive.
+
+## 💡 Examples
+
+```ts
+interface Product {
+  readonly id: string;
+  name: string;
+  price?: number;
+}
+
+const p: Product = { id: "sku-1", name: "Mug" };
+// p.id = "x"; // error: readonly
+
+type Dict = { [key: string]: number };
+const scores: Dict = { alice: 10, bob: 8 };
+
+// Nested + optional chaining-friendly shapes
+type Config = {
+  server: { host: string; port: number };
+  features?: { darkMode?: boolean };
+};
+
+// Intersection
+type Timestamped = { createdAt: Date };
+type Entity = Product & Timestamped;
+
+const item: Entity = {
+  id: "1",
+  name: "Tea",
+  createdAt: new Date(),
+};
+
+// Prefer explicit over empty object
+type JsonObject = Record<string, unknown>;
+```
+
+## ⚠️ Pitfalls
+
+- Optional props may be missing *or* explicitly `undefined` depending on `exactOptionalPropertyTypes`.
+- String index signatures force all named props to be assignable to the index type.
+- `{}` accepts almost everything except `null`/`undefined` — rarely what you want.
+- Methods vs function properties differ under `strictFunctionTypes` / `this` typing.
+
+## 🔗 Related
+
+- [Types](./types.md)
+- [Class](./class.md)
+- [Mapped types](./mapped_types.md)
+- [Utility types](./utility_types.md)
+- [Module](./module.md)

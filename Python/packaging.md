@@ -1,0 +1,88 @@
+# Packaging
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Packaging turns your code into an installable distribution (wheel/sdist) with metadata. Modern projects use `pyproject.toml` (PEP 517/518/621) with backends like `setuptools`, `hatchling`, or `flit`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `pyproject.toml` | Build + project metadata |
+| Build backend | setuptools / hatchling / … |
+| Wheel | Built install artifact (`.whl`) |
+| sdist | Source distribution |
+| Entry points | Console scripts |
+| Extras | Optional deps (`dev`, `docs`) |
+| Version | Static or dynamic |
+
+Layout: `src/mypkg/` (recommended) or flat `mypkg/`.
+
+## 💡 Examples
+
+**Minimal pyproject (setuptools):**
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awesome-tool"
+version = "0.1.0"
+description = "Demo package"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+awesome-tool = "awesome_tool.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+```
+
+**Build and install:**
+
+```bash
+python -m pip install build
+python -m build
+python -m pip install dist/awesome_tool-0.1.0-py3-none-any.whl
+# or editable
+python -m pip install -e ".[dev]"
+```
+
+**Console script stub:**
+
+```python
+# src/awesome_tool/cli.py
+def main() -> None:
+    print("hello from awesome-tool")
+
+if __name__ == "__main__":
+    main()
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `packages.find` / package data → empty installs.
+- Pinning too tightly in libraries frustrates consumers.
+- Shipping tests/secrets inside wheels by accident — check includes.
+- Multiple tools writing metadata (`setup.cfg` + poetry) — pick one source of truth.
+- Entry point module path typos fail only after install.
+
+## 🔗 Related
+
+- [Pip](pip.md)
+- [Venv](venv.md)
+- [Argparse](argparse.md)
+- [Import / export](import_export.md)
+- [Examples: cli tool](Examples/cli_tool.md)
+- [Testing with pytest](testing_pytest.md)

@@ -1,0 +1,69 @@
+# useState
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useState` adds local state to a function component. Calling the setter queues a re-render with the new value.
+
+## 🔧 Core concepts
+
+- **Signature** — `const [state, setState] = useState(initial)`.
+- **Lazy init** — `useState(() => expensive())` runs once.
+- **Updater form** — `setState(prev => next)` when next depends on previous.
+- **Objects/arrays** — replace immutably; don’t mutate then set the same reference.
+- **Batching** — React batches updates in event handlers (and more in React 18+).
+
+## 💡 Examples
+
+```tsx
+import { useState } from "react";
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button type="button" onClick={() => setCount((c) => c + 1)}>
+      {count}
+    </button>
+  );
+}
+```
+
+```tsx
+type Todo = { id: string; text: string; done: boolean };
+
+export function TodoDraft() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  function add(text: string) {
+    setTodos((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), text, done: false },
+    ]);
+  }
+
+  function toggle(id: string) {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
+  }
+
+  return null; // wire UI as needed
+}
+```
+
+## ⚠️ Pitfalls
+
+- `setState(obj.x++)` / mutating then `setState(obj)` — React may skip the update.
+- Using state as the only source when you could derive: `const full = first + last`.
+- Storing props in state without a sync strategy → stale UI.
+- For complex transitions prefer `useReducer`.
+
+## 🔗 Related
+
+- [hooks.md](./hooks.md) — hooks overview
+- [useEffect.md](./useEffect.md) — syncing with external systems
+- [events.md](./events.md) — updating from handlers
+- [props.md](./props.md) — vs lifting state

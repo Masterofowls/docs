@@ -1,0 +1,135 @@
+# Section
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<section>` element represents a **thematic grouping** of content, typically with a heading. It is sectioning content: it appears in the document outline and can own its own `<header>` / `<footer>`. Use it when the block is a meaningful chunk of the page—not as a generic styling wrapper (that is `<div>`).
+
+HTML5 also provides `<article>`, `<aside>`, `<nav>`, and `<main>` for more specific roles. Choose the most precise element; fall back to `<section>` for titled thematic groups, and `<div>` when there is no semantics to express.
+
+## 🔧 Core concepts
+
+### Section vs related elements
+
+| Element | Use when |
+|---------|----------|
+| `<section>` | Thematic group that belongs in the outline, usually with heading |
+| `<article>` | Self-contained composition (post, card, widget) distributable on its own |
+| `<aside>` | Tangentially related (pull quote, ads, secondary nav) |
+| `<main>` | Dominant unique content of the document (one per page) |
+| `<div>` | Purely presentational / script hook |
+
+### Headings and outline
+
+Every section should ideally have a heading (`h1`–`h6` or `hgroup` patterns). Nesting sections raises the logical rank in outline algorithms; in practice, authors still assign explicit heading levels carefully for accessibility.
+
+```html
+<main>
+  <h1>HTML landmarks</h1>
+  <section aria-labelledby="nav-sec">
+    <h2 id="nav-sec">Navigation</h2>
+    <p>…</p>
+  </section>
+  <section aria-labelledby="form-sec">
+    <h2 id="form-sec">Forms</h2>
+    <p>…</p>
+  </section>
+</main>
+```
+
+### Accessibility
+
+- `<section>` without an accessible name is **not** a landmark in most browsers.
+- With `aria-label` / `aria-labelledby` (often pointing at the heading), it becomes a `region` landmark.
+- Do not create dozens of named regions—reserve for major chunks.
+- Prefer one `<main>`; put sections inside it.
+
+### Headers and footers inside
+
+```html
+<section>
+  <header>
+    <h2>Release notes</h2>
+    <p>Version 2.4</p>
+  </header>
+  <p>…</p>
+  <footer>
+    <p>Last updated <time datetime="2026-07-10">July 10</time></p>
+  </footer>
+</section>
+```
+
+## 💡 Examples
+
+### Article composed of sections
+
+```html
+<article>
+  <h1>Using section wisely</h1>
+  <section>
+    <h2>When to use it</h2>
+    <p>Group related content under a shared theme.</p>
+  </section>
+  <section>
+    <h2>When to avoid it</h2>
+    <p>Do not wrap every heading for CSS convenience.</p>
+  </section>
+</article>
+```
+
+### Named region landmark
+
+```html
+<section aria-labelledby="newsletter-heading">
+  <h2 id="newsletter-heading">Newsletter</h2>
+  <form action="/subscribe" method="post">…</form>
+</section>
+```
+
+### FAQ pattern
+
+```html
+<section aria-labelledby="faq">
+  <h2 id="faq">FAQ</h2>
+  <div>
+    <h3>Is section a landmark?</h3>
+    <p>Only when it has an accessible name.</p>
+  </div>
+  <div>
+    <h3>Can I nest sections?</h3>
+    <p>Yes—reflect real hierarchy.</p>
+  </div>
+</section>
+```
+
+### Avoid: section as layout shell
+
+```html
+<!-- Prefer div for grid shells without meaning -->
+<div class="layout-grid">
+  <main>…</main>
+  <aside>…</aside>
+</div>
+```
+
+## ⚠️ Pitfalls
+
+- **Section soup** — Replacing all divs with sections adds noise and false outline entries.
+- **Headingless sections** — Weak semantics; add a heading or use a div.
+- **Multiple mains** — Invalid pattern; sections do not replace `main`.
+- **Skipping heading levels** — Jumping `h2` → `h4` confuses AT users.
+- **Over-labeling regions** — Too many landmarks slow navigation.
+- **Confusing article vs section** — If it could stand alone in a feed, prefer `article`.
+
+## 🔗 Related
+
+- [Div](div.md) — non-semantic containers
+- [Nav](nav.md) — navigation sections
+- [Footer](footer.md) — section and page footers
+- [Form](form.md) — forms inside sections
+- [List](list.md) — TOC lists for long sections
+- [Language](language.md) — `lang` on a section
+- [Style](style.md) — styling section layouts

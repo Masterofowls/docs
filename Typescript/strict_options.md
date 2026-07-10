@@ -1,0 +1,85 @@
+# Strict compiler options
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`strict: true` enables a suite of soundness checks. Turn it on for new projects; migrate incrementally with per-flag toggles. TS 5.x also adds related flags (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`).
+
+## 🔧 Core concepts
+
+| Flag (under `strict`) | Effect |
+| --- | --- |
+| `noImplicitAny` | Error on implied `any` |
+| `strictNullChecks` | `null` / `undefined` not in every type |
+| `strictFunctionTypes` | Contravariant params for function types |
+| `strictBindCallApply` | Typed `bind` / `call` / `apply` |
+| `strictPropertyInitialization` | Class props must be set |
+| `noImplicitThis` | `this` must be typed |
+| `alwaysStrict` | Emit `"use strict"` |
+| `useUnknownInCatchVariables` | `catch (e)` → `unknown` |
+
+**Extra (recommended):**
+
+- `noUncheckedIndexedAccess` — `T[K]` includes `undefined`.
+- `exactOptionalPropertyTypes` — distinguish missing vs `undefined`.
+- `noImplicitReturns` / `noFallthroughCasesInSwitch`.
+- `verbatimModuleSyntax` — type-only imports must use `import type`.
+
+## 💡 Examples
+
+```jsonc
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true
+  }
+}
+```
+
+```ts
+// strictNullChecks
+function len(s: string | null) {
+  // return s.length; // error
+  return s?.length ?? 0;
+}
+
+// strictPropertyInitialization
+class User {
+  name!: string; // definite assignment assertion — use sparingly
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+try {
+  /* ... */
+} catch (e) {
+  if (e instanceof Error) console.error(e.message);
+}
+
+import type { UserId } from "./ids"; // verbatimModuleSyntax
+```
+
+## ⚠️ Pitfalls
+
+- Enabling `strict` on a large JS codebase surfaces many errors — fix by folder / flag.
+- `noUncheckedIndexedAccess` adds `| undefined` everywhere — handle explicitly.
+- `exactOptionalPropertyTypes` breaks `{ prop?: T }` assignability with `undefined`.
+- `skipLibCheck: true` hides issues in `.d.ts` (common, but masks problems).
+- Don’t disable `strict` to “save time” — prefer local `as` / narrowing.
+
+## 🔗 Related
+
+- [config.md](./config.md)
+- [any_unknown_never.md](./any_unknown_never.md)
+- [commandline.md](./commandline.md)
+- [type_guards.md](./type_guards.md)
+- [this_types.md](./this_types.md)

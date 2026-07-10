@@ -1,0 +1,55 @@
+# sparse-checkout
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Sparse-checkout checks out only a subset of paths from a wide repository (monorepos). Combine with partial clone (`--filter=blob:none`) to reduce network and disk use. Cone mode is the recommended pattern.
+
+## 🔧 Core concepts
+
+- **Cone mode** — directory-based patterns (default/recommended).
+- **Patterns** — include dirs like `apps/web` and always root files needed.
+- **Init** — `sparse-checkout init --cone` then `set` / `add`.
+- **Partial clone** — fetch blobs on demand with filters.
+- **Disable** — `sparse-checkout disable` restores full tree.
+
+## 💡 Examples
+
+```bash
+git clone --filter=blob:none --sparse git@github.com:org/monorepo.git
+cd monorepo
+git sparse-checkout set apps/web packages/ui
+
+# Add more paths later
+git sparse-checkout add packages/utils
+
+# List / reapply
+git sparse-checkout list
+git sparse-checkout reapply
+
+# Non-cone (legacy patterns) — avoid unless needed
+git sparse-checkout init --no-cone
+git sparse-checkout set "/*" "!/*/" "/apps/web/"
+
+git sparse-checkout disable
+```
+
+## ⚠️ Pitfalls
+
+- Tools expecting a full tree (some codegen, IDE indexes) may break — document required paths.
+- Non-cone pattern syntax is easy to get wrong — prefer cone directories.
+- Sparse + submodules needs explicit submodule paths checked out.
+- CI must configure the same sparse set or use full checkout.
+- Narrow checkouts can hide files from `git status` that still exist in history.
+
+## 🔗 Related
+
+- [clone.md](./clone.md)
+- [status.md](./status.md)
+- [submodule.md](./submodule.md)
+- [worktree.md](./worktree.md)
+- [gitignore.md](./gitignore.md)
+- [fetch.md](./fetch.md)

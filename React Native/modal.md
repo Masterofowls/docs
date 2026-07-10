@@ -1,0 +1,73 @@
+# Modal
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`Modal` presents content above the current screen (native modal host). For navigation-style modals, prefer a stack with `presentation: "modal"`.
+
+## 🔧 Core concepts
+
+- **Props** — `visible`, `transparent`, `animationType` (`none` | `slide` | `fade`).
+- **`onRequestClose`** — required on Android (back button).
+- **Nesting** — avoid deep modal stacks; use navigation instead.
+- **Accessibility** — focus trap / labels for dismiss controls.
+
+## 💡 Examples
+
+```tsx
+import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+
+export function ConfirmModal({
+  open,
+  onClose,
+  message,
+}: {
+  open: boolean;
+  onClose: () => void;
+  message: string;
+}) {
+  return (
+    <Modal
+      visible={open}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.backdrop}>
+        <View style={styles.sheet}>
+          <Text>{message}</Text>
+          <Pressable onPress={onClose} accessibilityRole="button">
+            <Text>Close</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    padding: 24,
+  },
+  sheet: { backgroundColor: "#fff", borderRadius: 12, padding: 16 },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Missing `onRequestClose` on Android.
+- Putting a Modal inside a view with `opacity` / transforms — weird clipping.
+- Using Modal for every route — navigators scale better.
+
+## 🔗 Related
+
+- [backhandler.md](./backhandler.md) — Android back
+- [keyboard.md](./keyboard.md) — inputs in modals
+- [transition.md](./transition.md) — presentation motion
+- [touchable.md](./touchable.md) — dismiss controls

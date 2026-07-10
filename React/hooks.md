@@ -1,0 +1,59 @@
+# Hooks
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Hooks let function components use state, lifecycle, and shared logic. Call them only at the top level of React functions (components or custom hooks).
+
+## 🔧 Core concepts
+
+- **Built-ins** — `useState`, `useEffect`, `useContext`, `useRef`, `useMemo`, `useCallback`, `useReducer`, `useId`, …
+- **Rules** — top level only; only in React functions; same order every render.
+- **Custom hooks** — `useXxx` functions that call other hooks; share stateful logic.
+- **Classes** — no hooks; use lifecycle methods (legacy).
+
+## 💡 Examples
+
+```tsx
+import { useState, useEffect } from "react";
+
+export function useDocumentTitle(title: string) {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+}
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  useDocumentTitle(`Count: ${count}`);
+  return (
+    <button type="button" onClick={() => setCount((c) => c + 1)}>
+      {count}
+    </button>
+  );
+}
+```
+
+```jsx
+function useToggle(initial = false) {
+  const [on, setOn] = useState(initial);
+  const toggle = () => setOn((v) => !v);
+  return [on, toggle];
+}
+```
+
+## ⚠️ Pitfalls
+
+- Conditional / looped hook calls break React’s hook order.
+- Missing dependency arrays cause stale closures or infinite loops.
+- `useMemo` / `useCallback` are not free — use when measured or required for referential equality.
+
+## 🔗 Related
+
+- [useState.md](./useState.md) — state
+- [useEffect.md](./useEffect.md) — effects
+- [component.md](./component.md) — function components
+- [constructor.md](./constructor.md) — class alternative (legacy)

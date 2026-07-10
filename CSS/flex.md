@@ -1,0 +1,116 @@
+# Flexbox
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Flexbox is a one-dimensional layout model for distributing space and aligning items along a row or column. Set `display: flex` or `inline-flex` on a container, then control direction, wrapping, alignment, and growth with flex properties. Use Flexbox for toolbars, navs, form rows, and equal-height media objects; use Grid when you need two-dimensional tracks or overlapping areas.
+
+Main axis follows `flex-direction`; cross axis is perpendicular. Logical alignment (`start` / `end`) respects writing mode better than physical `left` / `right`.
+
+## 🔧 Core concepts
+
+### Container properties
+
+| Property | Common values | Role |
+| --- | --- | --- |
+| `flex-direction` | `row` \| `row-reverse` \| `column` \| `column-reverse` | Main axis |
+| `flex-wrap` | `nowrap` \| `wrap` \| `wrap-reverse` | Multi-line flex |
+| `flex-flow` | shorthand of direction + wrap | |
+| `justify-content` | `start` `end` `center` `space-between` `space-around` `space-evenly` | Main-axis distribution |
+| `align-items` | `stretch` `start` `end` `center` `baseline` | Cross-axis, one line |
+| `align-content` | same family as justify | Cross-axis when wrapped |
+| `gap` | `<row-gap> <column-gap>` | Spacing between items |
+
+### Item properties
+
+| Property | Role |
+| --- | --- |
+| `flex-grow` | Extra free space factor (default `0`) |
+| `flex-shrink` | Shrink factor (default `1`) |
+| `flex-basis` | Initial main size (`auto`, length, `%`, `content`) |
+| `flex` | Shorthand: `grow shrink basis` — prefer `flex: 1` / `flex: none` |
+| `align-self` | Override `align-items` for one item |
+| `order` | Visual order (avoid for tab order / accessibility) |
+
+### Useful shorthand recipes
+
+| Declaration | Meaning |
+| --- | --- |
+| `flex: 1` | `1 1 0%` — share space equally from zero basis |
+| `flex: auto` | `1 1 auto` — grow/shrink from content size |
+| `flex: none` | `0 0 auto` — sized by content, don’t flex |
+| `flex: 0 0 12rem` | Fixed main size |
+
+## 💡 Examples
+
+### Toolbar
+
+```css
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-inline: 1rem;
+}
+
+.toolbar__spacer {
+  flex: 1;
+}
+```
+
+### Media object
+
+```css
+.media {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.media__body {
+  flex: 1;
+  min-inline-size: 0; /* allow text truncation */
+}
+```
+
+### Wrapping chip list
+
+```css
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+```
+
+### Equal-height columns (row)
+
+```css
+.pricing {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch; /* default */
+}
+
+.pricing > .plan {
+  flex: 1 1 0;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `min-inline-size: 0` (or `min-width: 0`) on flex children so long text overflows instead of shrinking.
+- Using `order` to reshuffle content without updating DOM order—keyboard and screen-reader order stay source-based.
+- Mixing `justify-content: space-between` with `gap` expectations; gap is fixed space between items, not a substitute for margins in every case.
+- Default `flex-shrink: 1` unexpectedly crushing icons—set `flex: none` or `flex-shrink: 0` on fixed chrome.
+- Choosing Flexbox for a full page 2D layout that Grid expresses more clearly with template areas.
+
+## 🔗 Related
+
+- [CSS Grid](grid.md)
+- [Adaptive design](adaptive.md)
+- [Positioning](position.md)
+- [Buttons](button.md)

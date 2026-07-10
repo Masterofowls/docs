@@ -1,0 +1,137 @@
+# Src
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The **`src` attribute** (and relatives `srcset`, `data`, `href` for some resources) tells the browser where to fetch an embedded resource: scripts, images, frames, tracks, and media sources. Understanding URL resolution, CORS, and responsive image candidates prevents broken assets and layout shift.
+
+`src` always holds a single URL. For responsive images, combine `src` (fallback) with `srcset` and `sizes`. For `<video>` / `<audio>`, child `<source src>` elements provide format alternatives.
+
+## 🔧 Core concepts
+
+### Elements that use `src`
+
+| Element | Resource |
+|---------|----------|
+| `<img>` | Image |
+| `<script>` | JavaScript |
+| `<iframe>` | Nested browsing context |
+| `<audio>` / `<video>` | Media (or use `<source>`) |
+| `<source>` | Media/picture candidate |
+| `<track>` | Text track (WebVTT) |
+| `<embed>` | External plug-in content |
+| `<input type="image">` | Submit button image |
+
+Related: `<link href>` for stylesheets/icons; `<a href>` for navigation—not `src`.
+
+### URL resolution
+
+Relative `src` values resolve against the document URL, or against `<base href>` if present.
+
+```html
+<!-- Document: https://example.com/docs/html/ -->
+<img src="images/logo.png" alt="Logo">
+<!-- → https://example.com/docs/html/images/logo.png -->
+
+<img src="/images/logo.png" alt="Logo">
+<!-- → https://example.com/images/logo.png -->
+```
+
+Protocols: `https:` preferred; `data:` for small embeds; `blob:` for generated objects; avoid mixed content (`http` on `https` pages).
+
+### Srcset syntax
+
+```html
+<img
+  src="hero-800.jpg"
+  srcset="hero-400.jpg 400w, hero-800.jpg 800w, hero-1200.jpg 1200w"
+  sizes="(max-width: 700px) 100vw, 700px"
+  alt="Hero">
+```
+
+- **Width descriptors** (`400w`) — with `sizes`, browser picks density-appropriate file.
+- **Pixel density** (`logo.png 1x, logo@2x.png 2x`) — for fixed-size images.
+- `src` remains the fallback / default.
+
+### CORS and credentials
+
+Cross-origin images can display without CORS but **taint canvas**. Scripts and fonts need proper CORS. Use `crossorigin` on `<img>` / `<script>` / `<link>` when you need access to pixel data or better error info.
+
+```html
+<img src="https://cdn.example.com/pic.jpg" alt="" crossorigin="anonymous">
+```
+
+### Integrity
+
+Pair `src` with `integrity` (SRI) on scripts and stylesheets to ensure bytes match an expected hash.
+
+## 💡 Examples
+
+### Image with dimensions and lazy load
+
+```html
+<img
+  src="/media/team.jpg"
+  alt="Engineering team at the whiteboard"
+  width="640"
+  height="480"
+  loading="lazy"
+  decoding="async">
+```
+
+### Video sources
+
+```html
+<video controls poster="/media/poster.jpg">
+  <source src="/media/talk.webm" type="video/webm">
+  <source src="/media/talk.mp4" type="video/mp4">
+</video>
+```
+
+### Script module URL
+
+```html
+<script type="module" src="/assets/js/main.js"></script>
+```
+
+### Picture format negotiation
+
+```html
+<picture>
+  <source srcset="/img/hero.avif" type="image/avif">
+  <source srcset="/img/hero.webp" type="image/webp">
+  <img src="/img/hero.jpg" alt="Forest path in fog">
+</picture>
+```
+
+### Blob URL from script
+
+```html
+<script type="module">
+  const blob = new Blob(["print('hi')"], { type: "text/python" });
+  const url = URL.createObjectURL(blob);
+  // revoke when done: URL.revokeObjectURL(url);
+</script>
+```
+
+## ⚠️ Pitfalls
+
+- **Broken relative paths** — Moving pages without fixing assets 404s; prefer root-absolute `/…` for app-wide assets.
+- **`<base>` side effects** — Changes every relative `src` and `href`.
+- **Missing `src` on img** — Invalid; empty images still need intentional handling.
+- **Srcset without sizes** — Browser may assume `100vw` and over-download.
+- **Hotlinking** — Unreliable and often blocked; host or contract CDNs.
+- **Mixed content** — Active mixed content blocked; passive images may warn.
+- **Forgetting revoke** — Blob URLs leak memory until `revokeObjectURL`.
+
+## 🔗 Related
+
+- [Media](media.md) — images, audio, video elements
+- [URL](url.md) — URL anatomy and encoding
+- [Script](script.md) — script loading attributes
+- [Canvas](canvas.md) — CORS-tainted images
+- [Head](head.md) — `<base>` and resource hints
+- [Style](style.md) — CSS `url()` vs HTML `src`

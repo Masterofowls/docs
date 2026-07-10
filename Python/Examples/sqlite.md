@@ -1,0 +1,86 @@
+# SQLite
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+`sqlite3` is a zero-config SQL database in the stdlib. Great for local apps, caches, and prototypes. Use parameterized queries always; never format SQL with f-strings and user input.
+
+## 🔧 Core concepts
+
+| Task | API |
+| --- | --- |
+| Connect | `sqlite3.connect(path)` |
+| Cursor | `conn.execute` / `cursor` |
+| Commit | `conn.commit()` or `with conn:` |
+| Params | `?` placeholders |
+| Rows | `sqlite3.Row` factory |
+| Transactions | Context manager on connection |
+
+`:memory:` creates an in-memory DB. WAL mode helps concurrent readers.
+
+## 💡 Examples
+
+**Create and query:**
+
+```python
+import sqlite3
+from pathlib import Path
+
+db = Path("app.db")
+with sqlite3.connect(db) as conn:
+    conn.row_factory = sqlite3.Row
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        )
+        """
+    )
+    conn.execute("INSERT OR IGNORE INTO users (name) VALUES (?)", ("Ada",))
+    row = conn.execute(
+        "SELECT id, name FROM users WHERE name = ?", ("Ada",)
+    ).fetchone()
+    print(dict(row) if row else None)
+```
+
+**Many inserts:**
+
+```python
+import sqlite3
+
+rows = [("Ada",), ("Bob",), ("Cy",)]
+with sqlite3.connect("app.db") as conn:
+    conn.executemany("INSERT OR IGNORE INTO users (name) VALUES (?)", rows)
+```
+
+**Context and cleanup:**
+
+```python
+import sqlite3
+
+def list_names(path: str) -> list[str]:
+    with sqlite3.connect(path) as conn:
+        cur = conn.execute("SELECT name FROM users ORDER BY name")
+        return [r[0] for r in cur]
+```
+
+## ⚠️ Pitfalls
+
+- SQL injection: never interpolate user strings into SQL.
+- Forgetting `commit` (use `with conn:` which auto-commits if no error).
+- Sharing connections across threads — check `check_same_thread`.
+- `LIKE` wildcards from users need escaping.
+- Schema migrations: plan `ALTER` carefully; SQLite has limits.
+
+## 🔗 Related
+
+- [CSV and Excel](csv_excel.md)
+- [Dataclass pipeline](dataclass_pipeline.md)
+- [CLI tool](cli_tool.md)
+- [../context_managers.md](../context_managers.md)
+- [../exceptions.md](../exceptions.md)
+- [../pathlib.md](../pathlib.md)

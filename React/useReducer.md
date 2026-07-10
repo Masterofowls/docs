@@ -1,0 +1,75 @@
+# useReducer
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useReducer(reducer, initialState)` manages state with a `(state, action) => nextState` function. Prefer when updates are complex, multi-field, or easier to test as pure transitions than scattered `setState` calls.
+
+## 🔧 Core concepts
+
+- **Reducer** — pure; no side effects.
+- **Dispatch** — stable identity; `dispatch(action)`.
+- **Init** — `useReducer(reducer, initArg, init)` for lazy setup.
+- **vs useState** — state for simple values; reducer for structured transitions.
+- **Actions** — discriminated unions in TypeScript.
+
+## 💡 Examples
+
+```tsx
+import { useReducer } from "react";
+
+type State = { count: number; step: number };
+type Action =
+  | { type: "increment" }
+  | { type: "decrement" }
+  | { type: "setStep"; step: number }
+  | { type: "reset" };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "increment":
+      return { ...state, count: state.count + state.step };
+    case "decrement":
+      return { ...state, count: state.count - state.step };
+    case "setStep":
+      return { ...state, step: action.step };
+    case "reset":
+      return { count: 0, step: 1 };
+    default:
+      return state;
+  }
+}
+
+export function Counter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0, step: 1 });
+  return (
+    <div>
+      <p>{state.count}</p>
+      <button type="button" onClick={() => dispatch({ type: "increment" })}>
+        +
+      </button>
+      <button type="button" onClick={() => dispatch({ type: "setStep", step: 5 })}>
+        step 5
+      </button>
+    </div>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Side effects inside reducers (fetch, DOM)—put in effects or event handlers.
+- Mutating `state` instead of returning a new object.
+- Overusing for a single boolean toggle.
+- Forgetting exhaustive `switch` handling in TS.
+
+## 🔗 Related
+
+- [useState.md](./useState.md) — simpler state
+- [hooks.md](./hooks.md) — rules
+- [context.md](./context.md) — dispatch via context
+- [testing.md](./testing.md) — pure reducer tests
+- [performance.md](./performance.md) — update patterns

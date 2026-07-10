@@ -1,0 +1,85 @@
+# Pathlib
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`pathlib.Path` is the modern object-oriented path API. Prefer it over `os.path` string munging. Paths use `/` operator, work cross-platform, and integrate with open/read/write helpers.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `Path("a/b")` | Create path |
+| `p / "c"` | Join |
+| `.name` `.stem` `.suffix` | Parts |
+| `.parent` `.parents` | Ancestors |
+| `.resolve()` | Absolute + symlinks |
+| `.exists()` `.is_file()` | Queries |
+| `.iterdir()` `.glob()` `.rglob()` | Listing |
+| `.read_text()` `.write_text()` | Convenience I/O |
+| `.mkdir()` `.unlink()` `.rename()` | FS ops |
+
+Use `PurePath` when you only need parsing without touching the filesystem.
+
+## 💡 Examples
+
+**Build and inspect:**
+
+```python
+from pathlib import Path
+
+base = Path(__file__).resolve().parent
+data = base / "data" / "input.csv"
+print(data.name, data.suffix, data.parent)
+print(data.with_suffix(".json"))
+```
+
+**Read / write:**
+
+```python
+from pathlib import Path
+
+p = Path("notes.txt")
+p.write_text("hello\n", encoding="utf-8")
+text = p.read_text(encoding="utf-8")
+p.write_bytes(b"\x00\x01")
+```
+
+**Walk and filter:**
+
+```python
+root = Path("src")
+for py in sorted(root.rglob("*.py")):
+    if py.is_file() and "test" not in py.parts:
+        print(py.relative_to(root))
+```
+
+**mkdir / safe delete:**
+
+```python
+out = Path("build/out")
+out.mkdir(parents=True, exist_ok=True)
+tmp = out / "tmp.txt"
+tmp.write_text("x", encoding="utf-8")
+tmp.unlink(missing_ok=True)
+```
+
+## ⚠️ Pitfalls
+
+- Relative paths depend on process cwd — anchor with `Path(__file__).parent`.
+- Always pass `encoding` for text helpers.
+- `Path.glob("**/*")` can be huge; narrow patterns.
+- Mixing `str` paths and `Path` works often, but keep one style in APIs.
+- `resolve(strict=True)` raises if the path does not exist.
+
+## 🔗 Related
+
+- [Files I/O](files_io.md)
+- [Examples: manage files](Examples/manage_files.md)
+- [Context managers](context_managers.md)
+- [Strings](strings.md)
+- [JSON](json.md)
+- [Import / export](import_export.md)

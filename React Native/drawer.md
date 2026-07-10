@@ -1,0 +1,56 @@
+# Drawer
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Drawers are side navigation panels. Use `@react-navigation/drawer` (or a custom `Animated`/`Reanimated` panel). Gesture + back-button behavior should match platform norms.
+
+## 🔧 Core concepts
+
+- **Drawer navigator** — screens as drawer destinations; `drawerContent` for custom UI.
+- **Options** — `drawerPosition`, `swipeEnabled`, `headerShown`.
+- **Nesting** — often wrap a stack inside each drawer screen.
+- **Custom** — modal-like overlay with translateX animation if you don’t need a full navigator.
+
+## 💡 Examples
+
+```tsx
+import { createDrawerNavigator } from "@react-navigation/drawer";
+
+const Drawer = createDrawerNavigator();
+
+export function AppDrawer() {
+  return (
+    <Drawer.Navigator initialRouteName="Home">
+      <Drawer.Screen name="Home" component={HomeScreen} />
+      <Drawer.Screen name="Settings" component={SettingsScreen} />
+    </Drawer.Navigator>
+  );
+}
+```
+
+```tsx
+<Drawer.Navigator
+  screenOptions={{
+    drawerType: "front",
+    swipeEdgeWidth: 40,
+  }}
+  drawerContent={(props) => <CustomDrawer {...props} />}
+/>
+```
+
+## ⚠️ Pitfalls
+
+- Conflicting gestures with tabs/stacks — tune `swipeEnabled` per screen.
+- Forgetting Android back should close an open drawer first.
+- Heavy drawer content re-rendering on every navigation event.
+
+## 🔗 Related
+
+- [gesture.md](./gesture.md) — swipe gestures
+- [backhandler.md](./backhandler.md) — Android back
+- [transition.md](./transition.md) — motion
+- [layout.md](./layout.md) — screen layout

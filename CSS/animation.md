@@ -1,0 +1,125 @@
+# Animation
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS animations change property values over time using `@keyframes` and the `animation` longhands. Use them for attention, state feedback, and ambient motion—not for continuous layout thrashing. Prefer transitions for simple A→B state changes; use keyframe animations when you need multi-step timelines, loops, or delayed sequences.
+
+Always respect `prefers-reduced-motion` and keep animated properties on the compositor (`transform`, `opacity`) when possible.
+
+## 🔧 Core concepts
+
+### Animation properties
+
+| Property | Purpose |
+| --- | --- |
+| `animation-name` | Keyframes identifier |
+| `animation-duration` | Length of one cycle |
+| `animation-timing-function` | Easing (`ease`, `cubic-bezier()`, `steps()`) |
+| `animation-delay` | Start offset |
+| `animation-iteration-count` | `1`, `n`, or `infinite` |
+| `animation-direction` | `normal` \| `reverse` \| `alternate` \| `alternate-reverse` |
+| `animation-fill-mode` | `none` \| `forwards` \| `backwards` \| `both` |
+| `animation-play-state` | `running` \| `paused` |
+| `animation-composition` | How multiple animations combine (`replace` \| `add` \| `accumulate`) |
+
+Shorthand: `animation: name duration timing-function delay iteration-count direction fill-mode play-state`.
+
+### Keyframes
+
+```css
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+Percent stops (`0%`, `50%`, `100%`) allow multi-step sequences. Omitted properties interpolate when possible.
+
+### Performance notes
+
+| Prefer | Avoid animating |
+| --- | --- |
+| `transform`, `opacity` | `top` / `left` / `width` / `height` |
+| `translate` / `scale` / `rotate` | Frequent `box-shadow` / `filter` on large layers |
+| `will-change` sparingly | Permanent `will-change` on many nodes |
+
+## 💡 Examples
+
+### Entrance animation
+
+```css
+.toast {
+  animation: fade-up 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(0.75rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+```
+
+### Infinite loader
+
+```css
+.spinner {
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 0.2rem solid color-mix(in oklab, CanvasText 20%, transparent);
+  border-block-start-color: CanvasText;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+```
+
+### Staggered list with delays
+
+```css
+.item {
+  animation: fade-up 400ms ease both;
+}
+
+.item:nth-child(1) { animation-delay: 0ms; }
+.item:nth-child(2) { animation-delay: 60ms; }
+.item:nth-child(3) { animation-delay: 120ms; }
+```
+
+### Reduced motion fallback
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .spinner,
+  .item {
+    animation: none;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Animating layout properties every frame causes reflow and jank; use transforms instead.
+- Forgetting `animation-fill-mode: forwards` (or `both`) so the end state snaps back after the animation ends.
+- Running `infinite` animations on off-screen content without pausing (`animation-play-state` or removing the class).
+- Ignoring `prefers-reduced-motion`, which can make interfaces unusable for vestibular disorders.
+- Overusing `will-change`, which can increase memory use and create unexpected stacking contexts.
+
+## 🔗 Related
+
+- [Transforms](transform.md)
+- [Hover](hover.md)
+- [Effects](effects.md)
+- [Scale](scale.md)

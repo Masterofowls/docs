@@ -1,0 +1,78 @@
+# F-strings
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Formatted string literals (`f"..."` / `f'...'`) embed expressions inside `{}`. They are the preferred way to build strings in modern Python (3.6+). Use them for logging messages, paths, and readable interpolation—avoid for SQL/HTML without escaping.
+
+## 🔧 Core concepts
+
+| Feature | Syntax |
+| --- | --- |
+| Basic | `f"Hello, {name}"` |
+| Expression | `f"{x + 1}"`, `f"{obj.attr}"` |
+| Format spec | `f"{value:.2f}"`, `f"{n:04d}"` |
+| Debug (3.8+) | `f"{x=}"` → `x=42` |
+| Conversion | `!s` str, `!r` repr, `!a` ascii |
+| Nested quotes | Prefer different quote styles or escapes |
+| Multiline | `f"""..."""` |
+
+Format mini-language: alignment (`<^>`), width, precision, types (`d`, `f`, `x`, `%`).
+
+## 💡 Examples
+
+**Formatting numbers and dates:**
+
+```python
+from datetime import datetime
+
+price = 19.5
+n = 42
+now = datetime(2026, 7, 10, 13, 30)
+
+print(f"${price:.2f}")       # $19.50
+print(f"{n:04d}")            # 0042
+print(f"{now:%Y-%m-%d %H:%M}")
+```
+
+**Debug and repr:**
+
+```python
+user = "Ada"
+print(f"{user=}")            # user='Ada'
+print(f"{user!r}")           # 'Ada'
+```
+
+**Alignment and tables:**
+
+```python
+rows = [("id", "name"), (1, "Ada"), (2, "Bob")]
+for a, b in rows:
+    print(f"{a!s:>4} | {b:<10}")
+```
+
+**Walrus in f-string (careful):**
+
+```python
+data = [1, 2, 3]
+print(f"{(n := len(data))} items")  # 3 items
+```
+
+## ⚠️ Pitfalls
+
+- Backslashes inside `{}` expressions are limited; compute outside the braces if needed.
+- Nested f-strings and complex expressions hurt readability—extract variables.
+- Never build SQL/shell commands with raw f-strings; use parameterized APIs.
+- Mixing `str.format` / `%` / f-strings inconsistently makes style noisy.
+- Lazy logging: prefer `logger.info("x=%s", x)` over `f"..."` if the message may be skipped (minor; clarity often wins).
+
+## 🔗 Related
+
+- [Strings](strings.md)
+- [Types](types.md)
+- [Docstrings](docstrings.md)
+- [Dictionaries](dictionaries.md)
+- [Loops](loops.md)

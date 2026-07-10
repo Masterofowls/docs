@@ -1,0 +1,90 @@
+# Transactions / ORM
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Wrap multi-step writes in transactions so they commit or roll back together. Use `transaction.atomic()` (decorator or context manager). Understand autocommit (default), savepoints, `on_commit` hooks, and isolation when concurrent updates matter.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `atomic()` | Transaction / savepoint |
+| `on_commit(func)` | Run after successful commit |
+| `set_rollback(True)` | Mark atomic block to roll back |
+| Autocommit | Each query commits unless atomic |
+| `select_for_update()` | Row locks inside atomic |
+| `Robust` | Nested atomics create savepoints |
+
+DB-specific: PostgreSQL supports durable transactions and richer locking.
+
+## 💡 Examples
+
+**Atomic block:**
+
+```python
+from django.db import transaction
+
+
+@transaction.atomic
+def transfer(from_acct, to_acct, amount):
+    from_acct.balance -= amount
+    from_acct.save(update_fields=["balance"])
+    to_acct.balance += amount
+    to_acct.save(update_fields=["balance"])
+```
+
+**on_commit (side effects):**
+
+```python
+def create_order(data):
+    with transaction.atomic():
+        order = Order.objects.create(**data)
+        transaction.on_commit(lambda: send_order_email(order.pk))
+        return order
+```
+
+**Locking:**
+
+```python
+with transaction.atomic():
+    item = (
+        Product.objects.select_for_update()
+        .get(pk=pk)
+    )
+    if item.stock < 1:
+        raise InsufficientStock()
+    item.stock -= 1
+    item.save(update_fields=["stock"])
+```
+
+**Catch integrity errors:**
+
+```python
+from django.db import IntegrityError
+
+try:
+    with transaction.atomic():
+        Tag.objects.create(slug=slug)
+except IntegrityError:
+    ...
+```
+
+## ⚠️ Pitfalls
+
+- Long atomic blocks holding locks—keep them short.
+- Catching exceptions inside `atomic` without re-raising can leave the transaction broken until exit.
+- Side effects (email, HTTP) inside atomic that run even if later rollback—use `on_commit`.
+- `select_for_update` outside `atomic` is an error on some backends.
+- Assuming read-after-write visibility across connections without commit.
+
+## 🔗 Related
+
+- [Models](models.md)
+- [QuerySet](queryset.md)
+- [Signals](signals.md)
+- [Managers](managers.md)
+- [Testing](testing.md)

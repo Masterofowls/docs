@@ -1,0 +1,89 @@
+# History API
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The History API lets SPAs update the URL and session history without full reloads: `pushState`, `replaceState`, and the `popstate` event. Pair with the Navigation API / URL patterns for modern routing. Same-origin only for state URLs.
+
+## 🔧 Core concepts
+
+- **`history.pushState(state, unused, url?)`**: add entry; no reload.
+- **`history.replaceState(...)`**: replace current entry.
+- **`history.state`**: current state object (structured-cloneable).
+- **`history.back()` / `forward()` / `go(n)`**: traverse.
+- **`popstate`**: fires on back/forward (not on `pushState` itself).
+- **`hashchange`**: hash-only changes (older routing style).
+- **Title arg**: ignored in modern browsers — update `document.title` yourself.
+
+```js
+history.pushState({ page: 2 }, "", "/page/2");
+window.addEventListener("popstate", (e) => {
+  render(e.state);
+});
+```
+
+## 💡 Examples
+
+```js
+// Navigate in SPA
+function navigate(path, state = {}) {
+  history.pushState(state, "", path);
+  renderRoute(path, state);
+}
+
+function replace(path, state = {}) {
+  history.replaceState(state, "", path);
+  renderRoute(path, state);
+}
+
+window.addEventListener("popstate", (e) => {
+  renderRoute(location.pathname, e.state);
+});
+
+// Initial hydrate
+renderRoute(location.pathname, history.state);
+
+// Query updates without stacking junk
+const url = new URL(location.href);
+url.searchParams.set("q", query);
+history.replaceState(history.state, "", url);
+
+// Scroll restoration
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
+// Guard external links vs internal
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]");
+  if (!a || a.origin !== location.origin || a.target === "_blank") return;
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  navigate(a.pathname + a.search + a.hash);
+});
+```
+
+```js
+// State must be cloneable
+history.pushState({ id: 1, when: new Date() }, "", "/item/1");
+// history.pushState({ fn: () => {} }, "", "/x"); // DataCloneError
+```
+
+## ⚠️ Pitfalls
+
+- `pushState` does not fire `popstate` — you must render yourself after push.
+- State is structured-cloned — no functions, DOM nodes, or symbols.
+- Relative URLs resolve against current URL — easy to create wrong paths.
+- Back button through many `pushState` entries can feel sticky — use `replaceState` for filters.
+- Cross-origin URLs throw — stay same-origin.
+
+## 🔗 Related
+
+- [url.md](./url.md) — URL / URLSearchParams
+- [structured_clone.md](./structured_clone.md) — state cloning
+- [DOM/navigation.md](./DOM/navigation.md) — location / navigation
+- [DOM/events.md](./DOM/events.md) — popstate
+- [encode.md](./encode.md) — encoding query parts

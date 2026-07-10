@@ -1,0 +1,105 @@
+# Settings
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`settings.py` (or split modules) configures Django: apps, middleware, database, templates, static/media, auth, and third-party packages. Keep secrets out of source control—use environment variables. Django 4.2+/5.x: prefer `pathlib`, `django-environ`/`python-dotenv`, and explicit `DEFAULT_AUTO_FIELD`.
+
+## 🔧 Core concepts
+
+| Setting | Purpose |
+| --- | --- |
+| `INSTALLED_APPS` | Enabled applications |
+| `MIDDLEWARE` | Request/response pipeline |
+| `DATABASES` | DB connections |
+| `TEMPLATES` | Template engines |
+| `AUTH_USER_MODEL` | Custom user |
+| `STATIC_*` / `MEDIA_*` | Assets & uploads |
+| `ALLOWED_HOSTS` / `DEBUG` | Deployment safety |
+| `CACHES` / `EMAIL_*` | Infra integrations |
+
+Access via `from django.conf import settings`—never import settings module circularly from apps at import time if avoidable.
+
+## 💡 Examples
+
+**Core project settings:**
+
+```python
+from pathlib import Path
+import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "blog",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "app"),
+        "USER": os.environ.get("POSTGRES_USER", "app"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+        "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+    }
+}
+
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+```
+
+**Production hardening flags:**
+
+```python
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+```
+
+## ⚠️ Pitfalls
+
+- `DEBUG=True` in production leaks stack traces and secrets in error pages.
+- Empty `ALLOWED_HOSTS` with `DEBUG=False` refuses all hosts.
+- Committing `SECRET_KEY`—rotate if exposed.
+- Changing `AUTH_USER_MODEL` late requires complex migrations.
+
+## 🔗 Related
+
+- [URLs](urls.md)
+- [Authentication](authentication.md)
+- [django-allauth](django_allauth.md)
+- [REST framework](rest_framework.md)
+- [Admin](admin.md)
+- [Models](models.md)

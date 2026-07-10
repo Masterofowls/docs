@@ -1,0 +1,102 @@
+# Context Managers
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Context managers guarantee setup/teardown via `with`. They close files, release locks, and restore state even when exceptions occur. Implement with `__enter__`/`__exit__` or `@contextlib.contextmanager`.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `with cm as x:` | Enter, bind result, exit on leave |
+| Multiple | `with a, b:` |
+| Parenthesized | Multi-line `with` (3.10+) |
+| `__enter__` | Setup; return bound value |
+| `__exit__` | Cleanup; return truthy to suppress exc |
+| `contextlib.contextmanager` | Generator-based CM |
+| `ExitStack` | Dynamic stack of contexts |
+| `AsyncExitStack` / `async with` | Async variants |
+
+`__exit__(exc_type, exc, tb)` — return `True` to suppress the exception (rare).
+
+## 💡 Examples
+
+**Built-in file and lock:**
+
+```python
+from pathlib import Path
+from threading import Lock
+
+lock = Lock()
+path = Path("out.txt")
+
+with lock, path.open("w", encoding="utf-8") as f:
+    f.write("hello\n")
+```
+
+**Generator context manager:**
+
+```python
+from contextlib import contextmanager
+from collections.abc import Iterator
+
+@contextmanager
+def temp_attr(obj: object, name: str, value: object) -> Iterator[None]:
+    old = getattr(obj, name)
+    setattr(obj, name, value)
+    try:
+        yield
+    finally:
+        setattr(obj, name, old)
+
+class C:
+    mode = "prod"
+
+with temp_attr(C, "mode", "test"):
+    assert C.mode == "test"
+```
+
+**Class-based:**
+
+```python
+class suppress_os:
+    def __enter__(self) -> "suppress_os":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        return exc_type is not None and issubclass(exc_type, OSError)
+```
+
+**ExitStack:**
+
+```python
+from contextlib import ExitStack
+from pathlib import Path
+
+paths = [Path("a.txt"), Path("b.txt")]
+with ExitStack() as stack:
+    files = [stack.enter_context(p.open("w", encoding="utf-8")) for p in paths]
+    for f in files:
+        f.write("x\n")
+```
+
+## ⚠️ Pitfalls
+
+- Returning `True` from `__exit__` swallows exceptions — usually wrong.
+- Yielding inside `@contextmanager` after errors needs careful `try/finally`.
+- Nested `with` order: enter left-to-right, exit right-to-left.
+- Don't open resources without `with` unless you manage close yourself.
+- Async code needs `async with` and async context managers.
+
+## 🔗 Related
+
+- [Exceptions](exceptions.md)
+- [Files I/O](files_io.md)
+- [Pathlib](pathlib.md)
+- [Magic methods](magic_methods.md)
+- [Concurrency](concurrency.md)
+- [Async / await](async.md)

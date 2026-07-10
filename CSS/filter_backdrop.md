@@ -1,0 +1,89 @@
+# Filter & Backdrop Filter
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`filter` applies graphical effects (blur, brightness, drop-shadow…) to an element’s rendering — including descendants. `backdrop-filter` filters what is **behind** the element (frosted glass). Both can be expensive; use sparingly.
+
+## 🔧 Core concepts
+
+| Function | Role |
+| --- | --- |
+| `blur(r)` | Gaussian blur |
+| `brightness()` `contrast()` `saturate()` | tonal |
+| `grayscale()` `sepia()` `hue-rotate()` | color |
+| `opacity()` | similar to `opacity` prop |
+| `drop-shadow()` | shadow following alpha (vs `box-shadow`) |
+| `url(#svgFilter)` | SVG filter reference |
+
+- **Chain**: `filter: blur(4px) brightness(1.1);`
+- **Backdrop**: needs (semi)transparent background to see effect.
+- **Containing block / stacking**: filters create containing blocks / stacking contexts.
+
+```css
+.avatar {
+  filter: grayscale(1);
+}
+.avatar:hover {
+  filter: none;
+}
+.glass {
+  background: rgb(255 255 255 / 0.5);
+  backdrop-filter: blur(12px) saturate(1.2);
+}
+```
+
+## 💡 Examples
+
+```css
+/* Image treatment */
+.hero img {
+  filter: brightness(0.7) contrast(1.05);
+}
+
+/* Icon recolor trick (simple) */
+.icon {
+  filter: invert(1);
+}
+
+/* Drop shadow on transparent PNG */
+.logo {
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.35));
+}
+
+/* Modal frosted overlay content */
+.dialog {
+  background: oklch(100% 0 0 / 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Performance: prefer transform/opacity for motion; filter for static looks */
+```
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .blur-on-scroll {
+    filter: none;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- `filter` on a parent blurs/repaints all descendants — isolate effects on leaf images when possible.
+- `backdrop-filter` fails if no backdrop shows through (opaque bg) or browser lacks support — provide solid fallback bg.
+- Creates a stacking context — can change `z-index` expectations.
+- Animating heavy blurs is costly on low-end devices.
+- `drop-shadow` ≠ `box-shadow` (follows alpha silhouette).
+
+## 🔗 Related
+
+- [effects.md](./effects.md) — shadows and visuals
+- [transitions.md](./transitions.md) — animating filters
+- [background.md](./background.md) — translucent backgrounds
+- [z_index.md](./z_index.md) — stacking contexts
+- [performance via blur](./effects.md) — cost awareness

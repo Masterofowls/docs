@@ -1,0 +1,129 @@
+# Media
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+HTML media elements embed images, audio, video, and responsive picture sources. Core tags: `<img>`, `<picture>`, `<audio>`, `<video>`, `<source>`, `<track>`, and older embeds (`<iframe>`, `<object>`). Prefer native elements for playback controls, captions, and performance hints (`loading`, `decoding`, `preload`).
+
+Accessible media needs **text alternatives** (alt text, transcripts, captions) and must not autoplay with sound. Decorative images use empty `alt=""`.
+
+## 🔧 Core concepts
+
+### Images (`<img>`)
+
+Required: `src` (or `srcset` with sizes) and `alt`.
+
+| Attribute | Role |
+|-----------|------|
+| `alt` | Short equivalent; `alt=""` if decorative |
+| `width` / `height` | Reduce CLS; match aspect ratio |
+| `loading="lazy"` | Defer offscreen images |
+| `decoding="async"` | Decode without blocking |
+| `srcset` / `sizes` | Responsive resolution candidates |
+| `fetchpriority` | `high` for LCP image when appropriate |
+
+### Picture and art direction
+
+```html
+<picture>
+  <source type="image/avif" srcset="hero.avif">
+  <source type="image/webp" srcset="hero.webp">
+  <img src="hero.jpg" alt="Mountain lake at sunrise" width="1200" height="600">
+</picture>
+```
+
+Use media queries on `<source media="…">` when cropping changes by viewport—not only for format fallbacks.
+
+### Video and audio
+
+```html
+<video controls playsinline poster="poster.jpg" width="640" height="360">
+  <source src="talk.webm" type="video/webm">
+  <source src="talk.mp4" type="video/mp4">
+  <track kind="captions" srclang="en" src="talk.vtt" label="English" default>
+  Download the <a href="talk.mp4">MP4</a>.
+</video>
+```
+
+- `controls` — native UI (prefer over custom-only players without a11y).
+- `autoplay` — often blocked; if used, mute with `muted` and keep motion brief.
+- `loop`, `preload` (`none` | `metadata` | `auto`).
+- `<track>` — captions (`captions`), subtitles, descriptions, chapters.
+
+### Iframes
+
+Third-party embeds need `title`, restrictive `sandbox` when possible, and thoughtful `loading="lazy"`. Prefer privacy-enhanced embed URLs.
+
+## 💡 Examples
+
+### Responsive image with srcset
+
+```html
+<img
+  src="photo-800.jpg"
+  srcset="photo-400.jpg 400w, photo-800.jpg 800w, photo-1200.jpg 1200w"
+  sizes="(max-width: 600px) 100vw, 600px"
+  alt="Red ceramic mug on a wooden table"
+  width="800"
+  height="600"
+  loading="lazy"
+  decoding="async">
+```
+
+### Audio with transcript
+
+```html
+<figure>
+  <figcaption id="ep-title">Episode 12: Semantic HTML</figcaption>
+  <audio controls preload="metadata" aria-labelledby="ep-title">
+    <source src="ep12.mp3" type="audio/mpeg">
+  </audio>
+  <details>
+    <summary>Transcript</summary>
+    <p>Welcome to episode twelve…</p>
+  </details>
+</figure>
+```
+
+### Art-directed picture
+
+```html
+<picture>
+  <source media="(max-width: 600px)" srcset="hero-mobile.jpg">
+  <source media="(min-width: 601px)" srcset="hero-desktop.jpg">
+  <img src="hero-desktop.jpg" alt="Team collaborating in a bright studio">
+</picture>
+```
+
+### Accessible iframe embed
+
+```html
+<iframe
+  title="Map: office location"
+  src="https://maps.example.com/embed?q=office"
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  allowfullscreen></iframe>
+```
+
+## ⚠️ Pitfalls
+
+- **Missing alt** — Critical a11y/SEO failure; decorative needs `alt=""`, not omitted.
+- **Filename as alt** — `alt="IMG_4022.jpg"` helps no one.
+- **Autoplay + sound** — Hostile UX; often blocked; violates preferences.
+- **Captions missing** — Video without captions excludes Deaf/hard-of-hearing users.
+- **Huge unoptimized assets** — Compress, modern formats, correct dimensions.
+- **CSS background for content images** — Cannot carry alt text; use `<img>` for meaningful photos.
+- **Aspect ratio CLS** — Always set width/height or CSS `aspect-ratio`.
+
+## 🔗 Related
+
+- [Src](src.md) — `src`, `srcset`, and URL resolution
+- [URL](url.md) — absolute vs relative media URLs
+- [Canvas](canvas.md) — drawing frames from video/images
+- [Figure patterns](section.md) — grouping media with captions
+- [Script](script.md) — custom players and Media element API
+- [Style](style.md) — object-fit and responsive CSS

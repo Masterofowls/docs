@@ -1,0 +1,106 @@
+# Functions
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Functions are first-class values: declare them, pass them, return them, and store them. Prefer `function` declarations for hoisted named APIs, arrow functions for short callbacks, and methods for object behavior. Modern JS also supports default parameters, rest parameters, and concise bodies.
+
+## 🔧 Core concepts
+
+- **Declaration**: `function name() {}` — hoisted (name available in whole scope).
+- **Expression**: `const f = function() {}` / `const f = () => {}` — not hoisted as a binding.
+- **Arrow**: lexical `this`, no `arguments`, no `new`, no `prototype`.
+- **Defaults**: `function f(a = 1, b = a + 1) {}` — evaluated left-to-right when omitted/`undefined`.
+- **Rest**: `function f(...args) {}` — gathers remaining args into an array.
+- **Return**: explicit `return`; arrow concise body returns the expression.
+- **IIFE**: `(function () { /* private scope */ })();`
+
+```js
+function add(a, b = 0) {
+  return a + b;
+}
+const double = (n) => n * 2;
+```
+
+## 💡 Examples
+
+```js
+// Named declaration
+function greet(name = "world") {
+  return `Hello, ${name}`;
+}
+
+// Rest + defaults
+function sum(first = 0, ...rest) {
+  return rest.reduce((a, b) => a + b, first);
+}
+sum(1, 2, 3); // 6
+
+// Higher-order
+function once(fn) {
+  let called = false;
+  let result;
+  return function (...args) {
+    if (!called) {
+      called = true;
+      result = fn.apply(this, args);
+    }
+    return result;
+  };
+}
+
+// Method shorthand
+const api = {
+  base: "/v1",
+  get(path) {
+    return fetch(this.base + path);
+  },
+};
+
+// Arrow keeps outer this
+class Timer {
+  constructor() {
+    this.ticks = 0;
+  }
+  start() {
+    setInterval(() => {
+      this.ticks += 1;
+    }, 1000);
+  }
+}
+
+// arguments vs rest
+function legacy() {
+  return Array.from(arguments);
+}
+const modern = (...args) => args;
+```
+
+```js
+// Early return / guard clauses
+function parseId(raw) {
+  if (raw == null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Arrow functions are not constructors — `new (() => {})` throws.
+- Arrow `this` is lexical; do not use for object methods that need dynamic `this`.
+- Default params only trigger on `undefined`, not `null`.
+- Excess arguments are ignored unless you use rest/`arguments`.
+- Function declarations inside blocks have historically inconsistent hoisting — prefer `const` expressions in blocks.
+
+## 🔗 Related
+
+- [closures.md](./closures.md) — lexical capture
+- [this_keyword.md](./this_keyword.md) — call-site `this`
+- [destructuring.md](./destructuring.md) — param patterns
+- [spread_rest.md](./spread_rest.md) — rest args
+- [arrow / async](./async.md) — async functions
+- [oop.md](./oop.md) — methods & classes

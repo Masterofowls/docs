@@ -1,0 +1,89 @@
+# Collections Module
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`collections` provides specialized container types beyond built-in `list`/`dict`/`set`. Reach for them when counting, defaulting, dequeuing, or naming tuples.
+
+## 🔧 Core concepts
+
+| Type | Use |
+| --- | --- |
+| `Counter` | Multiset / tallies |
+| `defaultdict` | Dict with factory for missing keys |
+| `deque` | Fast append/pop both ends |
+| `namedtuple` | Lightweight immutable records |
+| `OrderedDict` | Rarely needed (dict keeps order) |
+| `ChainMap` | Layered mappings |
+| `UserDict` / `UserList` | Wrap for subclassing |
+
+Also see `collections.abc` for abstract interfaces (`Iterable`, `Mapping`, …).
+
+## 💡 Examples
+
+**Counter:**
+
+```python
+from collections import Counter
+
+counts = Counter("abracadabra")
+print(counts.most_common(3))
+print(counts["a"])
+counts.update("aaa")
+```
+
+**defaultdict:**
+
+```python
+from collections import defaultdict
+
+groups: defaultdict[str, list[int]] = defaultdict(list)
+for n in [1, 2, 3, 4]:
+    groups["even" if n % 2 == 0 else "odd"].append(n)
+```
+
+**deque as queue:**
+
+```python
+from collections import deque
+
+q: deque[str] = deque(maxlen=3)
+q.append("a")
+q.append("b")
+q.appendleft("z")
+print(q.popleft())
+```
+
+**namedtuple / ChainMap:**
+
+```python
+from collections import ChainMap, namedtuple
+
+Point = namedtuple("Point", ["x", "y"])
+p = Point(1, 2)
+
+defaults = {"color": "blue", "size": 10}
+overrides = {"size": 12}
+cfg = ChainMap(overrides, defaults)
+print(cfg["color"], cfg["size"])
+```
+
+## ⚠️ Pitfalls
+
+- `defaultdict` creates entries on `__getitem__` — use `.get` if you must not insert.
+- `Counter` missing keys return `0`, not `KeyError`.
+- `namedtuple` is immutable; for mutability use dataclass.
+- `OrderedDict` equality historically cared about order — prefer plain `dict`.
+- `deque` is not sliceable like a list.
+
+## 🔗 Related
+
+- [Dictionaries](dictionaries.md)
+- [Lists](lists.md)
+- [Dataclasses](dataclasses.md)
+- [Itertools](itertools.md)
+- [ABC / protocols](abc_protocols.md)
+- [Examples: list to dict](Examples/list_to_dict.md)

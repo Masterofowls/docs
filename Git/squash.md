@@ -1,0 +1,56 @@
+# squash
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Squashing combines multiple commits into one (or fewer) for a cleaner history before merge. Common via interactive rebase, `merge --squash`, or soft reset. Prefer squashing on feature branches, not on shared long-lived branches.
+
+## 🔧 Core concepts
+
+- **Interactive rebase** — `pick` + `squash`/`fixup` in `git rebase -i`.
+- **Merge squash** — `git merge --squash feature` stages combined diff; you commit once.
+- **Soft reset** — `git reset --soft main` then one new commit.
+- **fixup** — like squash but discards the squashed commit’s message by default.
+- **Autosquash** — `commit --fixup` + `rebase -i --autosquash`.
+
+## 💡 Examples
+
+```bash
+# Interactive: last 5 commits
+git rebase -i HEAD~5
+# change pick → squash/fixup on commits to fold
+
+# Soft reset onto main
+git checkout feature
+git reset --soft main
+git commit -m "feat: add billing portal"
+
+# Squash merge (keeps feature branch commits locally)
+git checkout main
+git merge --squash feature
+git commit -m "feat: add billing portal"
+
+# Fixup workflow
+git commit --fixup abcdef1
+git rebase -i --autosquash abcdef1^
+```
+
+## ⚠️ Pitfalls
+
+- Squashing rewritten commits that were pushed needs force-with-lease.
+- Losing detailed commit messages — keep a good final message / notes.
+- Squash-merge on GitHub makes the PR branch diverge — delete/rebuild branches.
+- Don’t squash commits that are merge bases for other work still in flight.
+- Conflicts during rebase squash still need resolution per step.
+
+## 🔗 Related
+
+- [rebase.md](./rebase.md)
+- [merge.md](./merge.md)
+- [amend.md](./amend.md)
+- [reset.md](./reset.md)
+- [commit.md](./commit.md)
+- [log.md](./log.md)

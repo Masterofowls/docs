@@ -1,0 +1,77 @@
+# Union Types
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+A union type (`A | B`) means a value may be one of several types. Narrow with control flow, discriminants, or type guards before using members unique to one branch.
+
+## 🧩 Core concepts
+
+- **Union (`|`)** — value is one of the constituents.
+- **Intersection (`&`)** — value must satisfy all constituents (often used with object shapes).
+- **Discriminated unions** — shared literal field (e.g. `kind`) enables exhaustive narrowing.
+- **Union of objects** — only common properties are accessible without narrowing.
+- **`never` in switches** — use for exhaustiveness checks when all cases handled.
+
+## 💡 Examples
+
+```ts
+type Id = string | number;
+
+function printId(id: Id) {
+  if (typeof id === "string") {
+    console.log(id.toUpperCase());
+  } else {
+    console.log(id.toFixed(0));
+  }
+}
+
+// Discriminated union
+type Success = { ok: true; data: string };
+type Failure = { ok: false; error: string };
+type Result = Success | Failure;
+
+function handle(r: Result) {
+  if (r.ok) {
+    console.log(r.data);
+  } else {
+    console.error(r.error);
+  }
+}
+
+// Exhaustiveness
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; size: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":
+      return Math.PI * s.radius ** 2;
+    case "square":
+      return s.size ** 2;
+    default: {
+      const _exhaustive: never = s;
+      return _exhaustive;
+    }
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Accessing a property that exists on only one union member is an error until narrowed.
+- `string | null` still needs null checks under `strictNullChecks`.
+- Over-wide unions (`string | number | boolean | object`) defeat the purpose — prefer discriminants.
+- Union of function types is contravariant in parameters under strict function checking.
+
+## 🔗 Related
+
+- [Types](./types.md)
+- [Literal types](./literal_types.md)
+- [Type guards](./type_guards.md)
+- [Conditional types](./conditional_types.md)
+- [Primitive types](./primitive_types.md)

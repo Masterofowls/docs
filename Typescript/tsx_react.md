@@ -1,0 +1,88 @@
+# TypeScript with React (TSX)
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+TSX adds type-safe props, events, and refs to React. Use `React.FC` sparingly; prefer explicit `props: Props` and `ReactElement` / JSX return types. Target React 18+ types (`@types/react`) with TS 5.x.
+
+## 🔧 Core concepts
+
+- **Props** — `type Props = { … }`; children via `React.ReactNode`.
+- **Events** — `React.ChangeEvent<HTMLInputElement>`, `MouseEvent<HTMLButtonElement>`.
+- **Refs** — `useRef<HTMLDivElement>(null)`; callback refs typed similarly.
+- **Hooks** — generic `useState<T>`, `useReducer`, `useRef`.
+- **Components** — function components; `ComponentType<P>`, `ElementType`.
+- **Assertions** — use `as` in TSX (angle brackets conflict with JSX).
+
+## 💡 Examples
+
+```tsx
+import { useRef, useState, type ReactNode, type FormEvent } from "react";
+
+type ButtonProps = {
+  label: string;
+  onPress: () => void;
+  children?: ReactNode;
+  disabled?: boolean;
+};
+
+export function Button({ label, onPress, children, disabled }: ButtonProps) {
+  return (
+    <button type="button" disabled={disabled} onClick={onPress}>
+      {label}
+      {children}
+    </button>
+  );
+}
+
+export function NameForm() {
+  const [name, setName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log(name, inputRef.current?.value);
+  }
+
+  return (
+    <form onSubmit={onSubmit}>
+      <input
+        ref={inputRef}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <button type="submit">Save</button>
+    </form>
+  );
+}
+
+type Item = { id: string; title: string };
+function List({ items }: { items: Item[] }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- `React.FC` implicitly adds `children` in older typings and weakens generics — prefer plain functions.
+- Event handler types differ (`ChangeEvent` vs native `Event`).
+- Don’t assert props with `as` to silence missing fields — fix the type.
+- `useRef(null)` needs a generic or starts as `null` union forever.
+- Library components may need `ComponentProps<typeof X>` for wrapper props.
+
+## 🔗 Related
+
+- [type_assertions.md](./type_assertions.md)
+- [generic_types.md](./generic_types.md)
+- [zod_integration.md](./zod_integration.md)
+- [this_types.md](./this_types.md)
+- [interfaces.md](./interfaces.md)

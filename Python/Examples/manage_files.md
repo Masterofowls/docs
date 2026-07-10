@@ -1,0 +1,98 @@
+# Manage files
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Create, read, write, copy, move, and delete files with `pathlib` and `shutil`. Prefer context managers (`with`) so handles close reliably. Use absolute paths in scripts; resolve relative to a known base directory.
+
+## 🔧 Core concepts
+
+| Task | API |
+| --- | --- |
+| Paths | `pathlib.Path` |
+| Read/write text | `Path.read_text` / `write_text` |
+| Read/write bytes | `read_bytes` / `write_bytes` |
+| List | `iterdir`, `glob`, `rglob` |
+| Copy / move | `shutil.copy2`, `shutil.move` |
+| Delete | `Path.unlink`, `shutil.rmtree` |
+| Temp | `tempfile.TemporaryDirectory` |
+
+Always pass `encoding="utf-8"` for text unless you know otherwise.
+
+## 💡 Examples
+
+**Read, write, append:**
+
+```python
+from pathlib import Path
+
+base = Path("data")
+base.mkdir(parents=True, exist_ok=True)
+
+path = base / "notes.txt"
+path.write_text("hello\n", encoding="utf-8")
+path.write_text(path.read_text(encoding="utf-8") + "world\n", encoding="utf-8")
+print(path.read_text(encoding="utf-8"))
+```
+
+**List and filter:**
+
+```python
+from pathlib import Path
+
+root = Path("data")
+for p in sorted(root.rglob("*.txt")):
+    if p.is_file():
+        print(p, p.stat().st_size)
+```
+
+**Copy, move, delete safely:**
+
+```python
+import shutil
+from pathlib import Path
+
+src = Path("data/notes.txt")
+backup = Path("data/backup")
+backup.mkdir(parents=True, exist_ok=True)
+
+shutil.copy2(src, backup / src.name)
+shutil.move(str(backup / src.name), backup / "notes.bak")
+
+target = backup / "notes.bak"
+if target.exists():
+    target.unlink()
+```
+
+**Atomic-ish write (write temp then replace):**
+
+```python
+from pathlib import Path
+
+def atomic_write(path: Path, text: str) -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+if __name__ == "__main__":
+    atomic_write(Path("data/config.json"), '{"ok": true}\n')
+```
+
+## ⚠️ Pitfalls
+
+- `open` without `with` leaks handles on exceptions.
+- `Path.unlink()` raises if missing—use `missing_ok=True` (3.8+).
+- `shutil.rmtree` is destructive; confirm paths before deleting.
+- Relative paths depend on the process cwd—not the script location (`Path(__file__).resolve().parent`).
+
+## 🔗 Related
+
+- [Convert files](convert_files.md)
+- [Encrypt](encrypt.md)
+- [Server](server.md)
+- [../import_export.md](../import_export.md)
+- [../strings.md](../strings.md)
+- [../f-string.md](../f-string.md)

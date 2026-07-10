@@ -1,0 +1,78 @@
+# Security
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django provides CSRF protection, XSS escaping, clickjacking headers, host validation, and SSL redirects. Harden production settings (`DEBUG=False`, secure cookies, HSTS). Treat user input and uploads as hostile; keep secrets out of code and VCS.
+
+## 🔧 Core concepts
+
+| Control | Mechanism |
+| --- | --- |
+| CSRF | Token + `CsrfViewMiddleware` |
+| XSS | Template auto-escape |
+| Clickjacking | `XFrameOptionsMiddleware` |
+| Host header | `ALLOWED_HOSTS` |
+| HTTPS | `SECURE_SSL_REDIRECT`, HSTS |
+| Cookies | `SECURE` / `HTTPONLY` / `SAMESITE` |
+| SQL | ORM parameterization |
+| Passwords | Hashers (`PBKDF2`, Argon2) |
+
+`django.middleware.security.SecurityMiddleware` applies many header redirects.
+
+## 💡 Examples
+
+**Production settings checklist:**
+
+```python
+DEBUG = False
+ALLOWED_HOSTS = ["www.example.com"]
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+CSRF_TRUSTED_ORIGINS = ["https://www.example.com"]
+```
+
+**CSRF in AJAX:**
+
+```javascript
+const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+fetch("/api/item/", {
+  method: "POST",
+  headers: { "X-CSRFToken": csrftoken, "Content-Type": "application/json" },
+  body: JSON.stringify({ title: "Hi" }),
+});
+```
+
+**Safe vs unsafe:**
+
+```django
+{{ user_bio }}           {# escaped #}
+{{ user_bio|safe }}      {# only if trusted #}
+```
+
+## ⚠️ Pitfalls
+
+- `DEBUG=True` in production leaks traces and settings.
+- Disabling CSRF for “API convenience” on cookie-auth browsers.
+- `|safe` / `mark_safe` on user HTML.
+- Open redirects via unvalidated `next=` parameters.
+- Serving user uploads from the same origin with executable MIME types.
+
+## 🔗 Related
+
+- [Settings](settings.md)
+- [Middleware](middleware.md)
+- [Authentication](authentication.md)
+- [Permissions](permissions.md)
+- [Sessions](sessions.md)
+- [File uploads](file_uploads.md)

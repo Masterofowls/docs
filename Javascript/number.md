@@ -1,0 +1,82 @@
+# Number
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`number` is IEEE-754 double precision. Integers are safe up to `Number.MAX_SAFE_INTEGER` (`2^53 - 1`). Use `BigInt` for larger integers. Prefer `Number` static methods over global `parseInt` / `isNaN` when possible.
+
+## 🔧 Core concepts
+
+- **Literals**: `42`, `3.14`, `0xff`, `0b1010`, `1e3`, separators `1_000_000`.
+- **Constants**: `MAX_VALUE`, `MIN_VALUE`, `EPSILON`, `NaN`, `POSITIVE_INFINITY`.
+- **Check**: `Number.isFinite`, `Number.isInteger`, `Number.isSafeInteger`, `Number.isNaN`.
+- **Parse**: `Number(text)`, `Number.parseInt(text, radix)`, `Number.parseFloat`.
+- **Format**: `toFixed`, `toPrecision`, `toString(radix)`, `toLocaleString`, `Intl.NumberFormat`.
+
+```js
+Number.isNaN(Number("x")); // true
+Number.parseInt("10px", 10); // 10
+```
+
+## 💡 Examples
+
+```js
+const n = 1_000_000.5;
+n.toFixed(2); // "1000000.50"
+
+// Safe integer check
+function addSafe(a, b) {
+  const s = a + b;
+  if (!Number.isSafeInteger(s)) throw new RangeError("unsafe");
+  return s;
+}
+
+// Epsilon compare
+function nearlyEqual(a, b, eps = Number.EPSILON) {
+  return Math.abs(a - b) < eps;
+}
+nearlyEqual(0.1 + 0.2, 0.3);
+
+// Parse with radix
+Number.parseInt("08", 10); // 8
+Number.parseInt("ff", 16); // 255
+
+// Locale currency
+new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+}).format(19.9);
+
+// BigInt interop
+const big = 10n;
+Number(big); // 10 — may lose precision for huge BigInts
+BigInt(42); // 42n
+
+// Unary plus
++"42"; // 42
++""; // 0
++null; // 0
++undefined; // NaN
+```
+
+```js
+// Clamp percent
+const pct = Math.min(100, Math.max(0, value));
+```
+
+## ⚠️ Pitfalls
+
+- Global `isNaN` coerces: `isNaN("foo") === true`; use `Number.isNaN`.
+- `parseInt` without radix can surprise on leading zeros in old engines — always pass radix.
+- `==` coerces strings/numbers; use `===` after explicit parse.
+- Floating point drift — don’t use binary floats for money.
+- `typeof NaN === "number"`.
+
+## 🔗 Related
+
+- [math.md](./math.md) — Math helpers
+- [boolean.md](./boolean.md) — falsy `0` / `NaN`
+- [strings.md](./strings.md) — parsing from text
+- [json.md](./json.md) — number serialization
+- [date.md](./date.md) — timestamps

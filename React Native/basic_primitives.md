@@ -1,0 +1,74 @@
+# Basic primitives
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Core building blocks: `View`, `Text`, `Image`, `ScrollView`, `TextInput`, `Pressable`, `FlatList`. There is no HTML — style with the `StyleSheet` API (Flexbox by default).
+
+## 🔧 Core concepts
+
+- **`View`** — container (like `div`); flex layout.
+- **`Text`** — all strings must be inside `Text`.
+- **`Image` / `ImageBackground`** — local `require` or remote `{ uri }`.
+- **`ScrollView` vs `FlatList`** — lists of unknown length → `FlatList` / `SectionList`.
+- **`StyleSheet.create`** — validated style objects; density-independent units.
+
+## 💡 Examples
+
+```tsx
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  Pressable,
+} from "react-native";
+
+const styles = StyleSheet.create({
+  row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16 },
+  title: { fontSize: 18, fontWeight: "600" },
+  avatar: { width: 40, height: 40, borderRadius: 20 },
+});
+
+export function UserRow({
+  name,
+  uri,
+  onPress,
+}: {
+  name: string;
+  uri: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable onPress={onPress} style={styles.row}>
+      <Image source={{ uri }} style={styles.avatar} />
+      <Text style={styles.title}>{name}</Text>
+    </Pressable>
+  );
+}
+```
+
+```tsx
+<FlatList
+  data={users}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => <UserRow {...item} onPress={() => {}} />}
+/>
+```
+
+## ⚠️ Pitfalls
+
+- Raw text outside `<Text>` crashes.
+- Nesting `VirtualizedList` inside `ScrollView` without care → warnings / perf issues.
+- Inline styles everywhere — harder to reuse; prefer `StyleSheet`.
+
+## 🔗 Related
+
+- [layout.md](./layout.md) — flex layout
+- [touchable.md](./touchable.md) — press handling
+- [accesebility.md](./accesebility.md) — a11y props
+- [animation.md](./animation.md) — animated views

@@ -1,0 +1,67 @@
+# Generic Types
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Generics parameterize types and functions over other types (`<T>`), preserving relationships between inputs and outputs. Constraints (`extends`) limit what `T` may be; defaults provide fallbacks.
+
+## 🧩 Core concepts
+
+- **Type parameters** — `function identity<T>(value: T): T`.
+- **Constraints** — `T extends { id: string }` requires a minimum shape.
+- **Defaults** — `type Box<T = string> = { value: T }`.
+- **Generic interfaces / classes / type aliases** — same idea across constructs.
+- **Inference** — usually from arguments; annotate when inference fails or is too wide.
+- **`keyof` + indexed access** — `T[K]` pairs well with constrained keys.
+
+## 💡 Examples
+
+```ts
+function identity<T>(value: T): T {
+  return value;
+}
+const n = identity(42); // number
+
+function pluck<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+pluck({ name: "Ada", age: 36 }, "name"); // string
+
+interface ApiResponse<T> {
+  data: T;
+  error?: string;
+}
+
+type Paginated<T> = {
+  items: T[];
+  total: number;
+};
+
+class Repo<T extends { id: string }> {
+  constructor(private items: T[] = []) {}
+  find(id: string): T | undefined {
+    return this.items.find((i) => i.id === id);
+  }
+}
+
+// Default type arg
+type Result<T = unknown> = { ok: true; value: T } | { ok: false };
+```
+
+## ⚠️ Pitfalls
+
+- Unconstrained `T` inside a function is treated like `unknown` for property access.
+- Over-constraining (`T extends any`) adds noise without safety.
+- Generic rest/tuple inference can surprise — add explicit type args when needed.
+- Don’t use generics when a concrete union or overload is clearer.
+
+## 🔗 Related
+
+- [Conditional types](./conditional_types.md)
+- [Mapped types](./mapped_types.md)
+- [Utility types](./utility_types.md)
+- [Class](./class.md)
+- [Types](./types.md)

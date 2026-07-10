@@ -1,0 +1,59 @@
+# Import / Export
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React apps use ES modules: `import` / `export`. Prefer **named exports** for components and utilities; default exports are fine for route-level pages when the framework expects them.
+
+## 🔧 Core concepts
+
+- **Named** — `export function Button` → `import { Button } from "./Button"`.
+- **Default** — `export default App` → `import App from "./App"`.
+- **Re-export** — `export { Button } from "./Button"` for barrel files.
+- **Type-only** — `import type { Props } from "./types"` (TypeScript).
+- **CSS / assets** — `import "./styles.css"`, `import logo from "./logo.svg"`.
+
+## 💡 Examples
+
+```tsx
+// Button.tsx
+export type ButtonProps = { label: string };
+
+export function Button({ label }: ButtonProps) {
+  return <button type="button">{label}</button>;
+}
+```
+
+```tsx
+// App.tsx
+import { Button } from "./components/Button";
+import type { ButtonProps } from "./components/Button";
+import "./App.css";
+
+export function App() {
+  const props: ButtonProps = { label: "Save" };
+  return <Button {...props} />;
+}
+```
+
+```js
+// barrel: components/index.ts
+export { Button } from "./Button";
+export { Input } from "./Input";
+```
+
+## ⚠️ Pitfalls
+
+- Circular imports between components — extract shared modules.
+- Mixing default and named for the same symbol confuses refactors.
+- Side-effect imports order can matter for CSS cascade.
+
+## 🔗 Related
+
+- [file_structure.md](./file_structure.md) — where modules live
+- [component.md](./component.md) — exporting components
+- [tsx.md](./tsx.md) — TypeScript modules
+- [main.md](./main.md) — entry imports

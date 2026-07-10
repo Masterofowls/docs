@@ -1,0 +1,76 @@
+# GH CLI
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+GitHub CLI (`gh`) manages repositories, pull requests, issues, releases, and Actions from the terminal. Authenticate once, then script common GitHub workflows without leaving the repo.
+
+## 🧩 Core concepts
+
+- **Auth** — `gh auth login` stores credentials (HTTPS or SSH).
+- **Repo context** — commands infer the GitHub remote from `origin` (override with `-R owner/repo`).
+- **PRs** — create, checkout, review, merge from the CLI.
+- **Issues** — list/create/close with labels and assignees.
+- **API** — `gh api` for arbitrary REST/GraphQL when no subcommand exists.
+- **Actions** — `gh run list/watch` for workflow runs.
+
+## 💡 Examples
+
+```bash
+# Auth & status
+gh auth login
+gh auth status
+
+# Repo
+gh repo view
+gh repo clone owner/name
+gh repo create my-app --private --source=. --remote=origin --push
+
+# Pull requests
+gh pr status
+gh pr list
+gh pr create --title "feat: checkout" --body "$(cat <<'EOF'
+## Summary
+- Add checkout flow
+
+## Test plan
+- [ ] Pay with test card
+EOF
+)"
+gh pr checkout 42
+gh pr diff 42
+gh pr review 42 --approve
+gh pr merge 42 --squash --delete-branch
+
+# Issues
+gh issue list --label bug
+gh issue create --title "Null ref on login" --body "Steps…"
+gh issue close 7
+
+# Actions
+gh run list --limit 10
+gh run watch
+gh run view 123456 --log-failed
+
+# API escape hatch
+gh api user
+gh api repos/{owner}/{repo}/pulls --jq '.[].title'
+```
+
+## ⚠️ Pitfalls
+
+- Wrong remote/`gh` repo context operates on a different project — confirm with `gh repo view`.
+- `gh pr create` needs a pushed branch with an upstream.
+- Org SSO may require `gh auth refresh -h github.com -s read:org` (or similar) after login.
+- Scripting merges still respects branch protection — expect interactive or admin failures.
+
+## 🔗 Related
+
+- [Push](./push.md)
+- [Pull](./pull.md)
+- [Branch](./branch.md)
+- [Commit](./commit.md)
+- [Fetch](./fetch.md)

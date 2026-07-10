@@ -1,0 +1,57 @@
+# Clipboard
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Read and write the system clipboard. In modern RN / Expo, use `@react-native-clipboard/clipboard` or `expo-clipboard` — the core `Clipboard` API was removed from the RN core package.
+
+## 🔧 Core concepts
+
+- **`setString(text)`** — copy to clipboard.
+- **`getString()`** — async read (may need permission prompts on some platforms).
+- **Expo** — `import * as Clipboard from "expo-clipboard"`.
+- **Security** — don’t log clipboard contents; treat as sensitive.
+
+## 💡 Examples
+
+```tsx
+import * as Clipboard from "expo-clipboard";
+import { Pressable, Text, Alert } from "react-native";
+
+export function CopyButton({ value }: { value: string }) {
+  async function copy() {
+    await Clipboard.setStringAsync(value);
+    Alert.alert("Copied");
+  }
+  return (
+    <Pressable onPress={copy} accessibilityRole="button" accessibilityLabel="Copy">
+      <Text>Copy</Text>
+    </Pressable>
+  );
+}
+```
+
+```tsx
+import Clipboard from "@react-native-clipboard/clipboard";
+
+async function paste() {
+  const text = await Clipboard.getString();
+  return text;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using deprecated `react-native` Clipboard import.
+- Expecting sync `getString` — it’s async.
+- Copying secrets into clipboard without user intent.
+
+## 🔗 Related
+
+- [share.md](./share.md) — system share sheet
+- [storage.md](./storage.md) — persistent storage
+- [permissions.md](./permissions.md) — platform permissions
+- [Expo/plugins.md](./Expo/plugins.md) — Expo modules

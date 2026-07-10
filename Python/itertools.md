@@ -1,0 +1,89 @@
+# Itertools
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`itertools` offers fast, memory-efficient building blocks for iterators: infinite streams, combinatorics, and chaining. Compose small tools instead of materializing huge lists.
+
+## 🔧 Core concepts
+
+| Function | Role |
+| --- | --- |
+| `count` `cycle` `repeat` | Infinite / repeated |
+| `chain` `chain.from_iterable` | Concatenate |
+| `islice` | Slice an iterator |
+| `tee` | Split into n iterators |
+| `groupby` | Group consecutive keys |
+| `accumulate` | Running totals |
+| `product` `permutations` `combinations` | Combinatorics |
+| `zip_longest` | Zip with fill |
+| `batched` | Chunks (3.12+) |
+
+All return iterators — consume with `for`, `list`, `next`, or `islice`.
+
+## 💡 Examples
+
+**islice and count:**
+
+```python
+from itertools import count, islice
+
+print(list(islice(count(10, 2), 5)))  # [10, 12, 14, 16, 18]
+```
+
+**chain and groupby:**
+
+```python
+from itertools import chain, groupby
+
+print(list(chain([1, 2], (3, 4))))
+
+rows = [("a", 1), ("a", 2), ("b", 3)]
+for key, group in groupby(rows, key=lambda r: r[0]):
+    print(key, list(group))
+```
+
+**Combinatorics:**
+
+```python
+from itertools import combinations, product
+
+print(list(combinations("ABC", 2)))
+print(list(product([0, 1], repeat=2)))
+```
+
+**batched (3.12+) / chunk recipe:**
+
+```python
+from itertools import batched, islice
+from collections.abc import Iterator
+
+print(list(batched(range(10), 3)))
+
+def chunked(it: Iterator[int], n: int) -> Iterator[list[int]]:
+    while True:
+        block = list(islice(it, n))
+        if not block:
+            return
+        yield block
+```
+
+## ⚠️ Pitfalls
+
+- `groupby` requires **sorted** (or already consecutive) keys.
+- `tee` can buffer a lot if iterators diverge — prefer re-iterating sources.
+- Infinite iterators need a stop condition.
+- Combinatorial functions explode in size — bound inputs.
+- Exhausting one `tee` branch while another lags costs memory.
+
+## 🔗 Related
+
+- [Iterators](iterators.md)
+- [Generators](generators.md)
+- [Loops](loops.md)
+- [Comprehensions](comprehensions.md)
+- [Collections module](collections_module.md)
+- [Zip / enumerate / map / filter](zip_enumerate_map_filter.md)

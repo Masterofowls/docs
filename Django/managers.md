@@ -1,0 +1,89 @@
+# Managers
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Managers are the interface for table-level ORM operations (`Model.objects`). Customize to encapsulate reusable querysets (published, for_user, …). Prefer chaining a custom `QuerySet` class and exposing it via `as_manager()` or `from_queryset`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `models.Manager` | Default `objects` |
+| Custom `Manager` | Extra methods / default filters |
+| Custom `QuerySet` | Chainable filters |
+| `as_manager()` | Manager from QuerySet |
+| `from_queryset` | Manager + QuerySet methods |
+| Multiple managers | e.g. `objects`, `published` |
+
+Related managers on reverse FK/M2M are separate (`article.tags`).
+
+## 💡 Examples
+
+**QuerySet + manager:**
+
+```python
+from django.db import models
+
+
+class ArticleQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(is_published=True)
+
+    def by_author(self, user):
+        return self.filter(author=user)
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=200)
+    is_published = models.BooleanField(default=False)
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+
+    objects = ArticleQuerySet.as_manager()
+```
+
+```python
+Article.objects.published().by_author(request.user)
+```
+
+**Manager with default filter (use carefully):**
+
+```python
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published=True)
+
+
+class Article(models.Model):
+    ...
+    objects = models.Manager()
+    published = PublishedManager()
+```
+
+**from_queryset:**
+
+```python
+ArticleManager = models.Manager.from_queryset(ArticleQuerySet)
+
+class Article(models.Model):
+    objects = ArticleManager()
+```
+
+## ⚠️ Pitfalls
+
+- Overriding `get_queryset` on the only manager hides rows in admin—keep a full `objects`.
+- Soft-delete managers that break FK integrity unexpectedly.
+- Putting create/update business logic only on managers without tests.
+- Forgetting related name clashes when adding managers.
+- Custom managers not used by `RelatedManager`—re-declare with `base_manager_name` / `default_manager_name` in Meta when needed.
+
+## 🔗 Related
+
+- [Models](models.md)
+- [QuerySet](queryset.md)
+- [Admin](admin.md)
+- [Transactions / ORM](transactions_orm.md)
+- [Testing](testing.md)

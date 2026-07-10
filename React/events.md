@@ -1,0 +1,64 @@
+# Events
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React uses a SyntheticEvent system: camelCase props (`onClick`, `onChange`) and functions as handlers. Behavior is consistent across browsers.
+
+## 🔧 Core concepts
+
+- **Naming** — `onClick`, `onSubmit`, `onKeyDown` (not `onclick`).
+- **Handler** — pass a function: `onClick={handleClick}`, not `onClick={handleClick()}`.
+- **Event object** — `event.preventDefault()`, `event.stopPropagation()`, `event.target`.
+- **Passing data** — wrap: `onClick={() => onSelect(id)}` or `onClick={onSelect.bind(null, id)}`.
+
+## 💡 Examples
+
+```tsx
+export function SearchForm({ onSearch }: { onSearch: (q: string) => void }) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    onSearch(String(data.get("q") ?? ""));
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="q" type="search" />
+      <button type="submit">Search</button>
+    </form>
+  );
+}
+```
+
+```jsx
+function List({ items, onSelect }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>
+          <button type="button" onClick={() => onSelect(item.id)}>
+            {item.label}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Calling the handler immediately (`onClick={fn()}`) runs it during render.
+- Don’t rely on the event after an `await` — React pools/reuses in older versions; read values first or use `event.persist()` only if needed on old React.
+- Prefer `onChange` on inputs for controlled components, not only `onBlur`.
+
+## 🔗 Related
+
+- [props.md](./props.md) — callback props
+- [jsx.md](./jsx.md) — JSX attributes
+- [useState.md](./useState.md) — controlled inputs
+- [component.md](./component.md) — handlers in components

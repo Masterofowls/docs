@@ -1,0 +1,66 @@
+# ScrollView
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`ScrollView` scrolls a finite set of children. Use for short content (forms, static pages). For long or dynamic lists prefer `FlatList` / `SectionList`. Combine with `KeyboardAvoidingView` / `keyboardShouldPersistTaps` for forms.
+
+## 🔧 Core concepts
+
+- **All children mount** — no virtualization.
+- **Horizontal** — `horizontal` prop.
+- **Refresh** — `refreshControl={<RefreshControl ... />}`.
+- **Paging** — `pagingEnabled`, `snapToInterval`.
+- **Nested** — careful with lists; prefer one scroll parent.
+- **Refs** — `scrollTo` / `scrollToEnd`.
+
+## 💡 Examples
+
+```tsx
+import { ScrollView, Text, StyleSheet } from "react-native";
+
+export function About() {
+  return (
+    <ScrollView
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={styles.title}>About</Text>
+      <Text>Long copy…</Text>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: { padding: 16, paddingBottom: 48 },
+  title: { fontSize: 22, marginBottom: 12 },
+});
+```
+
+**Horizontal chips:**
+
+```tsx
+<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+  {tags.map((t) => (
+    <Chip key={t} label={t} />
+  ))}
+</ScrollView>
+```
+
+## ⚠️ Pitfalls
+
+- Mapping hundreds of items into ScrollView → jank/memory.
+- Nesting FlatList inside ScrollView (virtualization breaks).
+- Forgetting bottom padding behind tab bars / home indicator.
+- `keyboardShouldPersistTaps` default blocking taps while keyboard open.
+
+## 🔗 Related
+
+- [flatlist.md](./flatlist.md) — virtualized lists
+- [keyboard.md](./keyboard.md) — keyboard UX
+- [refresh_control.md](./refresh_control.md) — pull to refresh
+- [safe_area.md](./safe_area.md) — insets
+- [layout.md](./layout.md) — flex layout

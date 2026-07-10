@@ -1,0 +1,56 @@
+# revert
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git revert` creates new commits that undo the changes of prior commits. Safe for shared branches because history is not rewritten. Use for undoing merges and published mistakes.
+
+## 🔧 Core concepts
+
+- **Inverse patch** — applies the opposite of the selected commit(s).
+- **Non-destructive** — original commits remain in history.
+- **Ranges** — can revert multiple commits (order matters).
+- **Merges** — `-m 1` specifies mainline parent for merge commits.
+- **No-commit** — `--no-commit` applies inverses and leaves staging for one commit.
+
+## 💡 Examples
+
+```bash
+# Undo a single commit on main
+git revert abcdef1
+git revert HEAD
+
+# Revert without auto-commit
+git revert --no-commit abcdef1
+git commit -m "revert: undo broken feature flag"
+
+# Sequence (oldest..newest often clearer with -n then one commit)
+git revert --no-commit bad1^..bad3
+git commit -m "revert: roll back bad1..bad3"
+
+# Revert a merge commit (keep first parent line)
+git revert -m 1 mergecommitsha
+
+# Abort conflicted revert
+git revert --abort
+```
+
+## ⚠️ Pitfalls
+
+- Reverting a merge without `-m` fails — pick the parent to keep.
+- Re-reverting later can be confusing if the original feature is re-applied.
+- Conflicts still happen when later commits touch the same lines.
+- Don’t confuse with `reset` — revert is for published history.
+- Empty revert (changes already undone) may need `--skip` or abort.
+
+## 🔗 Related
+
+- [reset.md](./reset.md)
+- [conflict.md](./conflict.md)
+- [log.md](./log.md)
+- [commit.md](./commit.md)
+- [merge.md](./merge.md)
+- [cherry_pick.md](./cherry_pick.md)

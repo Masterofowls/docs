@@ -1,0 +1,88 @@
+# Admin
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django Admin is an auto-generated CRUD UI for models registered with `admin.site`. Enable `django.contrib.admin`, create a superuser, and customize list displays, filters, and search. Use it for internal ops—not as a public end-user interface.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `admin.site.register(Model, ModelAdmin)` | Expose a model |
+| `@admin.register(Model)` | Decorator form |
+| `ModelAdmin` | list_display, list_filter, search_fields, readonly_fields |
+| `InlineModelAdmin` | Edit related objects on the parent page |
+| Permissions | Staff + model perms; superuser bypasses |
+| URLs | Included via `path("admin/", admin.site.urls)` |
+
+Requires `django.contrib.admin`, `auth`, `contenttypes`, `sessions`, `messages` in `INSTALLED_APPS`.
+
+## 💡 Examples
+
+**Register with list options:**
+
+```python
+# app/admin.py
+from django.contrib import admin
+from .models import Article
+
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ("title", "author", "published_at", "is_published")
+    list_filter = ("is_published", "published_at")
+    search_fields = ("title", "body")
+    prepopulated_fields = {"slug": ("title",)}
+    date_hierarchy = "published_at"
+    ordering = ("-published_at",)
+```
+
+**Inlines:**
+
+```python
+from django.contrib import admin
+from .models import Order, OrderItem
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 1
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    inlines = [OrderItemInline]
+    list_display = ("id", "user", "created_at")
+```
+
+**URLs:**
+
+```python
+# config/urls.py
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+]
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `admin.autodiscover` is fine on modern Django—apps' `admin.py` load via `AppConfig`.
+- Heavy `list_display` callables without `list_select_related` cause N+1 queries.
+- Exposing admin on the public internet without HTTPS, 2FA, and IP limits is risky.
+- Custom user models must be registered carefully; swap before the first migration.
+
+## 🔗 Related
+
+- [Custom admin](custom_admin.md)
+- [Models](models.md)
+- [Authentication](authentication.md)
+- [Settings](settings.md)
+- [URLs](urls.md)
+- [Forms](forms.md)

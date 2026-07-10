@@ -1,0 +1,59 @@
+# log
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git log` walks commit history with filters, formatting, and graphs. Use it to audit changes, find authors, and prepare release notes. Pair with `git show` for a single commit’s patch.
+
+## 🔧 Core concepts
+
+- **Range** — `A..B`, `A...B` (symmetric), path-limited history.
+- **Decorate** — branch/tag names on commits (`--decorate`).
+- **Format** — `--oneline`, `--graph`, pretty formats (`%h %an %s`).
+- **Filters** — `--author`, `--grep`, `--since` / `--until`, `-S` / `-G` pickaxe.
+- **Follow** — `--follow` for single-file renames (limited).
+
+## 💡 Examples
+
+```bash
+git log --oneline --graph --decorate -20
+git log main..HEAD --oneline
+git log --since="2026-01-01" --author="Ada" --oneline
+
+# Patch for each commit
+git log -p -- path/to/file.ts
+
+# Find commits that added/removed a string
+git log -S "featureFlag" --oneline
+git log -G "featureFlag\s*=" --oneline
+
+# Custom format
+git log --pretty=format:"%h %ad %an %s" --date=short
+
+# First parent only (linearize merges)
+git log --first-parent main
+
+# Tags / merges
+git log --merges --oneline
+git log v1.0.0..v1.1.0 --oneline
+```
+
+## ⚠️ Pitfalls
+
+- `A..B` means reachable from B not from A — order matters.
+- `--follow` only works with a single path.
+- Shallow clones truncate history — deepen with `git fetch --unshallow`.
+- Default pager may hide output — `GIT_PAGER=cat` or `--no-pager`.
+- Rewritten history (rebase/amend) changes hashes — don’t rely on old SHAs.
+
+## 🔗 Related
+
+- [reflog.md](./reflog.md)
+- [blame.md](./blame.md)
+- [diff.md](./diff.md)
+- [tag.md](./tag.md)
+- [bisect.md](./bisect.md)
+- [show via commit.md](./commit.md)

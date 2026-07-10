@@ -1,0 +1,79 @@
+# Links
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<a>` element creates hyperlinks to URLs, fragments, email/tel schemes, and downloadable files. Accessible links need clear text (not “click here”), meaningful `href`, and honest `target`/`rel` usage. Prefer real links for navigation so middle-click and progressive enhancement work.
+
+## 🔧 Core concepts
+
+| Attribute | Role |
+| --- | --- |
+| `href` | destination URL or `#fragment` |
+| `target` | `_self` `_blank` `_parent` `_top` or frame name |
+| `rel` | link relationship (`noopener`, `noreferrer`, `nofollow`, `me`, …) |
+| `download` | suggest download filename |
+| `hreflang` | language of target |
+| `type` | MIME hint |
+| `ping` | tracking URLs (privacy-sensitive) |
+
+- Without `href`, `<a>` is a placeholder (not in tab order the same way).
+- `target="_blank"` should include `rel="noopener noreferrer"` (modern browsers imply noopener for `_blank`, still good practice).
+
+```html
+<a href="/docs/intro">Introduction</a>
+<a href="https://example.com" target="_blank" rel="noopener noreferrer">External</a>
+<a href="#faq">Jump to FAQ</a>
+```
+
+## 💡 Examples
+
+```html
+<!-- Email / phone -->
+<a href="mailto:hello@example.com">Email us</a>
+<a href="tel:+15551234567">Call</a>
+
+<!-- Download -->
+<a href="/files/report.pdf" download="report.pdf">Download PDF</a>
+
+<!-- Fragment + id -->
+<a href="#shipping">Shipping</a>
+<section id="shipping">...</section>
+
+<!-- Skip link -->
+<a class="skip" href="#main">Skip to content</a>
+<main id="main">...</main>
+
+<!-- Button-looking link vs button -->
+<a class="btn" href="/signup">Sign up</a>
+<button type="button">Open dialog</button>
+
+<!-- Nav -->
+<nav aria-label="Primary">
+  <a href="/" aria-current="page">Home</a>
+  <a href="/pricing">Pricing</a>
+</nav>
+```
+
+```html
+<!-- Empty href="#" is a smell — use button for actions -->
+```
+
+## ⚠️ Pitfalls
+
+- Using `<a href="#">` or omitting `href` for JS actions breaks accessibility — use `<button>`.
+- Vague link text fails screen reader users scanning links lists.
+- `target="_blank"` without context surprises users — warn when needed.
+- Nested interactive content (`a` inside `a`, or `a` wrapping `button`) is invalid.
+- `javascript:` URLs are obsolete and unsafe.
+
+## 🔗 Related
+
+- [nav.md](./nav.md) — navigation landmarks
+- [button.md](./button.md) — buttons vs links
+- [url.md](./url.md) — URL concepts
+- [accessibility.md](./accessibility.md) — a11y
+- [aria.md](./aria.md) — aria-current

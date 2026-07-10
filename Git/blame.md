@@ -1,0 +1,54 @@
+# blame
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git blame` annotates each line with the commit that last changed it (author, date, SHA). Use it to find when a bug was introduced, then dig with `show` / `bisect`. Ignore whitespace and move detection options reduce noise.
+
+## 🔧 Core concepts
+
+- **Line attribution** — SHA, author, timestamp, line content.
+- **Range** — `-L start,end` limits lines.
+- **Moves/copies** — `-M` / `-C` detect moved/copied lines.
+- **Ignore rev** — `--ignore-rev` / `--ignore-revs-file` skip bulk format commits.
+- **GUI** — `git gui blame`, IDE blame views wrap the same data.
+
+## 💡 Examples
+
+```bash
+git blame path/to/file.ts
+git blame -L 40,80 path/to/file.ts
+git blame -w path/to/file.ts          # ignore whitespace
+git blame -M -C path/to/file.ts       # moves / copies
+
+git show abcdef1
+git log -L 40,80:path/to/file.ts
+
+# Ignore noisy formatting commits
+echo abcdef1 >> .git-blame-ignore-revs
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+git blame path/to/file.ts
+
+# Porcelain for scripts
+git blame --line-porcelain path/to/file.ts | head
+```
+
+## ⚠️ Pitfalls
+
+- Blame shows last *touch*, not necessarily the logical author of a design.
+- Mass reformat commits pollute blame — use ignore-revs.
+- Renames without follow can look like wholesale rewrites — try `-C` / history follow.
+- Generated files are useless to blame — exclude them.
+- Shallow clones may lack the original commit objects.
+
+## 🔗 Related
+
+- [log.md](./log.md)
+- [bisect.md](./bisect.md)
+- [diff.md](./diff.md)
+- [gitattributes.md](./gitattributes.md)
+- [commit.md](./commit.md)
+- [show via log.md](./log.md)

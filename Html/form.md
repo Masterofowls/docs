@@ -1,0 +1,134 @@
+# Forms
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<form>` element represents a document section that collects user input and submits it to a server or handles it with script. Native forms give you validation, keyboard behavior, autofill, and accessibility for free—prefer them over custom div-based “forms.”
+
+A form owns **associated controls**: descendants plus elements linked via the `form="id"` attribute. Submission builds a payload from **successful controls** (named, enabled, and meeting type rules).
+
+## 🔧 Core concepts
+
+### Essential attributes
+
+| Attribute | Role |
+|-----------|------|
+| `action` | URL that receives the submission (defaults to current URL) |
+| `method` | `get` (query string) or `post` (body); `dialog` closes a `<dialog>` |
+| `enctype` | `application/x-www-form-urlencoded` (default), `multipart/form-data` (files), `text/plain` |
+| `novalidate` | Skip built-in constraint validation on submit |
+| `autocomplete` | `on` / `off` for the form; controls can override |
+| `name` | Identifies the form in `document.forms` |
+| `target` | Browsing context for response (`_blank`, iframe name, …) |
+| `rel` | Link types for the submission request |
+
+### Association and structure
+
+```html
+<form id="signup" action="/api/signup" method="post" autocomplete="on">
+  <fieldset>
+    <legend>Account</legend>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required autocomplete="email">
+  </fieldset>
+  <button type="submit">Create account</button>
+</form>
+```
+
+- Every control needs an accessible **name** (`<label for>`, wrapping label, or `aria-label`).
+- Use `<fieldset>` / `<legend>` for related groups (radios, address blocks).
+- `button` without `type` inside a form defaults to `submit`—set `type="button"` for non-submit actions.
+
+### Constraint validation
+
+Built-in checks: `required`, `min`/`max`, `minlength`/`maxlength`, `pattern`, `type` (email, url, …), `step`. APIs: `checkValidity()`, `reportValidity()`, `setCustomValidity()`.
+
+Listen to `invalid` and `submit`; call `event.preventDefault()` when handling with `fetch`.
+
+### GET vs POST
+
+- **GET** — bookmarkable, idempotent filters/search; do not send secrets.
+- **POST** — mutations, passwords, large bodies, file uploads (`multipart/form-data`).
+
+## 💡 Examples
+
+### Accessible login form
+
+```html
+<form action="/login" method="post">
+  <div>
+    <label for="user">Username</label>
+    <input id="user" name="username" required
+      autocomplete="username" autocapitalize="none">
+  </div>
+  <div>
+    <label for="pass">Password</label>
+    <input id="pass" name="password" type="password" required
+      autocomplete="current-password">
+  </div>
+  <button type="submit">Sign in</button>
+</form>
+```
+
+### File upload
+
+```html
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <label for="avatar">Profile photo</label>
+  <input id="avatar" name="avatar" type="file" accept="image/*">
+  <button type="submit">Upload</button>
+</form>
+```
+
+### External control with `form` attribute
+
+```html
+<form id="filters" method="get" action="/search"></form>
+
+<label for="q">Query</label>
+<input form="filters" id="q" name="q" type="search">
+
+<button form="filters" type="submit">Search</button>
+```
+
+### Client-side submit with validation
+
+```html
+<form id="contact" action="/contact" method="post" novalidate>
+  <label for="msg">Message</label>
+  <textarea id="msg" name="message" required minlength="10"></textarea>
+  <button type="submit">Send</button>
+</form>
+<script>
+  document.getElementById("contact").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    if (!form.reportValidity()) return;
+    const body = new FormData(form);
+    await fetch(form.action, { method: "POST", body });
+  });
+</script>
+```
+
+## ⚠️ Pitfalls
+
+- **Missing labels** — Placeholder is not a label; AT and click-to-focus suffer.
+- **Unnamed controls** — Without `name`, values are omitted from submission.
+- **Disabling validation silently** — `novalidate` without custom checks ships bad data.
+- **CSRF** — Browser POSTs need server tokens/SameSite cookies; HTML alone is not enough.
+- **Nested forms** — Invalid HTML; browsers repair unpredictably.
+- **`div` buttons** — Lose default submit-on-Enter behavior in text fields.
+- **Autofill ignored** — Wrong `autocomplete` tokens break password managers.
+
+## 🔗 Related
+
+- [Input](input.md) — control types and attributes
+- [Label / lists](list.md) — structuring options (see also fieldset patterns here)
+- [Script](script.md) — progressive enhancement of submit handlers
+- [URL](url.md) — `action` URLs and query strings
+- [Meta](meta.md) — CSRF tokens sometimes injected via meta + JS
+- [Nav](nav.md) — do not confuse search forms with navigation landmarks
+- [Footer](footer.md) — newsletter forms in footers

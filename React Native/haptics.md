@@ -1,0 +1,62 @@
+# Haptics
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Haptics provide nuanced tactile feedback (impact, notification, selection). In Expo use `expo-haptics`; in bare RN use platform modules or community packages. Prefer haptics over crude `Vibration` for UI polish—especially iOS.
+
+## 🔧 Core concepts
+
+| Type | When |
+| --- | --- |
+| Impact | Light/medium/heavy taps |
+| Notification | Success / warning / error |
+| Selection | Picker ticks, toggles |
+
+Always no-op gracefully on unsupported hardware/simulators.
+
+## 💡 Examples
+
+```tsx
+import * as Haptics from "expo-haptics";
+import { Pressable, Text } from "react-native";
+
+export function LikeButton({ onLike }: { onLike: () => void }) {
+  return (
+    <Pressable
+      onPress={async () => {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        onLike();
+      }}
+    >
+      <Text>Like</Text>
+    </Pressable>
+  );
+}
+
+export async function notifySuccess() {
+  await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+}
+
+export async function tick() {
+  await Haptics.selectionAsync();
+}
+```
+
+## ⚠️ Pitfalls
+
+- Firing haptics on every scroll event—too noisy.
+- Ignoring “Reduce Motion” / haptic disable preferences when available.
+- Blocking UI on awaited haptics unnecessarily—fire-and-forget is fine.
+- Assuming Android parity with iOS Taptic Engine.
+
+## 🔗 Related
+
+- [vibration.md](./vibration.md) — basic vibrate
+- [pressable.md](./pressable.md) — buttons
+- [picker.md](./picker.md) — selection ticks
+- [gesture.md](./gesture.md) — gesture feedback
+- [touchable.md](./touchable.md) — press handling

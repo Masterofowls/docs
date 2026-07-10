@@ -1,0 +1,88 @@
+# Clipboard API
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The Async Clipboard API reads and writes the system clipboard with promises: `navigator.clipboard.writeText` / `readText`, and richer `write` / `read` with `ClipboardItem`. Requires secure context and often transient user activation / permissions.
+
+## 🔧 Core concepts
+
+- **Text**: `await navigator.clipboard.writeText(str)` / `readText()`.
+- **Items**: `clipboard.write([new ClipboardItem({ [type]: blob })])`.
+- **Permissions**: `clipboard-read` / `clipboard-write` (browser-dependent).
+- **Secure context**: HTTPS or localhost.
+- **Fallback**: legacy `document.execCommand("copy")` with a temporary textarea (deprecated).
+- **Paste events**: `paste` / `copy` / `cut` still useful for intercepting.
+
+```js
+await navigator.clipboard.writeText("Hello");
+const text = await navigator.clipboard.readText();
+```
+
+## 💡 Examples
+
+```js
+// Copy button
+btn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(input.value);
+    toast("Copied");
+  } catch {
+    toast("Clipboard blocked");
+  }
+});
+
+// Copy HTML + plain text
+async function copyRich(html, plain) {
+  const item = new ClipboardItem({
+    "text/plain": new Blob([plain], { type: "text/plain" }),
+    "text/html": new Blob([html], { type: "text/html" }),
+  });
+  await navigator.clipboard.write([item]);
+}
+
+// Read image (where supported)
+const items = await navigator.clipboard.read();
+for (const item of items) {
+  if (item.types.includes("image/png")) {
+    const blob = await item.getType("image/png");
+    img.src = URL.createObjectURL(blob);
+  }
+}
+
+// Paste event
+editor.addEventListener("paste", (e) => {
+  const text = e.clipboardData?.getData("text/plain");
+  const file = e.clipboardData?.files?.[0];
+  // e.preventDefault(); custom insert
+});
+
+// Permission query
+const status = await navigator.permissions.query({ name: "clipboard-read" });
+```
+
+```js
+// Feature detect
+if (!navigator.clipboard?.writeText) {
+  /* show manual select UI */
+}
+```
+
+## ⚠️ Pitfalls
+
+- `readText` often requires permission + user gesture; expect failures in background tabs.
+- Safari / Firefox policies differ for read — always try/catch and UX fallback.
+- Don’t put secrets on the clipboard longer than needed.
+- `ClipboardItem` blob MIME types must match what you write.
+- Focus may be required — call from click handlers, not arbitrary timers.
+
+## 🔗 Related
+
+- [events.md](./events.md) — copy/paste events
+- [datatransfer.md](./datatransfer.md) — DataTransfer
+- [drag_drop.md](./drag_drop.md) — drag data
+- [../encode.md](../encode.md) — text encoding
+- [form.md](./form.md) — selecting input text

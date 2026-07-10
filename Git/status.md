@@ -1,0 +1,62 @@
+# status
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git status` shows the working tree vs index vs HEAD: staged, unstaged, and untracked files. Use short and porcelain formats in scripts; branch tracking info shows ahead/behind remotes.
+
+## 🔧 Core concepts
+
+- **Sections** — staged (index), unstaged (worktree), untracked.
+- **Branch** — current branch, upstream, ahead/behind counts.
+- **Short** — `-s` / `--short`; `--branch` adds branch header.
+- **Porcelain** — `-z` / `--porcelain=v1|v2` stable for scripts.
+- **Ignore** — `--ignored` lists ignored files; respect `.gitignore`.
+
+## 💡 Examples
+
+```bash
+git status
+git status -sb              # short + branch
+git status --porcelain=v1   # scripting
+
+# Only untracked
+git status -u
+
+# Show ignored
+git status --ignored
+
+# Path limited
+git status -- apps/web
+
+# Useful aliases
+# st = status -sb
+git config alias.st "status -sb"
+```
+
+```text
+## main...origin/main [ahead 1]
+M  staged-file.ts
+ M unstaged-file.ts
+?? new-file.ts
+```
+
+## ⚠️ Pitfalls
+
+- “Clean” status doesn’t mean pushed — check ahead/behind or `git log @{u}..`.
+- Renames show as delete+add unless similarity detection kicks in (`status` / `diff -M`).
+- Submodule dirty state appears as modified content — inspect inside the submodule.
+- Assume-unchanged / skip-worktree files can hide local edits.
+- CRLF warnings may appear without listing as modified — check `core.autocrlf`.
+
+## 🔗 Related
+
+- [stage.md](./stage.md)
+- [diff.md](./diff.md)
+- [commit.md](./commit.md)
+- [branch.md](./branch.md)
+- [clean.md](./clean.md)
+- [gitignore.md](./gitignore.md)

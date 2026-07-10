@@ -1,0 +1,57 @@
+# amend
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git commit --amend` rewrites the latest commit (message and/or tree). Safe only for unpushed commits you own. After amend, the commit hash changes; pushed amends require a coordinated force-push.
+
+## 🔧 Core concepts
+
+- **Message only** — `git commit --amend -m "…"` or editor.
+- **Include staged** — stage fixes, then `--amend --no-edit`.
+- **Author / date** — `--reset-author` updates author metadata.
+- **Hooks** — amend re-runs `commit-msg` / related hooks unless skipped.
+- **Recovery** — old commit remains in reflog briefly.
+
+## 💡 Examples
+
+```bash
+# Fix message
+git commit --amend -m "fix: handle null session"
+
+# Add forgotten file to last commit
+git add src/missed.ts
+git commit --amend --no-edit
+
+# Edit message in editor
+git commit --amend
+
+# Reset author to current user
+git commit --amend --reset-author --no-edit
+
+# After amend of unpushed commit
+git push
+
+# If already pushed (team OK with force-with-lease)
+git push --force-with-lease
+```
+
+## ⚠️ Pitfalls
+
+- Amending published commits rewrites shared history — prefer a new commit.
+- `--no-verify` skips hooks — avoid unless explicitly required.
+- Empty amend (no changes, same message) may be rejected without `--allow-empty`.
+- Merge commits / amend during rebase have extra rules — use rebase todo instead.
+- Never amend someone else’s commit on a shared branch.
+
+## 🔗 Related
+
+- [commit.md](./commit.md)
+- [reset.md](./reset.md)
+- [reflog.md](./reflog.md)
+- [squash.md](./squash.md)
+- [push.md](./push.md)
+- [hooks.md](./hooks.md)

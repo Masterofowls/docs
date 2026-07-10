@@ -1,0 +1,92 @@
+# Typing Hints
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Type hints document and check interfaces with tools like mypy/pyright. They are not enforced at runtime by default. Prefer built-in generics (`list[int]`) on 3.9+ and `|` unions on 3.10+.
+
+## 🔧 Core concepts
+
+| Feature | Example |
+| --- | --- |
+| Built-in generics | `list[int]`, `dict[str, int]` |
+| Union | `int \| None`, `str \| bytes` |
+| Optional | `X \| None` (prefer over `Optional`) |
+| Callable | `Callable[[int], str]` |
+| TypeAlias | `type Vector = list[float]` (3.12+) |
+| TypeVar / ParamSpec | Generics |
+| Protocol | Structural typing |
+| TypedDict | Dict shapes |
+| `typing.cast` | Escape hatch for checkers |
+| `typing.Any` | Opt out (use sparingly) |
+
+From 3.11+: `Self`, `LiteralString`, improved error types. From 3.12+: `type` statement, PEP 695 generics.
+
+## 💡 Examples
+
+**Functions and collections:**
+
+```python
+from collections.abc import Iterable, Sequence
+
+def average(xs: Sequence[float]) -> float:
+    return sum(xs) / len(xs)
+
+def flatten(rows: Iterable[Iterable[int]]) -> list[int]:
+    return [n for row in rows for n in row]
+```
+
+**Aliases and TypedDict:**
+
+```python
+from typing import TypedDict
+
+type UserId = int  # 3.12+; else TypeAlias
+
+class User(TypedDict):
+    id: UserId
+    name: str
+    active: bool
+
+def label(u: User) -> str:
+    return f'{u["name"]}#{u["id"]}'
+```
+
+**Generics (3.12+):**
+
+```python
+def first[T](items: Sequence[T]) -> T | None:
+    return items[0] if items else None
+```
+
+**Protocol:**
+
+```python
+from typing import Protocol
+
+class Closable(Protocol):
+    def close(self) -> None: ...
+
+def shutdown(resource: Closable) -> None:
+    resource.close()
+```
+
+## ⚠️ Pitfalls
+
+- Hints are ignored at runtime unless you validate (pydantic, beartype, etc.).
+- Use `collections.abc` for `Iterable`/`Mapping`/`Sequence`, not concrete lists only.
+- `list` is invariant — `list[int]` is not a `list[float | int]` for checkers.
+- Avoid `Any` sprawl; prefer `object` or precise unions.
+- Forward refs: quote names or `from __future__ import annotations`.
+
+## 🔗 Related
+
+- [Functions](functions.md)
+- [ABC / protocols](abc_protocols.md)
+- [Dataclasses](dataclasses.md)
+- [Classes](classes.md)
+- [Types](types.md)
+- [Docstrings](docstrings.md)

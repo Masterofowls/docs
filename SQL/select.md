@@ -1,0 +1,69 @@
+# SELECT
+
+*_SQL · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`SELECT` retrieves rows from one or more tables. Shape results with column lists, filters (`WHERE`), ordering, limits, and aggregates. Prefer explicit column names over `SELECT *` in application queries.
+
+## 🧩 Core concepts
+
+- **Projection** — choose columns, aliases, expressions.
+- **Filtering** — `WHERE` (row-level) vs `HAVING` (after `GROUP BY`).
+- **Sorting / paging** — `ORDER BY`, `LIMIT`/`OFFSET` (or `FETCH FIRST` / `TOP`).
+- **Aggregates** — `COUNT`, `SUM`, `AVG`, `MIN`, `MAX` with `GROUP BY`.
+- **DISTINCT** — deduplicate result rows.
+- **Subqueries / CTEs** — nest logic with `(SELECT …)` or `WITH … AS`.
+
+## 💡 Examples
+
+```sql
+-- Basic
+SELECT id, email, created_at
+FROM users
+WHERE active = TRUE
+ORDER BY created_at DESC
+LIMIT 20 OFFSET 0;
+
+-- Aliases & expressions
+SELECT
+  first_name || ' ' || last_name AS full_name,
+  DATE_PART('year', AGE(born_at)) AS age
+FROM people;
+
+-- Aggregates
+SELECT status, COUNT(*) AS total
+FROM orders
+WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY status
+HAVING COUNT(*) > 10
+ORDER BY total DESC;
+
+-- CTE
+WITH recent AS (
+  SELECT user_id, COUNT(*) AS orders
+  FROM orders
+  WHERE created_at >= NOW() - INTERVAL '7 days'
+  GROUP BY user_id
+)
+SELECT u.email, r.orders
+FROM recent r
+JOIN users u ON u.id = r.user_id
+ORDER BY r.orders DESC;
+```
+
+## ⚠️ Pitfalls
+
+- `SELECT *` breaks when schemas change and transfers unused columns.
+- Filtering on expressions (`WHERE YEAR(created_at) = 2026`) can prevent index use — prefer range predicates.
+- `NULL` never equals anything — use `IS NULL` / `IS DISTINCT FROM`.
+- Dialect differences: `LIMIT` (Postgres/MySQL) vs `TOP` (SQL Server) vs `FETCH` (standard).
+
+## 🔗 Related
+
+- [Insert / Update / Delete](./insert_update_delete.md)
+- [Joins](./joins.md)
+- [Indexes](./indexes.md)
+- [Transactions](./transactions.md)

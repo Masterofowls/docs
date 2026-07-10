@@ -1,0 +1,70 @@
+# Image
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`Image` displays local `require` assets or remote `{ uri }` sources. Set dimensions (or use `style` width/height); remote images need explicit size. Prefer `expo-image` for caching, blurhash, and better performance in Expo apps.
+
+## 🔧 Core concepts
+
+| Topic | Notes |
+| --- | --- |
+| Local | `source={require("./pic.png")}` |
+| Remote | `source={{ uri, headers? }}` |
+| Resize | `resizeMode`: cover, contain, stretch, center |
+| Events | `onLoad`, `onError` |
+| Prefetch | `Image.prefetch(url)` |
+| Accessibility | `accessibilityLabel` for meaningful images |
+
+Network security: HTTPS; ATS / cleartext rules on iOS/Android.
+
+## 💡 Examples
+
+```tsx
+import { Image, StyleSheet, View } from "react-native";
+
+export function Avatar({ url }: { url: string }) {
+  return (
+    <Image
+      source={{ uri: url }}
+      style={styles.avatar}
+      resizeMode="cover"
+      accessibilityLabel="Profile photo"
+      onError={() => {
+        /* fallback */
+      }}
+    />
+  );
+}
+
+export function Logo() {
+  return (
+    <View>
+      <Image source={require("../assets/logo.png")} style={styles.logo} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  avatar: { width: 64, height: 64, borderRadius: 32 },
+  logo: { width: 120, height: 40 },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Remote images without width/height → layout 0.
+- Huge unoptimized assets in the bundle.
+- Missing cache strategy for lists of remote images.
+- Decorative images announced to VoiceOver—set `accessible={false}` when appropriate.
+
+## 🔗 Related
+
+- [styling.md](./styling.md) — layout
+- [Expo image_picker](./Expo/image_picker.md) — picking
+- [networking.md](./networking.md) — remote assets
+- [basic_primitives.md](./basic_primitives.md) — View/Text
+- [permissions.md](./permissions.md) — media library

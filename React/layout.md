@@ -1,0 +1,63 @@
+# Layout
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Layout in React is ordinary DOM + CSS (Flexbox, Grid, modules, Tailwind). Components compose shells: header, sidebar, main, footer — often via nested routes or layout wrappers.
+
+## 🔧 Core concepts
+
+- **Shell components** — `AppLayout`, `AuthLayout` wrap page content with `children`.
+- **CSS approach** — CSS Modules, Tailwind, styled-components, plain CSS — pick one stack.
+- **Responsive** — media queries or container queries; avoid hard-coded pixel-only UIs.
+- **Portals** — modals/tooltips via `createPortal` to escape overflow/stacking contexts.
+
+## 💡 Examples
+
+```tsx
+import type { ReactNode } from "react";
+
+export function AppLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="app">
+      <header className="app-header">Brand</header>
+      <div className="app-body">
+        <aside className="app-nav">Nav</aside>
+        <main className="app-main">{children}</main>
+      </div>
+    </div>
+  );
+}
+```
+
+```css
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.app-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+.app-main {
+  padding: 1.5rem;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Nesting too many layout wrappers without clear ownership.
+- Fixed heights that break on mobile keyboards / dynamic viewport.
+- Forgetting `min-width: 0` on flex/grid children that overflow.
+
+## 🔗 Related
+
+- [pages.md](./pages.md) — page content inside layouts
+- [children.md](./children.md) — layout slots
+- [root.md](./root.md) — app root
+- [file_structure.md](./file_structure.md) — where layouts live

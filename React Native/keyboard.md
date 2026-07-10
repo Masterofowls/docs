@@ -1,0 +1,61 @@
+# Keyboard
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Manage soft keyboard visibility, dismissals, and layout shifts with `Keyboard`, `KeyboardAvoidingView`, and community libs like `keyboard-controller` / `react-native-keyboard-aware-scroll-view`.
+
+## 🔧 Core concepts
+
+- **`Keyboard.dismiss()`** — hide keyboard.
+- **Events** — `keyboardDidShow` / `keyboardDidHide` (platform naming differs for Will/Did).
+- **`KeyboardAvoidingView`** — `behavior="padding"` (iOS) / often `"height"` or none on Android.
+- **`keyboardShouldPersistTaps`** — on scroll views so taps register while keyboard is open.
+
+## 💡 Examples
+
+```tsx
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  TextInput,
+  StyleSheet,
+} from "react-native";
+
+export function ChatInput() {
+  return (
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={64}
+    >
+      <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
+        <TextInput placeholder="Message" style={styles.input} />
+      </Pressable>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  input: { borderWidth: 1, margin: 16, padding: 12, borderRadius: 8 },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Double-avoiding (AvoidingView + manual padding) → huge gaps.
+- Android `windowSoftInputMode` in manifest conflicting with JS avoidance.
+- Forgetting `keyboardShouldPersistTaps="handled"` on forms in ScrollViews.
+
+## 🔗 Related
+
+- [layout.md](./layout.md) — flex + offsets
+- [basic_primitives.md](./basic_primitives.md) — TextInput
+- [modal.md](./modal.md) — keyboard inside modals
+- [platform_specific.md](./platform_specific.md) — iOS vs Android

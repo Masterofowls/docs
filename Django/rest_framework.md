@@ -1,0 +1,111 @@
+# REST framework
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django REST framework (DRF) builds Web APIs on Django: serializers, views/viewsets, routers, authentication, and permissions. Use for JSON APIs consumed by SPAs and mobile apps. Pair with Django 4.2+/5.x; install `djangorestframework`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Serializers | Validate input / render output |
+| `APIView` / generics | Class-based API endpoints |
+| ViewSets + Routers | CRUD URL wiring |
+| Authentication | Session, Token, JWT (3rd party), etc. |
+| Permissions | `IsAuthenticated`, `IsAdminUser`, custom |
+| Pagination / filtering | `DEFAULT_PAGINATION_CLASS`, `django-filter` |
+| Browsable API | HTML forms for debugging |
+
+Settings live under `REST_FRAMEWORK = {...}`.
+
+## 💡 Examples
+
+**Install & settings:**
+
+```python
+INSTALLED_APPS = [
+    # …
+    "rest_framework",
+]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+}
+```
+
+**ViewSet + router:**
+
+```python
+# api/views.py
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Article
+from .serializers import ArticleSerializer
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    queryset = Article.objects.select_related("author").all()
+    serializer_class = ArticleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_field = "slug"
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+```
+
+```python
+# config/urls.py
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from api.views import ArticleViewSet
+
+router = DefaultRouter()
+router.register("articles", ArticleViewSet, basename="article")
+
+urlpatterns = [
+    path("api/", include(router.urls)),
+    path("api-auth/", include("rest_framework.urls")),
+]
+```
+
+**Function-style `@api_view`:**
+
+```python
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def health(request):
+    return Response({"status": "ok"})
+```
+
+## ⚠️ Pitfalls
+
+- CSRF: SessionAuthentication requires CSRF on unsafe methods from browsers.
+- Exposing `ModelViewSet` without permissions is a data leak.
+- N+1 in serializers—use `select_related` on the queryset.
+- Do not put secrets in browsable API responses.
+
+## 🔗 Related
+
+- [Serializers](serializers.md)
+- [Authentication](authentication.md)
+- [URLs](urls.md)
+- [Views](views.md)
+- [Models](models.md)
+- [Settings](settings.md)

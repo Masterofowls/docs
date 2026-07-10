@@ -1,0 +1,105 @@
+# Logging
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `logging` module is the standard way to record program events. Prefer it over `print` for libraries and services. Configure once at the app entrypoint; modules use `logging.getLogger(__name__)`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Logger | Named channel (`getLogger`) |
+| Level | `DEBUG` `INFO` `WARNING` `ERROR` `CRITICAL` |
+| Handler | Destination (stderr, file, syslog) |
+| Formatter | Message layout |
+| Filter | Extra include/exclude rules |
+| Propagation | Child → parent loggers |
+
+Root logger defaults to `WARNING`. Libraries should not call `basicConfig`; apps should.
+
+## 💡 Examples
+
+**Module logger:**
+
+```python
+import logging
+
+log = logging.getLogger(__name__)
+
+def work(n: int) -> int:
+    log.debug("start n=%s", n)
+    if n < 0:
+        log.error("invalid n=%s", n)
+        raise ValueError(n)
+    log.info("ok")
+    return n * 2
+```
+
+**basicConfig for scripts:**
+
+```python
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logging.getLogger(__name__).info("boot")
+```
+
+**File + stderr handlers:**
+
+```python
+import logging
+from pathlib import Path
+
+def setup(log_path: Path) -> None:
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    fmt = logging.Formatter("%(levelname)s %(message)s")
+
+    sh = logging.StreamHandler()
+    sh.setLevel(logging.INFO)
+    sh.setFormatter(fmt)
+
+    fh = logging.FileHandler(log_path, encoding="utf-8")
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(fmt)
+
+    root.handlers.clear()
+    root.addHandler(sh)
+    root.addHandler(fh)
+```
+
+**exception helper:**
+
+```python
+import logging
+
+log = logging.getLogger("app")
+try:
+    1 / 0
+except ZeroDivisionError:
+    log.exception("divide failed")  # includes traceback
+```
+
+## ⚠️ Pitfalls
+
+- Eager f-strings in log calls allocate even if level is filtered — use `%s` lazy args.
+- Multiple `basicConfig` calls are no-ops if handlers already exist.
+- Catching exceptions without `log.exception` loses stack traces.
+- Don't log secrets (tokens, passwords).
+- Avoid configuring logging inside importable libraries.
+
+## 🔗 Related
+
+- [Exceptions](exceptions.md)
+- [Argparse](argparse.md)
+- [Examples: cli tool](Examples/cli_tool.md)
+- [Concurrency](concurrency.md)
+- [Pathlib](pathlib.md)
+- [Testing with pytest](testing_pytest.md)

@@ -1,0 +1,98 @@
+# Specificity
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Specificity decides which declaration wins when selectors match the same element. Count IDs, classes/attributes/pseudo-classes, and types/pseudo-elements. Cascade layers, importance, and order also matter — specificity is only one axis.
+
+## 🔧 Core concepts
+
+| Selector piece | Weight (a,b,c) |
+| --- | --- |
+| Inline `style=""` | wins over selectors (except `!important` wars) |
+| `#id` | (1,0,0) |
+| `.class`, `[attr]`, `:hover` | (0,1,0) |
+| `div`, `::before` | (0,0,1) |
+| `:where()` | (0,0,0) |
+| `:is()` / `:has()` / `:not()` | specificity of most specific argument |
+
+- **Tie-break**: later rule in the cascade wins (within same layer/importance).
+- **`!important`**: escalates importance; still compare specificity within that bucket.
+- **Layers**: `@layer` can make lower-specificity author styles win over unlayered — see cascade layers.
+
+```css
+#nav .link {
+  /* 1,1,0 */
+  color: blue;
+}
+.link:hover {
+  /* 0,2,0 */
+  color: red;
+} /* loses to #nav .link */
+```
+
+## 💡 Examples
+
+```css
+/* Soft defaults */
+:where(.btn) {
+  padding: 0.5rem 1rem;
+} /* 0 */
+.btn.primary {
+  background: var(--accent);
+} /* easy override */
+
+/* :is takes max */
+:is(#a, .b) span {
+  /* 1,0,1 */
+}
+
+/* Avoid IDs for styling */
+/* BAD */
+#header nav ul li a {
+}
+/* GOOD */
+.site-nav a {
+}
+
+/* Inline vs class */
+/* style="color:red" beats .text { color: blue } */
+.text {
+  color: blue !important;
+} /* beats inline without !important */
+
+/* Attribute vs class — same bucket */
+[data-active] {
+}
+.is-active {
+}
+```
+
+```css
+/* Progressive override */
+.card {
+  padding: 1rem;
+}
+.card.compact {
+  padding: 0.5rem;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Fighting specificity with ever-longer selectors or `!important` creates unmaintainable CSS.
+- IDs in CSS couple to unique DOM nodes — prefer classes.
+- `!important` in utilities can be OK; in components it usually signals a specificity problem.
+- Shadow DOM has a separate boundary — host/page rules don’t pierce freely.
+- Order only matters after layer + importance + specificity compare equal.
+
+## 🔗 Related
+
+- [selectors.md](./selectors.md) — selector types
+- [cascade_layers.md](./cascade_layers.md) — @layer
+- [pseudo_classes.md](./pseudo_classes.md) — specificity contributors
+- [nesting.md](./nesting.md) — nested specificity
+- [variables.md](./variables.md) — theming without specificity wars

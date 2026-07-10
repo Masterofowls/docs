@@ -1,0 +1,58 @@
+# Permissions
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Sensitive APIs (camera, photos, location, mic, notifications, tracking) require runtime permission prompts plus Info.plist / AndroidManifest declarations. Expo: `expo-*` modules + config plugins.
+
+## 🔧 Core concepts
+
+- **Declare** — usage strings (`NSCameraUsageDescription`) and manifest permissions.
+- **Request at need** — when the user taps an action, not on cold start spam.
+- **Check status** — `granted` | `denied` | `undetermined` | limited (iOS photos).
+- **Settings** — if denied, deep-link to app settings (`Linking.openSettings()`).
+- **Expo** — `expo-camera`, `expo-location`, `expo-image-picker`, etc.
+
+## 💡 Examples
+
+```tsx
+import * as ImagePicker from "expo-image-picker";
+import { Alert, Linking } from "react-native";
+
+export async function pickImage() {
+  const current = await ImagePicker.getMediaLibraryPermissionsAsync();
+  let status = current.status;
+  if (status !== "granted") {
+    const req = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    status = req.status;
+  }
+  if (status !== "granted") {
+    Alert.alert("Permission needed", "Enable photo access in Settings", [
+      { text: "Open Settings", onPress: () => Linking.openSettings() },
+      { text: "Cancel", style: "cancel" },
+    ]);
+    return null;
+  }
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    quality: 0.8,
+  });
+  return result.canceled ? null : result.assets[0];
+}
+```
+
+## ⚠️ Pitfalls
+
+- Missing plist usage descriptions → App Store reject / crash on access.
+- Requesting everything at launch → users deny all.
+- Ignoring Android 13+ granular media permissions.
+
+## 🔗 Related
+
+- [Expo/plugins.md](./Expo/plugins.md) — config plugins
+- [Expo/config.md](./Expo/config.md) — app config
+- [notification.md](./notification.md) — notification permission
+- [settings.md](./settings.md) — open settings

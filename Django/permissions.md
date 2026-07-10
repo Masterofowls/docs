@@ -1,0 +1,91 @@
+# Permissions
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django auth permissions are `app_label.codename` triples (add/change/delete/view plus custom). Attach via groups or directly on users. Enforce with mixins, decorators, `user.has_perm`, or DRF permission classes. Object-level rules need custom checks or packages like django-guardian.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Default perms | Auto-created per model |
+| Custom | `Meta.permissions` or `Permission` rows |
+| Groups | Bundle permissions |
+| `user_passes_test` / `permission_required` | Function views |
+| `PermissionRequiredMixin` / `LoginRequiredMixin` | CBVs |
+| `has_perm` / `has_module_perms` | Checks |
+
+Superusers pass all permission checks.
+
+## 💡 Examples
+
+**Model custom permission:**
+
+```python
+class Article(models.Model):
+    ...
+
+    class Meta:
+        permissions = [
+            ("publish_article", "Can publish article"),
+        ]
+```
+
+**CBV:**
+
+```python
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import UpdateView
+
+from .models import Article
+
+
+class ArticleUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Article
+    fields = ("title", "body")
+    permission_required = "blog.change_article"
+```
+
+**Function view + check:**
+
+```python
+from django.contrib.auth.decorators import login_required, permission_required
+
+
+@login_required
+@permission_required("blog.publish_article", raise_exception=True)
+def publish(request, pk):
+    ...
+```
+
+**Programmatic:**
+
+```python
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+ct = ContentType.objects.get_for_model(Article)
+perm = Permission.objects.get(codename="publish_article", content_type=ct)
+user.user_permissions.add(perm)
+user.has_perm("blog.publish_article")
+```
+
+## ⚠️ Pitfalls
+
+- Checking only authentication, not authorization.
+- Caching stale `user.user_permissions` after changes in the same request—refetch or clear cache.
+- Object ownership ≠ model permission—implement explicitly.
+- DRF: browser session auth vs token auth need matching permission classes.
+- Forgetting `raise_exception=True` → silent redirect to login on 403 cases.
+
+## 🔗 Related
+
+- [Authentication](authentication.md)
+- [Views](views.md)
+- [REST framework](rest_framework.md)
+- [Testing](testing.md)
+- [Security](security.md)

@@ -1,0 +1,70 @@
+# Transactions
+
+*_SQL · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Transactions group statements into an atomic unit: all commit or all roll back. Isolation levels control what concurrent sessions can see. Use them for multi-step writes that must stay consistent.
+
+## 🧩 Core concepts
+
+- **ACID** — Atomicity, Consistency, Isolation, Durability.
+- **BEGIN / COMMIT / ROLLBACK** — start, persist, or undo a unit of work.
+- **Savepoints** — partial rollback inside a transaction.
+- **Isolation levels** — `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SERIALIZABLE`.
+- **Locks** — row/table locks and deadlocks under contention.
+- **Autocommit** — many clients commit each statement unless a transaction is open.
+
+## 💡 Examples
+
+```sql
+BEGIN;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+-- Optional check
+SELECT balance FROM accounts WHERE id IN (1, 2);
+
+COMMIT;
+-- or: ROLLBACK;
+
+-- Savepoint
+BEGIN;
+INSERT INTO orders (user_id, total) VALUES (9, 50) RETURNING id;
+SAVEPOINT sp_items;
+INSERT INTO order_items (order_id, product_id, qty) VALUES (currval('orders_id_seq'), 55, 1);
+-- on failure:
+ROLLBACK TO SAVEPOINT sp_items;
+COMMIT;
+
+-- Isolation (PostgreSQL example)
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+-- critical reads/writes
+COMMIT;
+```
+
+Application pattern (pseudocode):
+
+```text
+BEGIN
+  write A
+  write B
+COMMIT  -- or ROLLBACK on error
+```
+
+## ⚠️ Pitfalls
+
+- Long transactions hold locks and inflate MVCC bloat — keep them short.
+- Ignoring errors and still committing can persist partial logical work if statements were autocommitted.
+- Deadlocks: engines abort one session — retry the whole transaction.
+- Isolation defaults differ (e.g. Postgres `READ COMMITTED` vs MySQL InnoDB `REPEATABLE READ`) — don’t assume anomaly behavior.
+
+## 🔗 Related
+
+- [Insert / Update / Delete](./insert_update_delete.md)
+- [Select](./select.md)
+- [Indexes](./indexes.md)
+- [Joins](./joins.md)

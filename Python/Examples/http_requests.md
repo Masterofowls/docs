@@ -1,0 +1,93 @@
+# HTTP Requests
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Call HTTP APIs with the popular `requests` library (or stdlib `urllib`). Handle timeouts, status codes, and JSON payloads explicitly. Install: `python -m pip install requests`.
+
+## 🔧 Core concepts
+
+| Task | Approach |
+| --- | --- |
+| GET/POST | `requests.get/post` |
+| JSON body | `json=` param |
+| Query string | `params=` |
+| Headers | `headers=` |
+| Timeout | Always set `timeout=` |
+| Errors | `raise_for_status()` |
+| Session | `requests.Session()` for connection reuse |
+
+Prefer sessions for multiple calls to the same host. Never hardcode secrets — use env vars.
+
+## 💡 Examples
+
+**GET JSON:**
+
+```python
+import os
+import requests
+
+def fetch_user(user_id: int) -> dict:
+    token = os.environ["API_TOKEN"]
+    url = f"https://api.example.com/users/{user_id}"
+    resp = requests.get(
+        url,
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=10,
+    )
+    resp.raise_for_status()
+    return resp.json()
+```
+
+**POST and session:**
+
+```python
+import requests
+
+with requests.Session() as s:
+    s.headers.update({"Accept": "application/json"})
+    r = s.post(
+        "https://httpbin.org/post",
+        json={"name": "Ada"},
+        timeout=10,
+    )
+    r.raise_for_status()
+    print(r.json()["json"])
+```
+
+**stdlib alternative:**
+
+```python
+import json
+from urllib.request import Request, urlopen
+
+req = Request(
+    "https://httpbin.org/get",
+    headers={"Accept": "application/json"},
+)
+with urlopen(req, timeout=10) as resp:
+    data = json.load(resp)
+print(data["url"])
+```
+
+**Retry sketch:** see [retry backoff](retry_backoff.md).
+
+## ⚠️ Pitfalls
+
+- Missing `timeout` can hang forever.
+- Not calling `raise_for_status()` treats 404/500 as success.
+- Logging response bodies may leak PII/tokens.
+- `verify=False` disables TLS verification — avoid.
+- Relative redirects + mixed POST/GET behavior — know `allow_redirects`.
+
+## 🔗 Related
+
+- [Retry backoff](retry_backoff.md)
+- [Scrape HTML](scrape_html.md)
+- [CLI tool](cli_tool.md)
+- [../json.md](../json.md)
+- [../exceptions.md](../exceptions.md)
+- [../logging.md](../logging.md)

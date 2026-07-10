@@ -1,0 +1,109 @@
+# Text
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Text CSS controls wrapping, alignment, decoration, spacing, overflow, and white-space behavior. It sits beside font properties: fonts choose the face; text properties shape how glyphs flow in a box. Use these tools for readable paragraphs, truncated labels, wrapping balance, and decorative underlines without breaking accessibility or copy-paste.
+
+Prefer logical alignment (`text-align: start`) and modern wrapping (`overflow-wrap`, `text-wrap`) for internationalized UIs.
+
+## 🔧 Core concepts
+
+### Alignment & direction
+
+| Property | Notes |
+| --- | --- |
+| `text-align` | `start` \| `end` \| `left` \| `right` \| `center` \| `justify` |
+| `text-align-last` | Last line alignment |
+| `direction` / `unicode-bidi` | Prefer HTML `dir` attribute when possible |
+| `writing-mode` | `horizontal-tb` \| `vertical-rl` \| … |
+| `text-orientation` | Vertical text glyph orientation |
+
+### Wrapping & overflow
+
+| Property | Role |
+| --- | --- |
+| `white-space` | `normal` \| `nowrap` \| `pre` \| `pre-wrap` \| `pre-line` \| `break-spaces` |
+| `overflow-wrap` / `word-break` | Long-string breaking strategies |
+| `line-break` | CJK line breaking |
+| `hyphens` | `none` \| `manual` \| `auto` (needs `lang`) |
+| `text-overflow` | `clip` \| `ellipsis` (needs overflow + nowrap typically) |
+| `text-wrap` | `wrap` \| `balance` \| `pretty` \| `nowrap` (modern) |
+
+### Decoration & spacing
+
+| Property | Role |
+| --- | --- |
+| `text-decoration-*` | line, style, color, thickness |
+| `text-underline-offset` | Optical underline position |
+| `letter-spacing` / `word-spacing` | Tracking |
+| `text-indent` | First-line indent |
+| `text-transform` | `uppercase` \| `lowercase` \| `capitalize` \| `none` |
+| `hanging-punctuation` | Optical margin hanging (limited support) |
+
+## 💡 Examples
+
+### Readable measure
+
+```css
+.prose {
+  max-inline-size: 65ch;
+  text-wrap: pretty;
+  line-height: 1.6;
+}
+
+.prose h2 {
+  text-wrap: balance;
+}
+```
+
+### Truncate single line
+
+```css
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-inline-size: 100%;
+}
+```
+
+### Clamp to N lines
+
+```css
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+```
+
+### Link underline polish
+
+```css
+.prose a {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in oklab, currentColor 55%, transparent);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Justifying text on narrow columns without hyphenation, creating huge word gaps.
+- Using `word-break: break-all` on normal prose, which shreds readability.
+- Truncating with ellipsis without another way to read the full string (title, expand, dialog).
+- Applying `text-transform: uppercase` for logos/headings that screen readers may still announce oddly—prefer real content casing when meaning matters.
+- Setting `letter-spacing` large on body text, harming readability.
+
+## 🔗 Related
+
+- [Fonts](font.md)
+- [Text fields](textfield.md)
+- [Buttons](button.md)
+- [Multi-column layout](column.md)

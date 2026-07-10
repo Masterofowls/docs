@@ -1,0 +1,88 @@
+# Type Coercion
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Coercion converts values between types implicitly (`==`, `+`, `if`) or explicitly (`Number`, `String`, `Boolean`, `BigInt`). Prefer explicit conversions. Know `ToPrimitive`, string concatenation vs addition, and truthiness to debug surprising results.
+
+## 🔧 Core concepts
+
+- **Explicit**: `Number(x)`, `String(x)`, `Boolean(x)`, `BigInt(x)`, `parseInt` / `parseFloat`.
+- **Implicit**: `+x` (number), `x + ""` (string), `!!x` (boolean), `==` rules.
+- **`+`**: if either side is string, concatenate; else numeric add.
+- **`ToPrimitive`**: prefers `valueOf` then `toString` (hint-dependent).
+- **Truthy/falsy**: see conditionals — not the same as `Boolean` edge cases for objects.
+
+```js
+Number("42"); // 42
+String(42); // "42"
+Boolean(0); // false
+"3" + 1; // "31"
++"3" + 1; // 4
+```
+
+## 💡 Examples
+
+```js
+// Numeric
+Number(""); // 0
+Number("  12 "); // 12
+Number("12a"); // NaN
+parseInt("12a", 10); // 12
+parseInt("08", 10); // 8 — always pass radix
+
+// Boolean
+Boolean([]); // true
+Boolean({}); // true
+Boolean(""); // false
+
+// == coercion highlights (avoid)
+false == 0; // true
+"" == 0; // true
+null == undefined; // true
+null == 0; // false
+
+// Objects
+[] + []; // ""
+[] + {}; // "[object Object]"
+{} + []; // depends on ASI / context — avoid
+
+// valueOf / toString
+const money = {
+  valueOf() {
+    return 100;
+  },
+};
+money + 1; // 101
+
+// Explicit helpers
+const toInt = (v) => {
+  const n = Number.parseInt(String(v), 10);
+  return Number.isFinite(n) ? n : null;
+};
+```
+
+```js
+// Template always stringifies
+`${[1, 2]}`; // "1,2"
+`${{ a: 1 }}`; // "[object Object]"
+```
+
+## ⚠️ Pitfalls
+
+- `parseInt` without radix and hex/`0`-prefix history — always pass `10`.
+- `Number(null)` is `0` but `Number(undefined)` is `NaN`.
+- Arrays coerce to strings via `join` — `==` comparisons get weird.
+- `BigInt` does not coerce with `Number` in arithmetic — convert deliberately.
+- Relying on `==` “convenience” creates subtle bugs — use `===` + explicit casts.
+
+## 🔗 Related
+
+- [equality.md](./equality.md) — === vs ==
+- [boolean.md](./boolean.md) — ToBoolean
+- [number.md](./number.md) — Number quirks
+- [bigint.md](./bigint.md) — BigInt conversion
+- [strings.md](./strings.md) — String conversion

@@ -1,0 +1,88 @@
+# Types
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Python is dynamically typed at runtime and optionally statically checked via type annotations (PEP 484+). Use built-in generics (`list[str]`, `dict[str, int]`), `typing` utilities, and `|` unions (3.10+). Annotations document APIs and enable mypy/pyright—they do not enforce types at runtime unless you add a validator.
+
+## 🔧 Core concepts
+
+| Kind | Examples |
+| --- | --- |
+| Built-ins | `int`, `float`, `bool`, `str`, `bytes`, `None` |
+| Collections | `list[T]`, `dict[K, V]`, `set[T]`, `tuple[A, B]` |
+| Union / optional | `int \| None`, `str \| int` |
+| Callables | `Callable[[int, str], bool]` |
+| Protocols | Structural typing (`typing.Protocol`) |
+| Aliases | `type UserId = int` (3.12+) or `TypeAlias` |
+| Generics | `class Box[T]: ...` (3.12+) or `TypeVar` |
+
+`isinstance` / `issubclass` for runtime checks; prefer EAFP with care for public boundaries.
+
+## 💡 Examples
+
+**Annotations and unions:**
+
+```python
+def parse_id(value: str | int) -> int:
+    return int(value)
+
+def find(name: str) -> str | None:
+    return name if name else None
+```
+
+**Collections and TypedDict:**
+
+```python
+from typing import TypedDict
+
+class User(TypedDict):
+    id: int
+    name: str
+    active: bool
+
+users: list[User] = [{"id": 1, "name": "Ada", "active": True}]
+```
+
+**Protocol (duck typing):**
+
+```python
+from typing import Protocol
+
+class Closeable(Protocol):
+    def close(self) -> None: ...
+
+def shutdown(resource: Closeable) -> None:
+    resource.close()
+```
+
+**Runtime check helpers:**
+
+```python
+from collections.abc import Iterable
+
+def total(xs: Iterable[int]) -> int:
+    return sum(xs)
+
+assert isinstance(True, int)  # bool is a subclass of int
+```
+
+## ⚠️ Pitfalls
+
+- Annotations are not runtime-enforced: `def f(x: int): ...` still accepts any object.
+- Mutable default arguments (`def f(xs=[])`) share one list—use `None` + create inside.
+- `list` vs `List` from `typing`: prefer built-ins on 3.9+.
+- `tuple[int]` is a one-int tuple; `tuple[int, ...]` is variable length.
+- Over-annotating trivial locals adds noise; focus on public functions and complex structures.
+
+## 🔗 Related
+
+- [Dictionaries](dictionaries.md)
+- [Docstrings](docstrings.md)
+- [*args and **kwargs](kwags.md)
+- [Strings](strings.md)
+- [Import / export](import_export.md)
+- [Async / await](async.md)

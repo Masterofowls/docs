@@ -1,0 +1,96 @@
+# Pseudo-classes
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Pseudo-classes select elements in a particular state or structural position (`:hover`, `:focus-visible`, `:nth-child`, `:valid`). They help style interaction and structure without extra markup. Prefer `:focus-visible` for keyboard-friendly outlines.
+
+## 🔧 Core concepts
+
+| Group | Examples |
+| --- | --- |
+| User action | `:hover` `:active` `:focus` `:focus-visible` `:focus-within` |
+| Location | `:link` `:visited` `:target` |
+| Input | `:checked` `:disabled` `:enabled` `:required` `:optional` `:valid` `:invalid` `:user-invalid` `:placeholder-shown` `:autofill` |
+| Structural | `:first-child` `:last-child` `:nth-child()` `:nth-of-type()` `:only-child` `:empty` |
+| Logical | `:is()` `:where()` `:not()` `:has()` |
+| Linguistic | `:lang()` `:dir()` |
+
+```css
+button:hover {
+  filter: brightness(1.05);
+}
+button:focus-visible {
+  outline: 2px solid var(--accent);
+}
+form:focus-within {
+  border-color: var(--accent);
+}
+```
+
+## 💡 Examples
+
+```css
+/* Zebra + first */
+tr:nth-child(odd) {
+  background: #fafafa;
+}
+li:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
+/* Checkbox UI */
+input[type="checkbox"]:checked + .label {
+  text-decoration: line-through;
+}
+
+/* Valid/invalid after interaction */
+input:user-invalid {
+  border-color: crimson;
+}
+input:user-valid {
+  border-color: seagreen;
+}
+
+/* Empty state */
+.list:empty::before {
+  content: "Nothing here";
+  color: #888;
+}
+
+/* Soft :is */
+:is(h1, h2, h3):first-child {
+  margin-top: 0;
+}
+
+/* Modal open on dialog */
+dialog:open {
+  border-radius: 12px;
+}
+```
+
+```css
+/* Avoid :visited privacy limits — only limited props allowed */
+a:visited {
+  color: rebeccapurple;
+}
+```
+
+## ⚠️ Pitfalls
+
+- `:hover` on touch devices can “stick” — pair with `@media (hover: hover)`.
+- Styling `:invalid` from page load is noisy — use `:user-invalid`.
+- `:visited` is privacy-restricted — few properties apply.
+- `:empty` is false if whitespace text nodes exist.
+- Specificity of most pseudo-classes equals a class (except `:where`).
+
+## 🔗 Related
+
+- [pseudo_elements.md](./pseudo_elements.md) — ::pseudo
+- [selectors.md](./selectors.md) — selector overview
+- [has_selector.md](./has_selector.md) — :has
+- [hover.md](./hover.md) — hover patterns
+- [specificity.md](./specificity.md) — weights

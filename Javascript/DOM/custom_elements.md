@@ -1,0 +1,100 @@
+# Custom Elements
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Custom Elements let you define new HTML tags (or upgrade builtins) with a JavaScript class. Combined with Shadow DOM and `<template>`, they form Web Components — reusable, encapsulated UI with lifecycle callbacks.
+
+## 🔧 Core concepts
+
+- **Define**: `customElements.define("my-el", class extends HTMLElement { ... })`.
+- **Name**: must include a hyphen (`my-card`).
+- **Lifecycle**: `connectedCallback`, `disconnectedCallback`, `attributeChangedCallback`, `adoptedCallback`.
+- **Observed attrs**: static `observedAttributes = ["open"]`.
+- **Autonomous** vs **customized built-in**: `extends: "button"` + `is="..."`.
+- **Upgrade**: `customElements.whenDefined("my-el")`, `upgrade`.
+
+```js
+class HelloWorld extends HTMLElement {
+  connectedCallback() {
+    this.textContent = "Hello";
+  }
+}
+customElements.define("hello-world", HelloWorld);
+```
+
+## 💡 Examples
+
+```js
+class FancyButton extends HTMLElement {
+  static observedAttributes = ["label", "disabled"];
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.innerHTML = `<button part="button"><slot></slot></button>`;
+    this._btn = this.shadowRoot.querySelector("button");
+  }
+
+  connectedCallback() {
+    this._btn.addEventListener("click", this._onClick);
+  }
+
+  disconnectedCallback() {
+    this._btn.removeEventListener("click", this._onClick);
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal === newVal) return;
+    if (name === "label") this._btn.textContent = newVal;
+    if (name === "disabled") this._btn.disabled = newVal != null;
+  }
+
+  _onClick = () => {
+    this.dispatchEvent(new CustomEvent("fancy-click", { bubbles: true }));
+  };
+}
+customElements.define("fancy-button", FancyButton);
+
+// Wait for definition
+await customElements.whenDefined("fancy-button");
+document.createElement("fancy-button");
+
+// Customized built-in (where supported)
+class ExpandingList extends HTMLUListElement {
+  connectedCallback() {
+    this.addEventListener("click", () => this.classList.toggle("open"));
+  }
+}
+customElements.define("expanding-list", ExpandingList, { extends: "ul" });
+// <ul is="expanding-list">
+```
+
+```js
+// Reflect property ↔ attribute
+get open() {
+  return this.hasAttribute("open");
+}
+set open(v) {
+  this.toggleAttribute("open", Boolean(v));
+}
+```
+
+## ⚠️ Pitfalls
+
+- Must call `super()` in constructors before using `this`; don’t read attributes too early if not upgraded.
+- Customized built-ins lack Safari support historically — prefer autonomous elements for portability.
+- `attributeChangedCallback` does not fire for property-only changes unless you reflect.
+- Defining twice throws — guard or use feature detection.
+- Slotted light DOM vs shadow: know where events retarget.
+
+## 🔗 Related
+
+- [shadow_dom.md](./shadow_dom.md) — encapsulation
+- [../Html/template_slot.md](../../Html/template_slot.md) — templates
+- [../Html/web_components.md](../../Html/web_components.md) — overview
+- [attributes.md](./attributes.md) — attribute APIs
+- [events.md](./events.md) — CustomEvent

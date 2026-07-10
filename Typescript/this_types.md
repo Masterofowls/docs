@@ -1,0 +1,84 @@
+# this types
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+TypeScript types the `this` context for methods, functions, and classes. Use explicit `this` parameters, polymorphic `this`, and `ThisParameterType` / `OmitThisParameter` for fluent APIs and correct callbacks under `strict` / `noImplicitThis`.
+
+## 🔧 Core concepts
+
+- **`this` parameter** — fake first param: `function f(this: T, …)` (erased at emit).
+- **Polymorphic `this`** — return `this` for subclass-preserving builders.
+- **`ThisType<T>`** — contextual `this` in object literal helpers (e.g. Vue options).
+- **Extractors** — `ThisParameterType<F>`, `OmitThisParameter<F>`.
+- **Arrow vs method** — arrows capture lexical `this`; methods use call-site `this`.
+
+## 💡 Examples
+
+```ts
+function setName(this: { name: string }, name: string) {
+  this.name = name;
+}
+const obj = { name: "Ada", setName };
+obj.setName("Grace");
+// setName("x"); // error — needs this
+
+class Builder {
+  value = 0;
+  add(n: number): this {
+    this.value += n;
+    return this;
+  }
+}
+class FancyBuilder extends Builder {
+  label = "";
+  named(s: string): this {
+    this.label = s;
+    return this;
+  }
+}
+new FancyBuilder().add(1).named("x"); // FancyBuilder
+
+type Fn = (this: HTMLElement, ev: Event) => void;
+type This = ThisParameterType<Fn>; // HTMLElement
+type Bare = OmitThisParameter<Fn>; // (ev: Event) => void
+
+// Object literal with ThisType
+type Bag = {
+  data: { count: number };
+  methods: {
+    inc(this: { data: { count: number } }): void;
+  };
+};
+```
+
+```ts
+class Widget {
+  id = 1;
+  // Prefer arrow for callbacks passed to DOM/timers
+  onClick = () => console.log(this.id);
+  // Method needs bind / arrow if detached
+  log() {
+    console.log(this.id);
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Detaching methods (`const f = obj.method; f()`) loses `this` — bind or use arrows.
+- `this` parameters are not allowed on arrow functions.
+- `noImplicitThis` errors in non-method functions without annotation.
+- Polymorphic `this` doesn’t work well with some aliasing / union returns.
+- Mixing `function` callbacks in React class components is a classic `this` bug.
+
+## 🔗 Related
+
+- [class.md](./class.md)
+- [strict_options.md](./strict_options.md)
+- [utility_types.md](./utility_types.md)
+- [tsx_react.md](./tsx_react.md)
+- [interfaces.md](./interfaces.md)

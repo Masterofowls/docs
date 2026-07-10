@@ -1,0 +1,72 @@
+# Const assertions
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`as const` asserts a value is deeply readonly with the narrowest literal types. Use it for config objects, route tables, and tuple literals so `keyof` / indexed access stay precise. Pairs well with `satisfies`.
+
+## 🔧 Core concepts
+
+- **Literals** — `"ok" as const` → type `"ok"` (not `string`).
+- **Arrays → readonly tuples** — `[1, "a"] as const` → `readonly [1, "a"]`.
+- **Objects** — all props `readonly`; nested values narrowed.
+- **Enum alternative** — `as const` object + `(typeof O)[keyof typeof O]`.
+- **Mutable copy** — spread or typed mutable alias when mutation is required.
+
+## 💡 Examples
+
+```ts
+const status = "success" as const; // "success"
+
+const point = [10, 20] as const;
+// readonly [10, 20]
+point[0]; // 10
+
+const config = {
+  host: "localhost",
+  port: 5432,
+  features: ["auth", "cache"],
+} as const;
+
+type Config = typeof config;
+type Feature = (typeof config.features)[number]; // "auth" | "cache"
+
+const Routes = {
+  home: "/",
+  user: "/users/:id",
+} as const;
+type RouteKey = keyof typeof Routes;
+type RoutePath = (typeof Routes)[RouteKey];
+
+// With satisfies — narrow + validate
+type Theme = { primary: string; radius: number };
+const theme = {
+  primary: "#336699",
+  radius: 8,
+} as const satisfies Theme;
+
+// Function args
+function move(dir: "up" | "down") {}
+const dirs = ["up", "down"] as const;
+move(dirs[0]);
+```
+
+## ⚠️ Pitfalls
+
+- `as const` makes structures readonly — assigning to props fails.
+- Widening returns if you annotate `: string[]` instead of using `as const`.
+- `as const` on mutable class fields doesn’t freeze at runtime — only types.
+- Large const objects can slow the checker — split modules if needed.
+- Runtime still mutable unless you also `Object.freeze` (shallow).
+
+## 🔗 Related
+
+- [satisfies.md](./satisfies.md)
+- [literal_types.md](./literal_types.md)
+- [readonly.md](./readonly.md)
+- [keyof_typeof.md](./keyof_typeof.md)
+- [tuple_types.md](./tuple_types.md)
+- [enums.md](./enums.md)

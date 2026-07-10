@@ -1,0 +1,62 @@
+# Build
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**EAS Build** compiles iOS/Android binaries in the cloud (or locally) from your Expo project. Profiles in `eas.json` define development, preview, and production builds.
+
+## 🔧 Core concepts
+
+- **Profiles** — `development` (dev client), `preview` (internal), `production` (store).
+- **Workflow** — `eas build -p android|ios --profile <name>`.
+- **Credentials** — EAS can manage keystores / distribution certs / provisioning.
+- **App config** — `app.json` / `app.config.ts` + native projects via **CNG / prebuild**.
+- **Local** — `eas build --local` when you need on-machine compiles.
+
+## 💡 Examples
+
+```json
+// eas.json
+{
+  "cli": { "version": ">= 12.0.0" },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
+```
+
+```bash
+npx eas-cli login
+npx eas-cli build --platform android --profile preview
+npx eas-cli build --platform ios --profile production
+npx eas-cli submit --platform ios --latest
+```
+
+## ⚠️ Pitfalls
+
+- Building production without matching bundle ID / package + store listings.
+- Forgetting `developmentClient: true` when you need custom native modules in dev.
+- Native changes without rebuilding the binary (JS OTA can’t add native code).
+
+## 🔗 Related
+
+- [commands.md](./commands.md) — CLI commands
+- [config.md](./config.md) — app config
+- [keystore_sign.md](./keystore_sign.md) — Android signing
+- [plugins.md](./plugins.md) — config plugins in builds

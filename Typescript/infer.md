@@ -1,0 +1,65 @@
+# infer keyword
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`infer` introduces a type variable inside a conditional type’s `extends` clause. Use it to extract return types, element types, promise payloads, and pattern pieces from other types — the foundation of many utility types.
+
+## 🔧 Core concepts
+
+- **Form** — `T extends … infer U … ? True : False`.
+- **Scope** — `U` is only usable in the true branch.
+- **Multiple `infer`** — can appear several times; each binds independently.
+- **Variance** — position (covariant/contravariant) affects inference direction.
+- **Distributive** — bare type params distribute over unions in conditionals.
+
+## 💡 Examples
+
+```ts
+type ReturnOf<T> = T extends (...args: any) => infer R ? R : never;
+type R = ReturnOf<() => Promise<number>>; // Promise<number>
+
+type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
+type A = Awaited<Promise<Promise<string>>>; // string
+
+type Head<T> = T extends [infer H, ...unknown[]] ? H : never;
+type H = Head<[1, 2, 3]>; // 1
+
+type Elem<T> = T extends (infer E)[] ? E : never;
+type E = Elem<string[]>; // string
+
+type PropType<T, K extends PropertyKey> =
+  T extends { [P in K]: infer V } ? V : never;
+
+// Template + infer
+type StripPrefix<S> = S extends `id-${infer Rest}` ? Rest : S;
+type X = StripPrefix<"id-42">; // "42"
+
+// Contravariant infer in parameters (simplified)
+type FirstArg<T> = T extends (arg: infer A, ...rest: any) => any ? A : never;
+```
+
+```ts
+// Built-ins (prefer these): ReturnType, Parameters, Awaited, InstanceType
+type RT = ReturnType<() => boolean>;
+type P = Parameters<(a: string, b: number) => void>; // [string, number]
+```
+
+## ⚠️ Pitfalls
+
+- `infer` only works in conditional `extends` clauses, not arbitrary positions.
+- Distributive conditionals: wrap as `[T] extends […]` to disable distribution.
+- Over-broad `any` in patterns weakens inference.
+- Recursive `infer` / conditionals can hit instantiation depth limits.
+- Prefer stdlib utilities when they already exist (`ReturnType`, etc.).
+
+## 🔗 Related
+
+- [conditional_types.md](./conditional_types.md)
+- [utility_types.md](./utility_types.md)
+- [template_literal_types.md](./template_literal_types.md)
+- [generic_types.md](./generic_types.md)
+- [tuple_types.md](./tuple_types.md)

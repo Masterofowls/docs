@@ -1,0 +1,59 @@
+# reset
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git reset` moves HEAD (and optionally the index / worktree) to a target commit. Soft / mixed / hard modes control how much is discarded. Prefer `restore` for unstaging/discarding file content without moving HEAD.
+
+## 🔧 Core concepts
+
+| Mode | HEAD | Index | Worktree |
+| --- | --- | --- | --- |
+| `--soft` | moves | kept | kept |
+| `--mixed` (default) | moves | matches HEAD | kept |
+| `--hard` | moves | matches HEAD | matches HEAD |
+
+- **Path reset** — `git reset HEAD -- file` unstages (mixed on paths).
+- **vs revert** — reset rewrites history; revert adds a new undo commit.
+- **vs restore** — `git restore --staged` / `--worktree` for file-level ops.
+
+## 💡 Examples
+
+```bash
+# Unstage all / one file
+git reset HEAD
+git reset HEAD -- src/app.ts
+
+# Undo last commit, keep changes staged
+git reset --soft HEAD~1
+
+# Undo last commit, keep changes unstaged
+git reset HEAD~1
+
+# Destroy local commits + changes (dangerous)
+git reset --hard HEAD~1
+git reset --hard origin/main
+
+# Move branch tip to a SHA
+git reset --hard abcdef1
+```
+
+## ⚠️ Pitfalls
+
+- `--hard` deletes uncommitted work — confirm with `status` / stash first.
+- Never reset published commits others use — use `revert` instead.
+- After reset of pushed commits, force-push is required (coordinate with team).
+- Detached HEAD + reset can orphan commits — recover via `reflog`.
+- Pathspec reset doesn’t move branch tip — only affects index entries.
+
+## 🔗 Related
+
+- [revert.md](./revert.md)
+- [reflog.md](./reflog.md)
+- [amend.md](./amend.md)
+- [stage.md](./stage.md)
+- [status.md](./status.md)
+- [commit.md](./commit.md)

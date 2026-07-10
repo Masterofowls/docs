@@ -1,0 +1,67 @@
+# Suspense
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`<Suspense fallback={...}>` shows fallback UI while children are loading (lazy components, React 19 resource reading patterns, frameworks with RSC/data). Pair with `lazy()` for code-splitting and error boundaries for failures.
+
+## 🔧 Core concepts
+
+- **Boundary** — catches “suspend” from descendants; shows `fallback`.
+- **`React.lazy`** — dynamic `import()` wrapped component.
+- **Nested** — nearest boundary handles the suspend.
+- **Transitions** — pending transitions can avoid hiding already-shown UI (concurrent).
+- **Not for** — ordinary `useEffect` fetching unless integrated with a Suspense-aware data API.
+
+## 💡 Examples
+
+```tsx
+import { lazy, Suspense } from "react";
+
+const Editor = lazy(() => import("./Editor"));
+
+export function Page() {
+  return (
+    <Suspense fallback={<p>Loading editor…</p>}>
+      <Editor />
+    </Suspense>
+  );
+}
+```
+
+**Nested boundaries:**
+
+```tsx
+<Suspense fallback={<PageSkeleton />}>
+  <Header />
+  <Suspense fallback={<FeedSkeleton />}>
+    <Feed />
+  </Suspense>
+</Suspense>
+```
+
+**Named export lazy:**
+
+```tsx
+const Chart = lazy(() =>
+  import("./Chart").then((m) => ({ default: m.Chart })),
+);
+```
+
+## ⚠️ Pitfalls
+
+- Missing error boundary—load failures are not Suspense.
+- One giant boundary → whole page flashes fallback.
+- Suspense for data without a compatible library/framework → won’t suspend.
+- Forgetting a default export when using `lazy(() => import(...))`.
+
+## 🔗 Related
+
+- [error_boundaries.md](./error_boundaries.md) — failures
+- [concurrent.md](./concurrent.md) — concurrent UI
+- [useTransition.md](./useTransition.md) — pending states
+- [performance.md](./performance.md) — code splitting
+- [router.md](./router.md) — route-level lazy

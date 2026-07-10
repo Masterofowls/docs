@@ -1,0 +1,126 @@
+# Transforms
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS transforms move, rotate, scale, and skew elements in 2D or 3D without necessarily reflowing the document. They are the foundation of performant UI motion when paired with `opacity`. Prefer the individual transform properties (`translate`, `rotate`, `scale`) for readable code, or the classic `transform` list when you need a precise composed matrix order.
+
+Transforms create a containing block for fixed descendants and often a new stacking context—account for that when building overlays.
+
+## 🔧 Core concepts
+
+### Individual vs shorthand
+
+| Property | Example |
+| --- | --- |
+| `translate` | `translate: 0 0.5rem` or `translate: 10% 0 2rem` (3D) |
+| `rotate` | `rotate: 15deg` or `rotate: x 45deg` |
+| `scale` | `scale: 1.05` / `scale: 1.1 0.9` |
+| `transform` | `transform: translateY(0.5rem) rotate(3deg)` |
+
+Used transform combines individual properties with `transform` according to CSS Transforms Module rules—avoid setting conflicting systems blindly.
+
+### Common transform functions
+
+| Function | Role |
+| --- | --- |
+| `translate()` / `translateX/Y/Z()` / `translate3d()` | Move |
+| `scale()` / `scaleX/Y/Z()` | Resize visually |
+| `rotate()` / `rotateX/Y/Z()` / `rotate3d()` | Rotate |
+| `skew()` / `skewX/Y()` | Oblique distortion |
+| `matrix()` / `matrix3d()` | Raw matrix |
+| `perspective()` | As a function on the element (often use property instead) |
+
+### 3D helpers
+
+| Property | Role |
+| --- | --- |
+| `perspective` | On parent: depth for 3D children |
+| `perspective-origin` | Vanishing point |
+| `transform-style` | `flat` \| `preserve-3d` |
+| `backface-visibility` | `visible` \| `hidden` |
+| `transform-origin` | Pivot point |
+
+## 💡 Examples
+
+### Enter transition with translate + opacity
+
+```css
+.drawer {
+  translate: 0 100%;
+  opacity: 0;
+  transition: translate 240ms ease, opacity 240ms ease;
+}
+
+.drawer.is-open {
+  translate: 0 0;
+  opacity: 1;
+}
+```
+
+### Classic transform list
+
+```css
+.badge {
+  transform: translateY(-50%) rotate(-6deg);
+  transform-origin: left center;
+}
+```
+
+### 3D card flip
+
+```css
+.flip {
+  perspective: 800px;
+}
+
+.flip__inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 500ms ease;
+}
+
+.flip.is-flipped .flip__inner {
+  transform: rotateY(180deg);
+}
+
+.flip__face {
+  backface-visibility: hidden;
+}
+
+.flip__face--back {
+  transform: rotateY(180deg);
+}
+```
+
+### GPU-friendly hover lift
+
+```css
+.tile {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    transform: translateY(-4px);
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Animating `top`/`left` instead of `translate`, causing layout thrashing.
+- Surprising `position: fixed` children when an ancestor gains a transform.
+- Using `skew` for primary layout alignment—text becomes harder to read.
+- Forgetting `transform-origin` on rotations so UI pivots from the wrong point.
+- Enabling `preserve-3d` and large blurs/filters on many nodes, which is expensive.
+
+## 🔗 Related
+
+- [Scale](scale.md)
+- [Animation](animation.md)
+- [Positioning](position.md)
+- [Effects](effects.md)

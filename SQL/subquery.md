@@ -1,0 +1,75 @@
+# Subqueries
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Subqueries are nested `SELECT`s in `WHERE`, `FROM`, `SELECT`, or DML. Prefer joins or CTEs for readability when equivalent; use subqueries for existence checks, scalar lookups, and derived tables.
+
+## 🔧 Core concepts
+
+- **Scalar** — returns one value; usable in expressions.
+- **IN / NOT IN** — membership; watch NULLs with `NOT IN`.
+- **EXISTS / NOT EXISTS** — semi-join; often best for existence.
+- **Derived table** — subquery in `FROM` (must be aliased).
+- **Correlated** — references outer row; runs per outer row (optimizer may rewrite).
+- **LATERAL** — Postgres: correlated FROM subquery.
+
+## 💡 Examples
+
+```sql
+-- Scalar
+SELECT name,
+       (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS order_count
+FROM users u;
+
+-- EXISTS
+SELECT u.id, u.email
+FROM users u
+WHERE EXISTS (
+  SELECT 1 FROM orders o
+  WHERE o.user_id = u.id AND o.total > 100
+);
+
+-- IN
+SELECT * FROM products
+WHERE category_id IN (SELECT id FROM categories WHERE active);
+
+-- Derived table
+SELECT c.customer_id, c.revenue
+FROM (
+  SELECT customer_id, SUM(total) AS revenue
+  FROM orders
+  GROUP BY customer_id
+) AS c
+WHERE c.revenue > 1000;
+
+-- Postgres LATERAL
+SELECT u.id, o.id AS last_order_id
+FROM users u
+LEFT JOIN LATERAL (
+  SELECT id FROM orders
+  WHERE user_id = u.id
+  ORDER BY created_at DESC
+  LIMIT 1
+) o ON TRUE;
+```
+
+## ⚠️ Pitfalls
+
+- `NOT IN (SELECT col …)` yields unknown if the subquery returns NULL — prefer `NOT EXISTS`.
+- Correlated subqueries can be slow without indexes on join keys.
+- Scalar subquery that returns >1 row errors at runtime.
+- MySQL historically limited subquery materialization — check `EXPLAIN`.
+- Deep nesting hurts readability — use CTEs.
+
+## 🔗 Related
+
+- [cte.md](./cte.md)
+- [joins.md](./joins.md)
+- [where_having.md](./where_having.md)
+- [select.md](./select.md)
+- [explain_analyze.md](./explain_analyze.md)
+- [aggregate.md](./aggregate.md)

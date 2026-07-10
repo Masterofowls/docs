@@ -1,0 +1,93 @@
+# Box Model
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Every element box has content, padding, border, and margin. `box-sizing` controls whether `width`/`height` include padding and border. Mastering the box model prevents overflow surprises and layout math errors.
+
+## 🔧 Core concepts
+
+- **Content box**: where text/replaced content sits.
+- **Padding**: inside the border, clears content.
+- **Border**: edge around padding.
+- **Margin**: outside border; vertical margins may collapse.
+- **`box-sizing: content-box`** (default): width = content only.
+- **`box-sizing: border-box`**: width includes padding + border (recommended reset).
+- **Outline** / **box-shadow**: don’t add to layout size.
+
+```css
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+.card {
+  width: 320px;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  margin: 1rem auto;
+}
+```
+
+## 💡 Examples
+
+```css
+/* Total footprint with border-box */
+.box {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px;
+  border: 4px solid;
+} /* content shrinks; outer width stays 100% */
+
+/* Margin collapse (siblings / parent-child) */
+.section + .section {
+  margin-top: 2rem; /* prefer gap in flex/grid */
+}
+
+/* Intrinsic sizing */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block; /* remove inline gap */
+}
+
+/* Min/max */
+.panel {
+  min-width: 0; /* allow flex/grid children to shrink */
+  max-width: 60ch;
+}
+
+/* Logical box */
+.box {
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  margin-inline: auto;
+}
+```
+
+```css
+/* Debug */
+* {
+  outline: 1px solid rgb(255 0 0 / 0.2);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Mixing `content-box` widths with padding causes overflow past the intended size.
+- Vertical margin collapse can “eat” parent padding expectations — use flex `gap` or BFC (`overflow: auto`).
+- Inline elements ignore `width`/`height` / vertical margins differently — use `inline-block` or block.
+- `min-width: auto` on flex items prevents shrinking below content — set `min-width: 0`.
+- Percentage padding resolves against **width** of containing block (including vertical padding %).
+
+## 🔗 Related
+
+- [logical_properties.md](./logical_properties.md) — inline/block
+- [overflow.md](./overflow.md) — clipping
+- [z_index.md](./z_index.md) — stacking
+- [flex.md](./flex.md) — flex sizing
+- [grid.md](./grid.md) — grid tracks

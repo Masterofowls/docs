@@ -1,0 +1,72 @@
+# Decorators
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Decorators wrap or annotate classes and members. TypeScript 5.0+ supports the Stage 3 ECMAScript decorator model when `experimentalDecorators` is off (default). Legacy decorators remain available via `experimentalDecorators: true` for older frameworks.
+
+## 🧩 Core concepts
+
+- **ES decorators (TS 5.x default path)** — functions applied with `@dec` on class/methods/fields/getters/setters/accessors.
+- **Context object** — receives `kind`, `name`, `addInitializer`, `access`, `private`, `static`.
+- **Class decorators** — receive the class (or replace it) and optional context.
+- **Member decorators** — wrap methods or initialize fields; return a replacement function/value where allowed.
+- **Legacy mode** — `experimentalDecorators` + often `emitDecoratorMetadata` for Reflect metadata (NestJS, older Angular).
+- **Composition** — multiple decorators apply bottom-up (nearest to the member first).
+
+## 💡 Examples
+
+```ts
+// tsconfig: "experimentalDecorators": false (ES decorators)
+
+function logged<This, Args extends unknown[], Return>(
+  value: (this: This, ...args: Args) => Return,
+  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>,
+) {
+  return function (this: This, ...args: Args): Return {
+    console.log(`call ${String(context.name)}`);
+    return value.apply(this, args);
+  };
+}
+
+class Calculator {
+  @logged
+  add(a: number, b: number) {
+    return a + b;
+  }
+}
+
+function seal(value: Function, _context: ClassDecoratorContext) {
+  Object.seal(value);
+  Object.seal(value.prototype);
+}
+
+@seal
+class Config {}
+```
+
+Legacy-style (when `experimentalDecorators: true`):
+
+```ts
+function deprecated(target: object, propertyKey: string | symbol) {
+  console.warn(`${String(propertyKey)} is deprecated`);
+}
+```
+
+## ⚠️ Pitfalls
+
+- ES and legacy decorator APIs are incompatible — match your framework’s expected mode.
+- `emitDecoratorMetadata` only applies to legacy decorators and emits design:type metadata.
+- Decorators are not enabled for parameter decoration in the new ES model the same way as legacy.
+- Order and replacement semantics differ between modes — test against your runtime.
+
+## 🔗 Related
+
+- [Class](./class.md)
+- [Config](./config.md)
+- [Module](./module.md)
+- [Types](./types.md)
+- [Command line](./commandline.md)

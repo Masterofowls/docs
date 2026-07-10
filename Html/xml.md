@@ -1,0 +1,131 @@
+# XML
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**XML** (Extensible Markup Language) is a strict, generic markup language for structured data. **HTML5** is an SGML-inspired living standard with its own parsing rules—far more forgiving than XML. Authors sometimes meet XML via XHTML serialization, SVG/MathML embedded in HTML, sitemaps, RSS/Atom, or app config files.
+
+This sheet contrasts XML rules with HTML practice and covers when polyglot markup, namespaces, and well-formedness matter in web documents.
+
+## 🔧 Core concepts
+
+### Well-formedness (XML)
+
+XML documents must be well-formed:
+
+- Single root element
+- Properly nested tags
+- Attribute values quoted
+- Case-sensitive names
+- Empty elements written as `<tag/>` or `<tag></tag>`
+- Special characters escaped: `&amp;` `&lt;` `&gt;` `&quot;` `&apos;`
+- Optional XML declaration: `<?xml version="1.0" encoding="UTF-8"?>`
+
+HTML parsers auto-correct many errors; XML parsers **fail fatally** on malformed input.
+
+### HTML vs XHTML
+
+| Topic | HTML5 (text/html) | XHTML / XML |
+|-------|-------------------|-------------|
+| MIME | `text/html` | `application/xhtml+xml` |
+| Void tags | `<br>` ok | `<br/>` or `<br></br>` |
+| Omitted tags | Often allowed | Never |
+| Namespaces | Limited magic for SVG/MathML | Explicit `xmlns` |
+| Script/CSS | Special CDATA-like rules | Must respect XML escaping |
+
+Serving XHTML as `text/html` makes browsers use the HTML parser—XML rules are not enforced.
+
+### Namespaces
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+  <circle cx="12" cy="12" r="10" fill="currentColor"/>
+</svg>
+```
+
+In HTML5, inline SVG and MathML are parsed with namespace awareness. Custom elements use different rules (no XML namespaces required).
+
+### `xml:lang` and `lang`
+
+In HTML, prefer `lang`. In XML vocabularies, `xml:lang` is standard. Polyglot documents may include both with identical values.
+
+### Embedding XML-ish content in HTML
+
+- **SVG / MathML** — first-class in HTML5.
+- **Foreign data** — often JSON in `<script type="application/json">` instead of inline XML.
+- **`XHTML` self-closing** — in `text/html`, trailing slashes on void elements are ignored noise; on non-void elements they can create surprising DOM trees—avoid casual `/>` on `<div/>`.
+
+## 💡 Examples
+
+### Minimal well-formed XML
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<note>
+  <to>Ada</to>
+  <from>Grace</from>
+  <message>Ship the spec.</message>
+</note>
+```
+
+### Inline SVG in HTML
+
+```html
+<figure>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Green circle">
+    <circle cx="50" cy="50" r="40" fill="#0f766e"/>
+  </svg>
+  <figcaption>Decorative brand mark</figcaption>
+</figure>
+```
+
+### Atom feed snippet
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Docs updates</title>
+  <link href="https://example.com/feed.xml" rel="self"/>
+  <updated>2026-07-10T12:00:00Z</updated>
+  <entry>
+    <title>Forms cheat sheet</title>
+    <link href="https://example.com/html/form"/>
+    <id>urn:uuid:1234</id>
+    <updated>2026-07-10T12:00:00Z</updated>
+  </entry>
+</feed>
+```
+
+### Polyglot-minded void elements
+
+```html
+<!-- Safe in both HTML and XHTML serializations -->
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="/app.css"/>
+<img src="/logo.svg" alt="Acme"/>
+<br/>
+```
+
+Still serve HTML as `text/html` unless you intentionally need XML tooling.
+
+## ⚠️ Pitfalls
+
+- **Assuming HTML is XML** — Unclosed `<p>` or `<li>` may “work” in HTML and break XML pipelines.
+- **`innerHTML` with XML strings** — HTML parser rules apply in the DOM, not XML rules.
+- **Namespace typos** — Wrong SVG `xmlns` yields elements in the wrong namespace (no rendering).
+- **Raw `&` in XML** — Must escape; HTML text content is also safer escaped.
+- **XHTML MIME without error handling** — A single error blank-screens the page in XML mode.
+- **`document.write` / copy-paste XHTML** — Self-closing non-void tags in HTML create empty elements and orphaned children.
+
+## 🔗 Related
+
+- [Head](head.md) — document prologue vs XML declaration
+- [Language](language.md) — `lang` / `xml:lang`
+- [Meta](meta.md) — charset related to encoding declarations
+- [URL](url.md) — XML Base concepts
+- [Media](media.md) — SVG as image `src`
+- [Script](script.md) — JSON data blocks vs XML
+- [Style](style.md) — styling SVG embedded in HTML

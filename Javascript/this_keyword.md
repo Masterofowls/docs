@@ -1,0 +1,101 @@
+# this Keyword
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`this` is determined by **how a function is called**, not where it is defined (except arrows, which inherit lexical `this`). Master call-site rules, binding methods, and class fields to avoid the most common JS bugs.
+
+## 🔧 Core concepts
+
+| Call style | `this` |
+| --- | --- |
+| `obj.method()` | `obj` |
+| `fn()` (sloppy) | global object |
+| `fn()` (strict / modules) | `undefined` |
+| `new Fn()` | new instance |
+| `fn.call/apply/bind` | explicit |
+| Arrow function | lexical outer `this` |
+| DOM handler (classic) | element (unless arrow/bound) |
+
+- **`bind`**: returns a new function with fixed `this` (and optional partial args).
+- **`call` / `apply`**: invoke immediately with chosen `this`.
+- **Class methods**: need binding or arrows if passed as callbacks.
+
+```js
+const obj = {
+  n: 1,
+  get() {
+    return this.n;
+  },
+};
+obj.get(); // 1
+```
+
+## 💡 Examples
+
+```js
+"use strict";
+
+function show() {
+  return this?.id;
+}
+const user = { id: 42, show };
+user.show(); // 42
+show(); // undefined (strict)
+
+// Explicit binding
+show.call({ id: 7 }); // 7
+const bound = show.bind({ id: 9 });
+bound(); // 9
+
+// Losing this
+const detached = user.show;
+detached(); // undefined
+
+// Arrow preserves outer this
+class Counter {
+  count = 0;
+  inc = () => {
+    this.count += 1;
+  };
+  bump() {
+    this.count += 1;
+  }
+}
+const c = new Counter();
+setTimeout(c.inc, 0); // OK
+setTimeout(c.bump, 0); // broken unless bound
+
+// call vs apply
+function greet(a, b) {
+  return `${this.name}: ${a} ${b}`;
+}
+greet.call({ name: "Ada" }, "hi", "there");
+greet.apply({ name: "Ada" }, ["hi", "there"]);
+
+// DOM
+button.addEventListener("click", function () {
+  console.log(this); // button
+});
+button.addEventListener("click", () => {
+  console.log(this); // outer lexical this
+});
+```
+
+## ⚠️ Pitfalls
+
+- Extracting methods (`const f = obj.m`) drops the receiver.
+- Arrows on prototypes are usually wrong — they close over the wrong `this` at definition time for classes use public fields carefully.
+- `bind` creates a new function each time — don’t bind inside render loops without caching.
+- In modules, top-level `this` is `undefined`, not `window`.
+
+## 🔗 Related
+
+- [functions.md](./functions.md) — arrow vs function
+- [closures.md](./closures.md) — lexical capture
+- [oop.md](./oop.md) — classes & methods
+- [strict_mode.md](./strict_mode.md) — undefined `this`
+- [DOM/events.md](./DOM/events.md) — handler `this`

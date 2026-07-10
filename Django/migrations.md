@@ -1,0 +1,80 @@
+# Migrations
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Migrations version the database schema to match models. Workflow: change models → `makemigrations` → review → `migrate`. Keep migrations in VCS; never edit applied production migrations casually—add a new one instead.
+
+## 🔧 Core concepts
+
+| Command | Role |
+| --- | --- |
+| `makemigrations` | Detect model changes, write migration files |
+| `migrate` | Apply / unapply migrations |
+| `showmigrations` | Status per app |
+| `sqlmigrate` | Preview SQL |
+| `squashmigrations` | Collapse history |
+| Operations | `CreateModel`, `AddField`, `AlterField`, `RunPython`, `RunSQL` |
+
+Dependencies graph ensures order across apps. Data migrations use `RunPython` / `RunPython.noop`.
+
+## 💡 Examples
+
+**Generate and apply:**
+
+```bash
+python manage.py makemigrations blog
+python manage.py migrate
+python manage.py showmigrations blog
+python manage.py sqlmigrate blog 0003
+```
+
+**Data migration:**
+
+```python
+from django.db import migrations
+
+
+def forwards(apps, schema_editor):
+    Article = apps.get_model("blog", "Article")
+    Article.objects.filter(slug="").update(slug="untitled")
+
+
+def backwards(apps, schema_editor):
+    pass
+
+
+class Migration(migrations.Migration):
+    dependencies = [("blog", "0002_article_slug")]
+
+    operations = [
+        migrations.RunPython(forwards, backwards),
+    ]
+```
+
+**Fake / zero (careful):**
+
+```bash
+python manage.py migrate blog 0002
+python manage.py migrate blog zero          # unapply all for app
+python manage.py migrate blog 0003 --fake   # mark applied, no SQL
+```
+
+## ⚠️ Pitfalls
+
+- Using real model classes in `RunPython`—always `apps.get_model`.
+- Renaming models/fields without `RenameModel` / `RenameField` drops and recreates data.
+- Circular dependencies between apps—split or use `SeparateDatabaseAndState`.
+- Editing already-deployed migrations breaks other environments.
+- Long locks on large `AlterField`—plan downtime or online schema tools.
+
+## 🔗 Related
+
+- [Models](models.md)
+- [Managers](managers.md)
+- [QuerySet](queryset.md)
+- [Settings](settings.md)
+- [Testing](testing.md)

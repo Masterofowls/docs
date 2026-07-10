@@ -1,0 +1,89 @@
+# Error boundaries
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Error boundaries catch render/lifecycle errors in the child tree and show fallback UI instead of unmounting the whole app. They must be class components (or a library wrapper)—there is no `useErrorBoundary` built-in. They do **not** catch event handler, async, or SSR errors outside render.
+
+## 🔧 Core concepts
+
+- **`getDerivedStateFromError`** — update state to show fallback.
+- **`componentDidCatch`** — log to reporting service.
+- **Granularity** — wrap widgets, not only the root.
+- **Reset** — change `key` or provide a “try again” that clears error state.
+- **vs Suspense** — Suspense = loading; boundary = failure.
+
+## 💡 Examples
+
+```tsx
+import { Component, type ErrorInfo, type ReactNode } from "react";
+
+type Props = { children: ReactNode; fallback?: ReactNode };
+type State = { error: Error | null };
+
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { error: null };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("UI crash", error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        this.props.fallback ?? (
+          <div role="alert">
+            <p>Something went wrong.</p>
+            <button type="button" onClick={() => this.setState({ error: null })}>
+              Try again
+            </button>
+          </div>
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+```tsx
+<ErrorBoundary>
+  <Suspense fallback={<p>Loading…</p>}>
+    <Profile />
+  </Suspense>
+</ErrorBoundary>
+```
+
+**Event handlers—catch yourself:**
+
+```tsx
+function save() {
+  try {
+    doSave();
+  } catch (e) {
+    setError(e);
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Expecting boundaries to catch `setTimeout` / `fetch` rejections automatically.
+- One root boundary only—bad UX for partial failures.
+- Not logging `componentDidCatch`.
+- Infinite error loops if fallback throws.
+
+## 🔗 Related
+
+- [suspense.md](./suspense.md) — loading boundaries
+- [component.md](./component.md) — class vs function
+- [testing.md](./testing.md) — assert fallbacks
+- [strict_mode.md](./strict_mode.md) — double render in dev
+- [concurrent.md](./concurrent.md) — render model

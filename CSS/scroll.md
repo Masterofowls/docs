@@ -1,0 +1,118 @@
+# Scroll
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Scroll-related CSS controls overflow, scroll snapping, scrollbars, overscroll behavior, and scroll-driven interactions. Use it to create readable regions, carousels, sticky companions, and safer nested scroll areas. Prefer intentional overflow (`auto` / `hidden`) over accidental clipping, and always ensure keyboard and focusable content remain reachable inside scrollports.
+
+Logical properties (`overflow-inline`, `overflow-block`) help in vertical and horizontal writing modes.
+
+## 🔧 Core concepts
+
+### Overflow
+
+| Property | Values / role |
+| --- | --- |
+| `overflow` | `visible` \| `hidden` \| `clip` \| `scroll` \| `auto` |
+| `overflow-x` / `overflow-y` | Per axis (physical) |
+| `overflow-inline` / `overflow-block` | Logical axes |
+| `overscroll-behavior` | `auto` \| `contain` \| `none` — chained scroll / bounce |
+
+### Scroll snap
+
+| Property | Role |
+| --- | --- |
+| `scroll-snap-type` | `x`/`y`/`both` + `mandatory`/`proximity` on container |
+| `scroll-snap-align` | `start` \| `center` \| `end` on items |
+| `scroll-snap-stop` | `normal` \| `always` |
+| `scroll-padding` | Insets for snap/scroll targets (sticky headers) |
+| `scroll-margin` | Outset on targets for `scrollIntoView` / snap |
+
+### Scrollbars & utilities
+
+| Feature | Notes |
+| --- | --- |
+| `scrollbar-gutter: stable` | Reserve space to avoid layout shift |
+| `scrollbar-width` / `scrollbar-color` | Standard scrollbar styling (limited) |
+| `::-webkit-scrollbar*` | WebKit/Blink custom scrollbars |
+| `scroll-behavior: smooth` | Animated navigation (respect reduced motion) |
+
+## 💡 Examples
+
+### Scrollable panel
+
+```css
+.panel {
+  max-block-size: min(24rem, 70dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+```
+
+### Horizontal snap carousel
+
+```css
+.carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel > .slide {
+  flex: 0 0 min(80%, 20rem);
+  scroll-snap-align: start;
+}
+```
+
+### Offset for sticky header anchors
+
+```css
+:root {
+  --header-h: 3.5rem;
+}
+
+.site-header {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: var(--header-h);
+}
+
+:target,
+[id] {
+  scroll-margin-block-start: calc(var(--header-h) + 0.5rem);
+}
+```
+
+### Smooth scroll with reduced motion
+
+```css
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Putting `overflow: hidden` on ancestors and breaking `position: sticky` descendants.
+- Nested scroll areas that trap scroll chaining—use `overscroll-behavior: contain` thoughtfully.
+- `scroll-behavior: smooth` without a reduced-motion fallback.
+- Snap carousels that hide focusable controls off-screen without keyboard alternatives.
+- Custom WebKit scrollbar CSS that removes affordance or fails contrast checks.
+
+## 🔗 Related
+
+- [Positioning](position.md)
+- [Adaptive design](adaptive.md)
+- [Flexbox](flex.md)
+- [Hover](hover.md)

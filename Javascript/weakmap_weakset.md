@@ -1,0 +1,88 @@
+# WeakMap & WeakSet
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`WeakMap` and `WeakSet` hold **weak** references to object keys/values so entries can be garbage-collected when nothing else references the key. They are not iterable and have no `.size` — designed for private metadata, caching, and DOM-associated state without leaks.
+
+## 🔧 Core concepts
+
+- **WeakMap**: keys must be objects (or non-registered symbols in modern engines); values any.
+- **API**: `get`, `set`, `has`, `delete` — no iteration.
+- **WeakSet**: objects only; `add`, `has`, `delete`.
+- **GC**: when key is unreachable, entry may disappear.
+- **vs Map/Set**: strong refs keep keys alive forever if the collection lives.
+
+```js
+const wm = new WeakMap();
+const el = document.createElement("div");
+wm.set(el, { clicks: 0 });
+wm.get(el).clicks++;
+```
+
+## 💡 Examples
+
+```js
+// Private data per instance (pre-#fields pattern)
+const _balance = new WeakMap();
+class Account {
+  constructor(amount) {
+    _balance.set(this, amount);
+  }
+  deposit(n) {
+    _balance.set(this, _balance.get(this) + n);
+  }
+  get balance() {
+    return _balance.get(this);
+  }
+}
+
+// DOM metadata without expando properties
+const state = new WeakMap();
+function track(el) {
+  if (!state.has(el)) state.set(el, { seen: 0 });
+  state.get(el).seen++;
+}
+
+// Visited set for graph walk (objects)
+const seen = new WeakSet();
+function walk(node) {
+  if (seen.has(node)) return;
+  seen.add(node);
+  for (const child of node.children ?? []) walk(child);
+}
+
+// Cache expensive computation keyed by object
+const cache = new WeakMap();
+function meta(obj) {
+  if (cache.has(obj)) return cache.get(obj);
+  const value = compute(obj);
+  cache.set(obj, value);
+  return value;
+}
+```
+
+```js
+// WeakRef / FinalizationRegistry (related, stronger control)
+const ref = new WeakRef(obj);
+ref.deref(); // obj or undefined if collected
+```
+
+## ⚠️ Pitfalls
+
+- Primitives cannot be WeakMap keys (except allowed symbols) — box or use Map.
+- Not enumerable: you cannot list keys for debugging easily.
+- Do not rely on *when* GC runs — only that entries *may* go away.
+- WeakMap values stay alive while the key is reachable — value holding key = leak cycle still collectable if only weakly held… avoid mutual strong cycles via other roots.
+- `WeakSet` has no get — membership only.
+
+## 🔗 Related
+
+- [map.md](./map.md) — strong Map
+- [set.md](./set.md) — strong Set
+- [oop.md](./oop.md) — `#private` fields
+- [DOM/storage.md](./DOM/storage.md) — not for persistence
+- [objects.md](./objects.md) — object identity as keys

@@ -1,0 +1,66 @@
+# Mapped Types
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Mapped types transform each property of an existing type: `{ [K in keyof T]: ... }`. They underpin `Partial`, `Readonly`, `Pick`-style utilities and custom key remapping with `as` (TS 4.1+).
+
+## 🧩 Core concepts
+
+- **Basic map** — iterate `keyof T` and produce a new property type.
+- **Modifiers** — add/remove `readonly` and `?` with `+`/`-` prefixes.
+- **Key remapping** — `as NewKey` (or `as Exclude<...>`) to rename or filter keys.
+- **Homomorphic maps** — preserve optional/readonly modifiers when mapping from `keyof T` directly.
+- **Template keys** — remap with template literal types for prefixed/suffixed names.
+
+## 💡 Examples
+
+```ts
+type ReadonlyProps<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+type OptionalProps<T> = {
+  [K in keyof T]?: T[K];
+};
+
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
+type RequiredProps<T> = {
+  [K in keyof T]-?: T[K];
+};
+
+// Key remapping
+type Getters<T> = {
+  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];
+};
+
+type User = { name: string; age: number };
+type UserGetters = Getters<User>;
+// { getName: () => string; getAge: () => number }
+
+// Filter keys via remapping to never
+type PublicOnly<T> = {
+  [K in keyof T as K extends `_${string}` ? never : K]: T[K];
+};
+```
+
+## ⚠️ Pitfalls
+
+- Mapping over a union of keys vs a union of objects behaves differently — start from a single object type.
+- Remapping to `never` removes the key; accidental `never` values wipe fields.
+- Index signatures and mapped types interact carefully with excess property checks.
+- Prefer composing built-in utilities before writing deep custom maps.
+
+## 🔗 Related
+
+- [Utility types](./utility_types.md)
+- [Conditional types](./conditional_types.md)
+- [Object types](./object_types.md)
+- [Literal types](./literal_types.md)
+- [Generic types](./generic_types.md)

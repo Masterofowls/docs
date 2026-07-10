@@ -1,0 +1,84 @@
+# Console
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`console` is the standard debugging surface in browsers and Node. Beyond `log`, use levels, grouping, timing, and tabular output. Prefer structured messages over string concatenation.
+
+## 🔧 Core concepts
+
+- **Levels**: `debug`, `log`, `info`, `warn`, `error` (filterable in DevTools).
+- **Format**: `%s`, `%d`, `%o`, `%c` (CSS in browsers).
+- **Groups**: `group` / `groupCollapsed` / `groupEnd`.
+- **Timing**: `time` / `timeLog` / `timeEnd`.
+- **Tables**: `console.table(arrayOrObject)`.
+- **Assertions**: `console.assert(cond, ...msg)` logs only when falsy.
+- **Counts**: `count` / `countReset`.
+- **Traces**: `console.trace()` prints a stack.
+
+```js
+console.log("user=%s id=%d", "Ada", 42);
+console.warn("deprecated");
+console.error(new Error("fail"));
+```
+
+## 💡 Examples
+
+```js
+const users = [
+  { id: 1, name: "Ada" },
+  { id: 2, name: "Alan" },
+];
+console.table(users);
+
+console.group("request");
+console.log("method", "GET");
+console.log("path", "/api");
+console.groupEnd();
+
+console.time("work");
+await doWork();
+console.timeEnd("work");
+
+console.count("hit");
+console.count("hit");
+console.countReset("hit");
+
+console.assert(users.length > 0, "expected users");
+
+// Styled (browser)
+console.log("%cOK", "color: green; font-weight: bold");
+
+// Inspect depth (Node)
+console.dir(users[0], { depth: null });
+
+// Clear
+// console.clear();
+```
+
+```js
+// Debug-only helper
+const debug = (...args) => {
+  if (import.meta.env?.DEV ?? process.env.NODE_ENV !== "production") {
+    console.debug(...args);
+  }
+};
+
+debug("payload", { ok: true });
+```
+
+## ⚠️ Pitfalls
+
+- Logging live objects shows later mutations in some DevTools — log clones or primitives when needed.
+- `console.log` in hot paths hurts performance; gate behind flags.
+- Stringifying secrets into logs is a security risk — redact tokens.
+- `assert` does not throw; use real assertions for control flow.
+- Node and browsers differ slightly (`dir`, `%c` support).
+
+## 🔗 Related
+
+- [error.md](./error.md) — Error objects and stacks
+- [json.md](./json.md) — pretty-print data
+- [api.md](./api.md) — runtime globals
+- [objects.md](./objects.md) — inspecting structures

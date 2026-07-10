@@ -1,0 +1,100 @@
+# Media Queries
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`@media` applies styles based on device/viewport characteristics: width, hover capability, color scheme, resolution, and more. Use them for layout breakpoints and accessibility preferences. Prefer mobile-first `min-width` queries and modern ranges.
+
+## 🔧 Core concepts
+
+- **Syntax**: `@media (condition) { ... }` / `@media screen and (...)`.
+- **Width**: `(min-width: 48rem)`, range `(width >= 48rem)`, `(48rem <= width <= 80rem)`.
+- **Preferences**: `prefers-color-scheme`, `prefers-reduced-motion`, `prefers-contrast`.
+- **Pointer/hover**: `(hover: hover)`, `(pointer: fine|coarse)`.
+- **Display**: `print`, `screen`, `(display-mode: standalone)`.
+- **Script**: `matchMedia` mirrors the same queries in JS.
+
+```css
+.card {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 40rem) {
+  .card {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+/* Mobile first */
+.nav {
+  flex-direction: column;
+}
+@media (width >= 64rem) {
+  .nav {
+    flex-direction: row;
+  }
+}
+
+/* Range */
+@media (30rem <= width <= 60rem) {
+  .side {
+    display: none;
+  }
+}
+
+/* Interaction */
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111;
+  }
+}
+
+/* High DPI assets often via picture/srcset; CSS: */
+@media (resolution >= 2dppx) {
+  .icon {
+    background-size: 50%;
+  }
+}
+
+/* Container queries for components — see container_queries.md */
+```
+
+```css
+/* Avoid too many breakpoints — design fluidly first */
+```
+
+## ⚠️ Pitfalls
+
+- Desktop-first `max-width` stacks get messy — prefer `min-width` progression.
+- `em`/`rem` in queries refer to initial font size, not element-local rem in some engines — know your units.
+- Hover styles on touch devices can stick — gate with `(hover: hover)`.
+- Don’t hide critical content only on “mobile” queries — responsive ≠ removed.
+- Overlapping conflicting breakpoints cause hard-to-trace bugs — keep a scale.
+
+## 🔗 Related
+
+- [container_queries.md](./container_queries.md) — component queries
+- [dark_mode.md](./dark_mode.md) — color scheme
+- [print.md](./print.md) — print media
+- [adaptive.md](./adaptive.md) — responsive patterns
+- [../Javascript/DOM/media_query_list.md](../Javascript/DOM/media_query_list.md) — JS API

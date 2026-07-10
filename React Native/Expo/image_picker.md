@@ -1,0 +1,71 @@
+# Image Picker
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**`expo-image-picker`** launches the system gallery or camera to pick images/videos. Request media permissions, then `launchImageLibraryAsync` / `launchCameraAsync`. Returns local `uri`s for upload or display.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `requestMediaLibraryPermissionsAsync` | Gallery |
+| `requestCameraPermissionsAsync` | Camera |
+| `launchImageLibraryAsync` | Pick existing |
+| `launchCameraAsync` | Capture |
+| Options | `mediaTypes`, `allowsEditing`, `quality`, `allowsMultipleSelection` |
+
+Config plugin for photos permission strings.
+
+## 💡 Examples
+
+```tsx
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+import { Image, Pressable, Text } from "react-native";
+
+export function AvatarPicker() {
+  const [uri, setUri] = useState<string | null>(null);
+
+  async function pick() {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) setUri(result.assets[0]?.uri ?? null);
+  }
+
+  return (
+    <>
+      <Pressable onPress={pick}>
+        <Text>Choose photo</Text>
+      </Pressable>
+      {uri ? (
+        <Image source={{ uri }} style={{ width: 96, height: 96 }} />
+      ) : null}
+    </>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using deprecated `MediaTypeOptions` enums on newer SDKs—prefer `mediaTypes` arrays.
+- Ignoring `canceled` results.
+- Uploading full-resolution images without compression.
+- Missing Info.plist / Android permission messages.
+
+## 🔗 Related
+
+- [../camera.md](../camera.md) — live camera
+- [../image.md](../image.md) — display
+- [../permissions.md](../permissions.md) — permission UX
+- [config.md](./config.md) — plugins
+- [secure_store.md](./secure_store.md) — not for images

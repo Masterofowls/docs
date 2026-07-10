@@ -1,0 +1,91 @@
+# Email
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Send mail via `django.core.mail` using a configurable `EMAIL_BACKEND`. Dev: console or locmem; prod: SMTP or transactional providers. Prefer `EmailMessage` / `EmailMultiAlternatives` for headers, attachments, and HTML+text.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `send_mail` | Simple helper |
+| `mail_admins` / `mail_managers` | Ops alerts |
+| `EmailMessage` | Full control |
+| `EmailMultiAlternatives` | text + HTML |
+| `get_connection` | Explicit backend/connection |
+| `EMAIL_*` settings | Host, TLS, from address |
+
+Backends: SMTP, console, locmem, filebased, dummy.
+
+## 💡 Examples
+
+**Settings:**
+
+```python
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.example.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
+DEFAULT_FROM_EMAIL = "noreply@example.com"
+```
+
+**Simple send:**
+
+```python
+from django.core.mail import send_mail
+
+send_mail(
+    subject="Welcome",
+    message="Thanks for joining.",
+    from_email=None,  # DEFAULT_FROM_EMAIL
+    recipient_list=["user@example.com"],
+    fail_silently=False,
+)
+```
+
+**HTML + attachment:**
+
+```python
+from django.core.mail import EmailMultiAlternatives
+
+msg = EmailMultiAlternatives(
+    subject="Invoice",
+    body="Your invoice is attached.",
+    from_email="billing@example.com",
+    to=["user@example.com"],
+)
+msg.attach_alternative("<p>Your <strong>invoice</strong> is attached.</p>", "text/html")
+msg.attach("invoice.pdf", pdf_bytes, "application/pdf")
+msg.send()
+```
+
+**Tests:**
+
+```python
+from django.core import mail
+
+self.assertEqual(len(mail.outbox), 1)
+self.assertEqual(mail.outbox[0].subject, "Welcome")
+```
+
+## ⚠️ Pitfalls
+
+- Sending synchronously in request path—use a queue for volume.
+- `fail_silently=True` hiding misconfiguration.
+- Header injection via unsanitized subject/addresses.
+- HTML-only mail without text alternative.
+- Hardcoding credentials—use env / secrets manager.
+
+## 🔗 Related
+
+- [Settings](settings.md)
+- [Testing](testing.md)
+- [Management commands](management_commands.md)
+- [Security](security.md)
+- [Authentication](authentication.md)

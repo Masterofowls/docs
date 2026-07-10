@@ -1,0 +1,74 @@
+# Type Guards
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Type guards narrow a value’s type inside a control-flow branch. Built-ins include `typeof`, `instanceof`, and `in`; custom guards use `value is T` predicates or assertion functions (`asserts`).
+
+## 🧩 Core concepts
+
+- **`typeof` guards** — narrow primitives (`string`, `number`, `boolean`, `symbol`, `bigint`, `function`).
+- **`instanceof`** — narrow to class instances.
+- **`in` operator** — check property presence on object unions.
+- **User-defined predicates** — `function isFoo(x: unknown): x is Foo`.
+- **Assertion functions** — `asserts x is T` or `asserts x` throw if invalid (TS 3.7+).
+- **Discriminants** — literal fields are the most reliable narrowing strategy.
+
+## 💡 Examples
+
+```ts
+function padLeft(value: string | number) {
+  if (typeof value === "number") {
+    return " ".repeat(value);
+  }
+  return value;
+}
+
+class Dog {
+  bark() {}
+}
+function speak(animal: Dog | string) {
+  if (animal instanceof Dog) {
+    animal.bark();
+  } else {
+    console.log(animal.toUpperCase());
+  }
+}
+
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+
+function move(animal: Fish | Bird) {
+  if ("swim" in animal) {
+    animal.swim();
+  } else {
+    animal.fly();
+  }
+}
+
+function isString(x: unknown): x is string {
+  return typeof x === "string";
+}
+
+function assertDefined<T>(x: T | null | undefined): asserts x is T {
+  if (x == null) throw new Error("Expected a value");
+}
+```
+
+## ⚠️ Pitfalls
+
+- Predicates must be truthful — a wrong `x is T` lies to the type checker.
+- `typeof null` is `"object"` — handle `null` explicitly.
+- Narrowing may be lost when assigning to a mutable variable and using it later (control-flow limits).
+- Arrow functions as predicates need explicit return type annotations: `(x): x is T => ...`.
+
+## 🔗 Related
+
+- [Union types](./union_types.md)
+- [Types](./types.md)
+- [Primitive types](./primitive_types.md)
+- [Class](./class.md)
+- [Literal types](./literal_types.md)

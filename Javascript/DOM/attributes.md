@@ -1,0 +1,81 @@
+# Attributes
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+HTML attributes are reflected on elements as content attributes and often as IDL properties. Use `getAttribute` / `setAttribute` for the HTML attribute string; use properties (`el.id`, `el.href`) for typed live values. `data-*` maps to `dataset`.
+
+## 🔧 Core concepts
+
+- **Attribute API**: `hasAttribute`, `getAttribute`, `setAttribute`, `removeAttribute`, `toggleAttribute`.
+- **NamedNodeMap**: `el.attributes` — live list of `Attr` nodes.
+- **Property vs attribute**: `el.value` (live) vs `getAttribute("value")` (initial HTML).
+- **Boolean attributes**: presence means true (`disabled`, `checked`, `hidden`).
+- **`dataset`**: `data-user-id` → `el.dataset.userId`.
+- **Namespaces**: `getAttributeNS` / `setAttributeNS` for SVG/MathML.
+
+```js
+el.setAttribute("aria-label", "Close");
+el.toggleAttribute("hidden", true);
+```
+
+## 💡 Examples
+
+```js
+const btn = document.querySelector("button");
+
+btn.setAttribute("type", "button");
+btn.getAttribute("type"); // "button"
+btn.hasAttribute("disabled"); // false
+btn.toggleAttribute("disabled"); // adds
+btn.removeAttribute("disabled");
+
+// data-*
+el.dataset.userId = "42";
+console.log(el.getAttribute("data-user-id")); // "42"
+delete el.dataset.userId;
+
+// Reflecting properties
+const a = document.createElement("a");
+a.href = "/docs";
+a.getAttribute("href"); // "/docs" (may be absolutized for href property)
+
+// Iterate attributes
+for (const attr of el.attributes) {
+  console.log(attr.name, attr.value);
+}
+
+// ARIA
+el.setAttribute("role", "dialog");
+el.setAttribute("aria-modal", "true");
+
+// Boolean via property
+input.disabled = true;
+input.hasAttribute("disabled"); // true
+```
+
+```js
+// Safe read with default
+function attr(el, name, fallback = "") {
+  return el.hasAttribute(name) ? el.getAttribute(name) : fallback;
+}
+```
+
+## ⚠️ Pitfalls
+
+- `getAttribute` returns `null` when missing — not `""`.
+- Changing the `value` property on inputs does not always update the content attribute the same way across browsers — know which you need.
+- `dataset` values are always strings; parse numbers yourself.
+- Setting `innerHTML` can wipe attributes on replaced subtrees.
+- Invalid attribute names or wrong namespaces fail silently or throw in XML.
+
+## 🔗 Related
+
+- [class.md](./class.md) — class attribute / classList
+- [selectors.md](./selectors.md) — attribute selectors
+- [content_methods.md](./content_methods.md) — reading content
+- [form.md](./form.md) — form control properties
+- [create_add_remove.md](./create_add_remove.md) — creating elements
+- [../strings.md](../strings.md) — string values
+- [../objects.md](../objects.md) — dataset object

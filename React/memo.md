@@ -1,0 +1,61 @@
+# memo
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`memo(Component)` wraps a function component so React skips re-rendering when props are shallowly equal (`Object.is` per prop). Use after measuring; unstable callback/object props defeat it unless memoized.
+
+## 🔧 Core concepts
+
+- **Shallow compare** — default prop equality.
+- **Custom compare** — `memo(Comp, (prev, next) => boolean)` (return true to skip).
+- **Children** — `children` prop changes often; be careful.
+- **Compiler** — React Compiler may auto-memoize; manual `memo` still fine.
+- **Pair with** — `useCallback` / `useMemo` for stable props.
+
+## 💡 Examples
+
+```tsx
+import { memo } from "react";
+
+type Props = { name: string; active: boolean; onSelect: () => void };
+
+export const UserRow = memo(function UserRow({ name, active, onSelect }: Props) {
+  return (
+    <button type="button" aria-pressed={active} onClick={onSelect}>
+      {name}
+    </button>
+  );
+});
+```
+
+**Custom equality:**
+
+```tsx
+const Chart = memo(
+  function Chart({ data }: { data: number[] }) {
+    return <canvas />;
+  },
+  (prev, next) =>
+    prev.data.length === next.data.length &&
+    prev.data.every((v, i) => v === next.data[i]),
+);
+```
+
+## ⚠️ Pitfalls
+
+- Memoizing everything—noise and complexity.
+- Passing inline `onClick={() => ...}` or `style={{}}` → always re-render.
+- Expecting `memo` to deep-compare objects.
+- Skipping renders that must update from context—context still forces update when consumed.
+
+## 🔗 Related
+
+- [useCallback.md](./useCallback.md) — stable handlers
+- [useMemo.md](./useMemo.md) — stable values
+- [performance.md](./performance.md) — profiling
+- [component.md](./component.md) — function components
+- [keys_lists.md](./keys_lists.md) — list rows

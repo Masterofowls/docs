@@ -1,0 +1,62 @@
+# useLayoutEffect
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useLayoutEffect` runs synchronously after DOM mutations but before the browser paints. Use for measuring layout (`getBoundingClientRect`) and applying DOM corrections that must not flicker. Prefer `useEffect` for most subscriptions and data loading.
+
+## 🔧 Core concepts
+
+- **Timing** — render → DOM update → layout effects → paint → passive effects.
+- **Same API** — `useLayoutEffect(setup, deps)` like `useEffect`.
+- **SSR** — warns on server; gate with `typeof window` or use `useEffect`.
+- **Blocking** — long work delays paint—keep short.
+
+## 💡 Examples
+
+```tsx
+import { useLayoutEffect, useRef, useState } from "react";
+
+export function Tooltip({ text }: { text: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    setHeight(node.getBoundingClientRect().height);
+  }, [text]);
+
+  return (
+    <div ref={ref} style={{ marginTop: height > 40 ? 8 : 0 }}>
+      {text}
+    </div>
+  );
+}
+```
+
+**Scroll restore without flash:**
+
+```tsx
+useLayoutEffect(() => {
+  listRef.current?.scrollTo(0, savedScrollTop);
+}, [items]);
+```
+
+## ⚠️ Pitfalls
+
+- Using layout effects for data fetching—blocks paint; use `useEffect` / loaders.
+- Infinite loops: layout effect sets state that changes layout deps every time.
+- SSR mismatch / warnings—prefer `useEffect` unless measurement is required.
+- Heavy computation in layout effect → jank.
+
+## 🔗 Related
+
+- [useEffect.md](./useEffect.md) — default effect
+- [useRef.md](./useRef.md) — DOM refs
+- [performance.md](./performance.md) — paint timing
+- [hooks.md](./hooks.md) — rules
+- [concurrent.md](./concurrent.md) — rendering model

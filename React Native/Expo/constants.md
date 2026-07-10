@@ -1,0 +1,71 @@
+# Constants
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**`expo-constants`** exposes app metadata from the native manifest / config: version, `expoConfig`, installation id (where available), and EAS project fields. Use for feature flags wiring, update URLs, and debugging—not for secrets.
+
+## 🔧 Core concepts
+
+| Field | Role |
+| --- | --- |
+| `Constants.expoConfig` | App config (name, slug, extra, …) |
+| `Constants.easConfig` | EAS ids when present |
+| `nativeAppVersion` / `nativeBuildVersion` | Store versions |
+| `executionEnvironment` | storeClient / standalone / … |
+| `appOwnership` | expo / standalone (legacy nuances) |
+
+`extra` comes from `app.config` → `expo.extra`.
+
+## 💡 Examples
+
+```tsx
+import Constants from "expo-constants";
+import { Text } from "react-native";
+
+export function BuildStamp() {
+  const version = Constants.expoConfig?.version ?? "dev";
+  const projectId =
+    Constants.expoConfig?.extra?.eas?.projectId ??
+    Constants.easConfig?.projectId;
+  return (
+    <Text>
+      v{version} · {projectId ?? "no-project"}
+    </Text>
+  );
+}
+
+export function apiBaseUrl() {
+  return (
+    Constants.expoConfig?.extra?.apiUrl ??
+    process.env.EXPO_PUBLIC_API_URL ??
+    ""
+  );
+}
+```
+
+```ts
+// app.config.ts
+extra: {
+  apiUrl: process.env.EXPO_PUBLIC_API_URL,
+  eas: { projectId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+}
+```
+
+## ⚠️ Pitfalls
+
+- Putting secrets in `extra` (shipped in the binary).
+- Assuming `manifest` legacy fields on new SDKs—prefer `expoConfig`.
+- Using Constants for values that change per environment without rebuild/update.
+- Null access before config is available—optional chain.
+
+## 🔗 Related
+
+- [config.md](./config.md) — app config
+- [updates_ota.md](./updates_ota.md) — projectId
+- [notifications_expo.md](./notifications_expo.md) — push tokens
+- [build.md](./build.md) — versioning
+- [env](./config.md) — EXPO_PUBLIC_*

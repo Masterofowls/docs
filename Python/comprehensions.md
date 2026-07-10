@@ -1,0 +1,77 @@
+# Comprehensions
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Comprehensions build lists, sets, dicts, and generator expressions concisely. Prefer them over manual loops for simple map/filter transforms. Keep them readable — nest sparingly.
+
+## 🔧 Core concepts
+
+| Form | Result |
+| --- | --- |
+| `[expr for x in it if cond]` | `list` |
+| `{expr for x in it}` | `set` |
+| `{k: v for ...}` | `dict` |
+| `(expr for x in it)` | Generator (lazy) |
+| Nested | `for` clauses left-to-right |
+| Walrus | `:=` inside filters (3.8+) |
+
+Scope: iteration variables leak in list/set/dict comps in 3.x? Actually in Python 3, comprehension iteration variables are isolated in their own scope (unlike 2.x).
+
+## 💡 Examples
+
+**List / set / dict:**
+
+```python
+nums = range(8)
+squares = [n * n for n in nums if n % 2 == 0]
+unique_lens = {len(w) for w in ["a", "bb", "ccc", "bb"]}
+index = {c: i for i, c in enumerate("abc")}
+```
+
+**Nested:**
+
+```python
+matrix = [[1, 2], [3, 4]]
+flat = [x for row in matrix for x in row]
+pairs = [(i, j) for i in range(3) for j in range(3) if i != j]
+```
+
+**Generator expression:**
+
+```python
+total = sum(n * n for n in range(1_000_000))  # no giant list
+lines = (line.strip() for line in open("f.txt", encoding="utf-8"))
+# prefer pathlib + context manager in real code
+```
+
+**Walrus in comprehension:**
+
+```python
+def normalize(s: str) -> str:
+    return s.strip().lower()
+
+names = [" Ada ", "Bob", "  "]
+clean = [n for name in names if (n := normalize(name))]
+# ["ada", "bob"]
+```
+
+## ⚠️ Pitfalls
+
+- Over-nested comps are worse than a plain loop.
+- Dict comps: later keys overwrite earlier ones silently.
+- Side effects inside comps hurt readability — avoid prints/mutations.
+- Generator expressions are single-pass — materialize with `list()` if reused.
+- Huge list comps can exhaust memory; use generators.
+
+## 🔗 Related
+
+- [Lists](lists.md)
+- [Dictionaries](dictionaries.md)
+- [Sets](sets.md)
+- [Generators](generators.md)
+- [Loops](loops.md)
+- [Walrus](walrus.md)

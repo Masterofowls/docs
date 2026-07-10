@@ -1,0 +1,133 @@
+# Icons
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Icons in CSS-driven UIs are usually inline SVG, icon fonts, or mask/background images. Inline SVG is preferred for accessibility, theming via `currentColor`, and crisp scaling. Style icons to align with text, inherit color, and keep decorative icons hidden from assistive tech with `aria-hidden="true"`.
+
+Treat icon size as a design token (`1em` or fixed rem) so icons scale with surrounding type when appropriate.
+
+## 🔧 Core concepts
+
+### Delivery techniques
+
+| Technique | Pros | Cons |
+| --- | --- | --- |
+| Inline SVG | Colorable, accessible, CSS-targetable | Markup weight if not sprited |
+| `<img src="*.svg">` | Simple caching | Harder to recolor |
+| CSS `mask-image` | Recolor with `background-color` | Needs careful sizing |
+| Icon font | Easy swap | Ligature/a11y pitfalls, FOIT |
+| Sprite / symbol `<use>` | Deduplicates paths | Cross-origin/`use` quirks |
+
+### Alignment & sizing
+
+| Property / tip | Why |
+| --- | --- |
+| `inline-size` / `block-size` | Explicit box |
+| `flex-shrink: 0` | Prevent crush in flex rows |
+| `vertical-align: -0.125em` | Optical align with text |
+| `display: block` on SVG in buttons | Remove baseline gap |
+
+### Theming with currentColor
+
+```css
+.icon {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  fill: currentColor; /* or stroke for outline icons */
+}
+```
+
+Parent `color` then drives the icon.
+
+## 💡 Examples
+
+### Button with inline SVG
+
+```html
+<button type="button" class="btn">
+  <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <path d="…" />
+  </svg>
+  Download
+</button>
+```
+
+```css
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+```
+
+### Mask-based icon
+
+```css
+.icon-mask {
+  display: inline-block;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  background-color: currentColor;
+  mask: url("/icons/check.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/check.svg") center / contain no-repeat;
+}
+```
+
+### Optical alignment in text
+
+```css
+.with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.with-icon .icon {
+  inline-size: 1em;
+  block-size: 1em;
+}
+```
+
+### Standalone icon button (accessible name)
+
+```html
+<button type="button" class="icon-btn" aria-label="Close">
+  <svg class="icon" aria-hidden="true" focusable="false">…</svg>
+</button>
+```
+
+```css
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using icon fonts with ligature text that screen readers announce as random letters—prefer SVG + accessible names.
+- Leaving SVG focusable in some browsers without `focusable="false"` inside buttons.
+- Scaling icons with only `font-size` on icon fonts while stroke widths look uneven—prefer SVG.
+- Crushing icons in flex layouts without `flex-shrink: 0`.
+- Decorative icons without `aria-hidden` that add noise to the accessibility tree.
+
+## 🔗 Related
+
+- [Buttons](button.md)
+- [Images](image.md)
+- [Fonts](font.md)
+- [Flexbox](flex.md)

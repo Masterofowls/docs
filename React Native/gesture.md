@@ -1,0 +1,62 @@
+# Gesture
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Handle touches beyond simple presses with **React Native Gesture Handler** + **Reanimated**. Prefer RNGH over the old PanResponder for modern apps.
+
+## 🔧 Core concepts
+
+- **`GestureDetector` + `Gesture`** — tap, pan, pinch, long press, race/simultaneous.
+- **Root** — wrap app in `GestureHandlerRootView`.
+- **Pressable / Touchable** — from `react-native-gesture-handler` inside navigators.
+- **Native driver / UI thread** — update shared values in gesture callbacks.
+
+## 💡 Examples
+
+```tsx
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
+
+export function Draggable() {
+  const x = useSharedValue(0);
+  const y = useSharedValue(0);
+  const pan = Gesture.Pan().onChange((e) => {
+    x.value += e.changeX;
+    y.value += e.changeY;
+  });
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: x.value }, { translateY: y.value }],
+  }));
+
+  return (
+    <GestureDetector gesture={pan}>
+      <Animated.View style={[{ width: 80, height: 80, backgroundColor: "#333" }, style]} />
+    </GestureDetector>
+  );
+}
+
+export function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Draggable />
+    </GestureHandlerRootView>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Missing `GestureHandlerRootView` → gestures silently fail.
+- Mixing RN `Touchable*` inside RNGH navigators without RNGH replacements.
+- Gesture fights with `ScrollView` — use `simultaneousWithExternalGesture` / `native` gesture carefully.
+
+## 🔗 Related
+
+- [touchable.md](./touchable.md) — simple presses
+- [animation.md](./animation.md) — animated values
+- [drawer.md](./drawer.md) — drawer swipes
+- [transition.md](./transition.md) — interactive transitions

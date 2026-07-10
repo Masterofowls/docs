@@ -1,0 +1,59 @@
+# Storage
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Persist data on device: **AsyncStorage** / **MMKV** for general prefs, **SecureStore** / Keychain for secrets, and the filesystem for files. Remember the store is per-install and can be cleared.
+
+## 🔧 Core concepts
+
+- **AsyncStorage** — async key/value strings; fine for small prefs.
+- **MMKV** — fast sync-ish storage (via JSI); great for app state.
+- **SecureStore / Keychain** — tokens, not large blobs.
+- **File system** — `expo-file-system` for downloads/cache.
+- **Serialization** — `JSON.stringify` / `parse` with versioned schemas.
+
+## 💡 Examples
+
+```tsx
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const KEY = "settings/v1";
+
+export async function loadSettings<T>(fallback: T): Promise<T> {
+  const raw = await AsyncStorage.getItem(KEY);
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function saveSettings<T>(value: T) {
+  await AsyncStorage.setItem(KEY, JSON.stringify(value));
+}
+```
+
+```tsx
+import * as SecureStore from "expo-secure-store";
+
+await SecureStore.setItemAsync("session", token);
+const token = await SecureStore.getItemAsync("session");
+```
+
+## ⚠️ Pitfalls
+
+- Storing secrets in AsyncStorage.
+- Unbounded growth — no eviction strategy for caches.
+- Assuming storage survives reinstall or OS backup policies for secure items.
+
+## 🔗 Related
+
+- [settings.md](./settings.md) — preferences UX
+- [request.md](./request.md) — auth tokens
+- [clipboard.md](./clipboard.md) — ephemeral data
+- [Expo/config.md](./Expo/config.md) — Expo modules

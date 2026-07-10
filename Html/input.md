@@ -1,0 +1,135 @@
+# Input
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<input>` element creates interactive controls for forms. Behavior depends on the `type` attribute: text fields, checkboxes, radios, files, dates, range sliders, buttons, and more. Inputs participate in constraint validation, autofill, and keyboard accessibility when properly labeled.
+
+Always associate a visible `<label>` (or accessible name). Choose the most specific `type` so mobile keyboards, validation, and password managers work correctly.
+
+## 🔧 Core concepts
+
+### Common types
+
+| `type` | Use |
+|--------|-----|
+| `text` | Single-line text (default) |
+| `email`, `url`, `tel`, `search` | Semantic text with validation / keyboards |
+| `password` | Obscured text; use `autocomplete` |
+| `number` | Numeric; `min`/`max`/`step` |
+| `checkbox` | Independent on/off |
+| `radio` | One of a named group |
+| `file` | File picker; needs `enctype="multipart/form-data"` on form |
+| `hidden` | Not shown; still submitted |
+| `date`, `time`, `datetime-local`, `month`, `week` | Temporal pickers (support varies) |
+| `range`, `color` | Visual pickers |
+| `submit`, `reset`, `button`, `image` | Form actions |
+
+### Critical attributes
+
+- `name` — key in submitted data
+- `value` — current / default value; for checkbox/radio, the value when selected
+- `required`, `disabled`, `readonly`
+- `placeholder` — hint only, **not** a label
+- `autocomplete` — tokens like `email`, `new-password`, `street-address`
+- `inputmode` — virtual keyboard hint (`decimal`, `numeric`, `email`, …)
+- `pattern` — regex for text-like types
+- `accept`, `multiple` — file inputs
+- `checked` — initial state for checkbox/radio
+- `min`, `max`, `step`, `minlength`, `maxlength`
+
+### Labels and grouping
+
+```html
+<label for="email">Email</label>
+<input id="email" name="email" type="email" required autocomplete="email">
+
+<fieldset>
+  <legend>Shipping</legend>
+  <label><input type="radio" name="ship" value="std" checked> Standard</label>
+  <label><input type="radio" name="ship" value="exp"> Express</label>
+</fieldset>
+```
+
+Radios sharing the same `name` form one tab stop group; arrows move between options.
+
+### Events and values
+
+- `input` — value changing; `change` — committed change
+- Read via `element.value`, `checked`, or `FormData`
+- Files: `input.files` (`FileList`); not available in plain Form URL encoding without multipart
+
+## 💡 Examples
+
+### Text with validation
+
+```html
+<label for="username">Username</label>
+<input
+  id="username"
+  name="username"
+  type="text"
+  required
+  minlength="3"
+  maxlength="32"
+  pattern="[a-zA-Z0-9_]+"
+  autocomplete="username"
+  aria-describedby="username-hint">
+<p id="username-hint">Letters, numbers, and underscore only.</p>
+```
+
+### Checkbox and switch-like pattern
+
+```html
+<label>
+  <input type="checkbox" name="tos" value="yes" required>
+  I agree to the terms
+</label>
+```
+
+### Number and range
+
+```html
+<label for="qty">Quantity</label>
+<input id="qty" name="qty" type="number" min="1" max="99" step="1" value="1">
+
+<label for="vol">Volume</label>
+<input id="vol" name="volume" type="range" min="0" max="100" value="50"
+  aria-valuemin="0" aria-valuemax="100">
+```
+
+### File input
+
+```html
+<label for="docs">Attachments</label>
+<input
+  id="docs"
+  name="docs"
+  type="file"
+  accept=".pdf,image/*"
+  multiple
+  aria-describedby="docs-help">
+<p id="docs-help">PDF or images, up to 5 files.</p>
+```
+
+## ⚠️ Pitfalls
+
+- **Placeholder as label** — Disappears on input; bad for a11y and memory.
+- **`type="number"` for IDs** — Spinners and parsing issues; use `inputmode="numeric"` + `pattern` for digit strings.
+- **Missing `name` on radios** — Grouping breaks; all can appear selected independently.
+- **Styling away focus** — Never remove outlines without a visible `:focus-visible` replacement.
+- **Hidden required fields** — Can block submit with no visible error.
+- **Date formats** — Wire format is ISO-like; display is locale-dependent—do not parse as local free text.
+- **Disabled vs readonly** — `disabled` controls are **not** submitted; `readonly` text still is.
+
+## 🔗 Related
+
+- [Forms](form.md) — submission, `FormData`, validation API
+- [List](list.md) — `<datalist>` options for inputs
+- [Script](script.md) — enhancing input behavior
+- [Table](table.md) — inputs in data grids (label carefully)
+- [URL](url.md) — `type="url"` and query encoding
+- [Meta](meta.md) — CSRF / tokens often paired with hidden inputs

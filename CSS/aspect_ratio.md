@@ -1,0 +1,91 @@
+# Aspect Ratio
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`aspect-ratio` preserves a box’s width-to-height relationship (e.g. `16 / 9`) as the other dimension flexes. Replaces old padding-top hacks for media frames, embeds, and cards. Combine with `object-fit` for replaced content.
+
+## 🔧 Core concepts
+
+- **Syntax**: `aspect-ratio: auto | <ratio>` e.g. `16 / 9`, `1`, `4 / 3`.
+- **`auto`**: use intrinsic ratio of replaced elements when available.
+- **Conflict**: if width, height, and ratio all set, browsers may ignore one per rules — prefer width + ratio or height + ratio.
+- **Min/max**: `min-height` can override the ratio box.
+- **With grid/flex**: ratio boxes as items work well for galleries.
+
+```css
+.video {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #000;
+}
+.video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+```
+
+## 💡 Examples
+
+```css
+/* Square thumbs */
+.thumb {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Portrait card */
+.poster {
+  aspect-ratio: 2 / 3;
+}
+
+/* Prefer auto for images with intrinsic size */
+img {
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+}
+
+/* Grid gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+.gallery > * {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* Fallback old hack (legacy) */
+.legacy {
+  height: 0;
+  padding-top: 56.25%;
+  position: relative;
+}
+```
+
+```css
+/* Explicit both dimensions wins over ratio in some cases — avoid */
+```
+
+## ⚠️ Pitfalls
+
+- Setting both `width` and `height` plus `aspect-ratio` can produce surprising ignored values.
+- Content taller than the ratio box overflows unless `overflow: hidden` / flex layout inside.
+- Intrinsic `auto` ratio fails for empty containers — set an explicit ratio.
+- SVGs without intrinsic sizing may need explicit ratio.
+- Don’t use ratio alone for text-heavy cards without overflow plan.
+
+## 🔗 Related
+
+- [object_fit.md](./object_fit.md) — fitting media
+- [image.md](./image.md) — images
+- [box_model.md](./box_model.md) — sizing
+- [grid.md](./grid.md) — galleries
+- [../Html/video_audio.md](../Html/video_audio.md) — media embeds

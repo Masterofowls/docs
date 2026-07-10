@@ -1,0 +1,92 @@
+# Views
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Views receive an `HttpRequest` and return an `HttpResponse` (or raise). Use function-based views (FBVs) for simple flows and class-based views (CBVs) for reusable patterns. Keep views thin: validate input, call services/ORM, return response or redirect.
+
+## 🔧 Core concepts
+
+| Style | Notes |
+| --- | --- |
+| FBV | `def view(request, **kwargs)` |
+| CBV | `MyView.as_view()` in URLconf |
+| Shortcuts | `render`, `redirect`, `get_object_or_404` |
+| Decorators | `login_required`, `require_POST`, `csrf_exempt` (rare) |
+| Mixins | Auth/permission for CBVs |
+| Errors | `Http404`, `PermissionDenied`, custom handlers |
+
+Request attributes: `method`, `GET`, `POST`, `user`, `session`, `FILES`, `headers`.
+
+## 💡 Examples
+
+**Function-based view:**
+
+```python
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from .forms import ArticleForm
+from .models import Article
+
+
+def article_detail(request, slug: str):
+    article = get_object_or_404(Article, slug=slug, is_published=True)
+    return render(request, "blog/article_detail.html", {"article": article})
+
+
+@login_required
+def article_edit(request, slug: str):
+    article = get_object_or_404(Article, slug=slug, author=request.user)
+    if request.method == "POST":
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect(article)
+    else:
+        form = ArticleForm(instance=article)
+    return render(request, "blog/article_form.html", {"form": form})
+```
+
+**JSON response without DRF:**
+
+```python
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
+
+@require_GET
+def health(request):
+    return JsonResponse({"status": "ok"})
+```
+
+**CBV sketch:**
+
+```python
+from django.views import View
+from django.http import HttpResponse
+
+
+class PingView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("pong")
+```
+
+## ⚠️ Pitfalls
+
+- Returning unsanitized user HTML → XSS; use templates auto-escape.
+- Long-running work in a request blocks workers—use tasks/queues.
+- Catching all exceptions and returning 200 hides failures.
+- Mutating data on GET violates HTTP semantics—use POST/PUT/PATCH/DELETE.
+
+## 🔗 Related
+
+- [Built-in class-based views](buildin_views.md)
+- [URLs](urls.md)
+- [Forms](forms.md)
+- [Authentication](authentication.md)
+- [REST framework](rest_framework.md)
+- [Models](models.md)

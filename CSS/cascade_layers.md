@@ -1,0 +1,100 @@
+# Cascade Layers
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`@layer` groups style rules into named cascade layers so **order of layers** beats specificity across layers. Use layers to keep resets, tokens, components, and utilities predictable without specificity wars. Unlayered styles win over layered ones.
+
+## 🔧 Core concepts
+
+- **Declare order**: `@layer reset, tokens, base, components, utilities;`
+- **Assign**: `@layer components { .card {} }` or `@layer components.card { }`.
+- **Import**: `@import "x.css" layer(components);`
+- **Priority**: earlier layers lose to later layers (when both apply), regardless of specificity.
+- **Unlayered**: strongest among normal author styles (before `!important` games).
+- **`!important`**: reverses layer order in the important bucket.
+
+```css
+@layer reset, base, components, utilities;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+@layer components {
+  .btn {
+    padding: 0.5rem 1rem;
+  }
+}
+@layer utilities {
+  .p-0 {
+    padding: 0;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+/* Nested layers */
+@layer framework {
+  @layer base {
+    body {
+      margin: 0;
+    }
+  }
+  @layer components {
+    .btn {
+      color: white;
+    }
+  }
+}
+/* framework.base, framework.components */
+
+/* Reordering via first declaration */
+@layer a, b;
+@layer b {
+  .x {
+    color: red;
+  }
+}
+@layer a {
+  .x {
+    color: blue;
+  }
+} /* still loses — b is later */
+
+/* Anonymous layer */
+@layer {
+  /* first anonymous */
+}
+
+/* Libraries first */
+@layer vendor, app;
+```
+
+```css
+/* Tip: put utilities last so .mt-0 beats components */
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting the initial `@layer a, b, c` order makes first-seen order define priority — declare explicitly.
+- Unlayered CSS accidentally overrides everything layered — migrate carefully.
+- `!important` in early layers becomes surprisingly strong — avoid.
+- Layers don’t replace good naming — still organize files.
+- DevTools cascade view is essential when debugging layer order.
+
+## 🔗 Related
+
+- [specificity.md](./specificity.md) — within a layer
+- [reset_normalize.md](./reset_normalize.md) — reset layer
+- [selectors.md](./selectors.md) — selector design
+- [variables.md](./variables.md) — tokens layer
+- [nesting.md](./nesting.md) — nest inside layers

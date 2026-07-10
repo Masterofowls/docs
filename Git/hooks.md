@@ -1,0 +1,65 @@
+# hooks
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Git hooks are scripts that run on events (commit, push, merge). Client hooks live in `.git/hooks/`; teams often share them via Husky, pre-commit framework, or `core.hooksPath`. Use hooks to lint, test, and block bad commits — keep them fast.
+
+## 🔧 Core concepts
+
+| Hook | When |
+| --- | --- |
+| `pre-commit` | Before commit object is created |
+| `commit-msg` | Validate/edit message |
+| `pre-push` | Before refs are pushed |
+| `post-checkout` / `post-merge` | After switch/merge |
+| `pre-receive` (server) | Before updating remote refs |
+
+- **Sample hooks** — `.git/hooks/*.sample` (disabled until renamed).
+- **Skip** — `--no-verify` bypasses client hooks (use sparingly).
+- **Shared path** — `git config core.hooksPath .githooks`.
+
+## 💡 Examples
+
+```bash
+# Enable a sample
+cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+# Shared hooks in repo
+mkdir -p .githooks
+git config core.hooksPath .githooks
+
+# .githooks/pre-commit
+#!/usr/bin/env bash
+set -euo pipefail
+npm run lint
+npm run typecheck
+
+# Skip once (emergency)
+git commit --no-verify -m "wip"
+```
+
+```bash
+# pre-commit framework (Python) / Husky (Node) install hooks for the team
+```
+
+## ⚠️ Pitfalls
+
+- Hooks in `.git/hooks` aren’t versioned — without `hooksPath`/tooling, teammates miss them.
+- Slow `pre-commit` trains people to `--no-verify`.
+- Hooks must be executable on Unix; Windows needs compatible runners.
+- Server-side hooks are the real enforcement for protected repos.
+- Don’t put secrets in hook scripts committed to the repo.
+
+## 🔗 Related
+
+- [commit.md](./commit.md)
+- [amend.md](./amend.md)
+- [push.md](./push.md)
+- [init.md](./init.md)
+- [status.md](./status.md)
+- [gitignore.md](./gitignore.md)

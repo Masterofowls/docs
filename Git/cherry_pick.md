@@ -1,0 +1,57 @@
+# cherry-pick
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git cherry-pick` applies the patch of one or more existing commits onto the current branch as new commits. Use to backport fixes; avoid heavy cherry-picking as a substitute for proper merges/rebases.
+
+## 🔧 Core concepts
+
+- **New SHAs** — picked commits get new hashes (same diff, new parents).
+- **Ranges** — `A^..B` or `--no-walk` for explicit lists.
+- **Mainline** — `-m 1` when picking merge commits.
+- **Continue** — conflict → fix → `--continue` / `--abort` / `--skip`.
+- **Sign-off** — `-x` records “cherry picked from” in the message.
+
+## 💡 Examples
+
+```bash
+git checkout release/1.2
+git cherry-pick abcdef1
+git cherry-pick -x abcdef1   # note source SHA in message
+
+# Multiple
+git cherry-pick abcdef1 1234567
+git cherry-pick A^..B
+
+# No auto-commit
+git cherry-pick --no-commit abcdef1
+
+# During conflicts
+git status
+# fix files
+git add -u
+git cherry-pick --continue
+# or
+git cherry-pick --abort
+```
+
+## ⚠️ Pitfalls
+
+- Duplicate commits later when merging the original branch (duplicate changes / conflicts).
+- Empty cherry-pick if changes already present — `--skip` or abort.
+- Merge commits need `-m`; picking merges is often the wrong tool.
+- Don’t cherry-pick unpublished WIP that will be rewritten (amended/rebased).
+- Binary conflicts and renames can make picks painful — prefer merge for large sets.
+
+## 🔗 Related
+
+- [rebase.md](./rebase.md)
+- [merge.md](./merge.md)
+- [conflict.md](./conflict.md)
+- [revert.md](./revert.md)
+- [log.md](./log.md)
+- [commit.md](./commit.md)

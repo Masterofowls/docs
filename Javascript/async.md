@@ -1,0 +1,108 @@
+# Async / Await
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`async` functions always return a Promise. `await` pauses the function until a thenable settles, then resumes with the value or throws the rejection. Prefer `async`/`await` for sequential flow; use `Promise.all` (and friends) for concurrency.
+
+## 🔧 Core concepts
+
+- **`async function` / `async () => {}`**: return value is wrapped in `Promise.resolve`.
+- **`await expr`**: only inside `async` functions or top-level modules.
+- **Errors**: rejected promises become thrown exceptions at `await`.
+- **Concurrency**: start promises first, then `await` them together.
+- **Top-level await**: allowed in ES modules (and some bundler targets).
+
+```js
+async function load() {
+  const res = await fetch("/api/user");
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}
+```
+
+## 💡 Examples
+
+```js
+// Sequential vs parallel
+async function sequential(ids) {
+  const out = [];
+  for (const id of ids) {
+    out.push(await fetch(`/u/${id}`).then((r) => r.json()));
+  }
+  return out;
+}
+
+async function parallel(ids) {
+  return Promise.all(
+    ids.map((id) => fetch(`/u/${id}`).then((r) => r.json())),
+  );
+}
+
+// try/catch around await
+async function safe() {
+  try {
+    return await load();
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+// Await multiple
+const [a, b] = await Promise.all([fetchA(), fetchB()]);
+
+// allSettled for partial success
+const results = await Promise.allSettled([p1, p2, p3]);
+for (const r of results) {
+  if (r.status === "fulfilled") console.log(r.value);
+  else console.warn(r.reason);
+}
+
+// Async iteration
+async function* pages(url) {
+  let next = url;
+  while (next) {
+    const data = await fetch(next).then((r) => r.json());
+    yield data.items;
+    next = data.next;
+  }
+}
+
+for await (const batch of pages("/api?page=1")) {
+  console.log(batch.length);
+}
+```
+
+```js
+// Don't forget to return / await inside map
+const bad = ids.map(async (id) => await work(id)); // Promise[]
+const good = await Promise.all(ids.map((id) => work(id)));
+
+// Microtask timing
+async function order() {
+  console.log("1");
+  await Promise.resolve();
+  console.log("3");
+}
+order();
+console.log("2"); // 1, 2, 3
+```
+
+## ⚠️ Pitfalls
+
+- `await` in a loop serializes work — often unintentional.
+- Floating promises: always `await`, `return`, or `.catch()` async calls.
+- `async` callbacks in `forEach` do not wait — use `for...of` or `Promise.all`.
+- Catching with empty `catch` hides AbortError and network failures.
+- Mixing `.then` chains with `await` is fine, but keep one style per function.
+
+## 🔗 Related
+
+- [promise.md](./promise.md) — Promise API
+- [fetch.md](./fetch.md) — HTTP requests
+- [error.md](./error.md) — try/catch patterns
+- [iteration.md](./iteration.md) — for await...of
+- [for_of.md](./for_of.md) — sync iteration
+- [api.md](./api.md) — AbortController

@@ -1,0 +1,79 @@
+# Sessions
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Sessions persist per-visitor data across requests via a session key (usually a cookie). Server-side backends store the payload (DB, cache, file, signed cookies). Access with `request.session` like a dict. Enable `SessionMiddleware` and `django.contrib.sessions`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `request.session` | Read/write mapping |
+| `session.save()` | Force persist |
+| `flush` / `cycle_key` | Logout / rotate key |
+| `SESSION_ENGINE` | Backend |
+| `SESSION_COOKIE_*` | Cookie flags |
+| `set_expiry` | Per-session lifetime |
+
+Backends: database (default), cache, cached_db, file, signed_cookies.
+
+## 💡 Examples
+
+**Usage:**
+
+```python
+def cart_add(request, product_id):
+    cart = request.session.get("cart", {})
+    cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+    request.session["cart"] = cart
+    request.session.modified = True  # if mutating nested structures
+    return redirect("cart")
+```
+
+**Login hygiene:**
+
+```python
+from django.contrib.auth import login
+
+def login_view(request):
+    ...
+    login(request, user)  # rotates session key by default
+```
+
+**Settings:**
+
+```python
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True       # HTTPS only
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
+```
+
+**Clear:**
+
+```python
+request.session.flush()       # delete data + cookie
+request.session.cycle_key()   # keep data, new key
+```
+
+## ⚠️ Pitfalls
+
+- Mutating nested dicts/lists without `modified = True` or reassignment.
+- Storing large objects or secrets in signed-cookie sessions.
+- Missing `Secure` / `HttpOnly` / `SameSite` in production.
+- Session fixation—always cycle on privilege change (login does this).
+- Cache-only backend: eviction loses sessions.
+
+## 🔗 Related
+
+- [Middleware](middleware.md)
+- [Authentication](authentication.md)
+- [Caching](caching.md)
+- [Messages framework](messages_framework.md)
+- [Security](security.md)
+- [Settings](settings.md)

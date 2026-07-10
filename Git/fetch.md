@@ -1,0 +1,61 @@
+# Fetch
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`git fetch` downloads objects and updates remote-tracking refs from a remote without changing your working tree or current branch. Use it to inspect upstream changes before merging or rebasing.
+
+## 🧩 Core concepts
+
+- **Remote** — named location (`origin`) with URL(s).
+- **Remote-tracking branches** — updated to match the remote (e.g. `origin/main`).
+- **Prune** — remove stale remote-tracking refs deleted upstream.
+- **Tags** — default fetch may omit tags; `--tags` pulls them.
+- **Refspecs** — control which refs are fetched into which local names.
+- **Fetch ≠ pull** — pull is fetch + integrate (merge/rebase).
+
+## 💡 Examples
+
+```bash
+# Fetch default remote
+git fetch
+git fetch origin
+
+# Fetch all remotes
+git fetch --all
+
+# Prune deleted remote branches
+git fetch --prune
+git fetch origin --prune
+
+# Fetch one branch
+git fetch origin main
+
+# Include tags
+git fetch --tags
+
+# Inspect after fetch
+git log --oneline HEAD..origin/main
+git diff main origin/main
+
+# Dry-run prune
+git fetch --prune --dry-run
+```
+
+## ⚠️ Pitfalls
+
+- Fetch never updates your checked-out branch — you must merge/rebase/reset intentionally.
+- Without prune, deleted remote branches still appear in `git branch -r`.
+- Shallow clones (`--depth`) need deepen/unshallow for full history operations.
+- Multiple remotes: `git fetch` alone only hits the current branch’s remote (or `origin` by config).
+
+## 🔗 Related
+
+- [Pull](./pull.md)
+- [Push](./push.md)
+- [Merge](./merge.md)
+- [Rebase](./rebase.md)
+- [Branch](./branch.md)

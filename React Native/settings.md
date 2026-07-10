@@ -1,0 +1,61 @@
+# Settings
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+App settings span in-app preferences, opening the OS Settings page, and build-time config (`react-native-config`, Expo `extra` / env). Separate user prefs from secrets.
+
+## 🔧 Core concepts
+
+- **In-app prefs** — theme, language, feature toggles → AsyncStorage / MMKV / SecureStore.
+- **`Linking.openSettings()`** — send user to system app settings (permissions).
+- **Build config** — `.env` via Expo (`EXPO_PUBLIC_*`) or native config libs.
+- **Expo Constants** — `Constants.expoConfig?.extra` for non-secret config.
+
+## 💡 Examples
+
+```tsx
+import { Linking, Pressable, Text } from "react-native";
+
+export function OpenAppSettings() {
+  return (
+    <Pressable onPress={() => Linking.openSettings()} accessibilityRole="button">
+      <Text>Open system settings</Text>
+    </Pressable>
+  );
+}
+```
+
+```tsx
+import Constants from "expo-constants";
+
+const apiUrl =
+  Constants.expoConfig?.extra?.apiUrl ?? "https://api.example.com";
+```
+
+```ts
+// app.config.ts extra
+export default {
+  expo: {
+    extra: {
+      apiUrl: process.env.EXPO_PUBLIC_API_URL,
+    },
+  },
+};
+```
+
+## ⚠️ Pitfalls
+
+- Putting secrets in `EXPO_PUBLIC_*` or `extra` — they ship in the binary.
+- Mixing permission recovery UI with preference screens without clear copy.
+- Not migrating prefs when storage keys change.
+
+## 🔗 Related
+
+- [storage.md](./storage.md) — persistence
+- [permissions.md](./permissions.md) — settings deep link
+- [Expo/config.md](./Expo/config.md) — app config
+- [platform_specific.md](./platform_specific.md) — OS differences

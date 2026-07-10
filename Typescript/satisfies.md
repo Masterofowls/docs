@@ -1,0 +1,72 @@
+# satisfies operator
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`satisfies T` (TS 4.9+) checks that an expression is assignable to `T` while **preserving** the expression’s more specific inferred type. Use it for config objects, route maps, and `as const` data that must match a contract without widening.
+
+## 🔧 Core concepts
+
+- **Check without widen** — validates against `T`, keeps literal / tuple detail.
+- **vs annotation** — `const x: T = …` widens to `T`; `satisfies` keeps narrow type.
+- **vs `as T`** — assertion skips checking; `satisfies` errors on mismatch.
+- **Combines with `as const`** — deep readonly + literal types + shape check.
+
+## 💡 Examples
+
+```ts
+type ColorMap = Record<string, string | RGB>;
+type RGB = [number, number, number];
+
+// Annotation widens values → string | RGB everywhere
+const colorsAnnotated: ColorMap = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+};
+
+// satisfies: red stays a tuple, green stays "#00ff00"
+const colors = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+} satisfies ColorMap;
+
+colors.red.map((n) => n / 255); // OK — tuple known
+colors.green.toUpperCase();     // OK — string literal methods
+
+const palette = {
+  primary: "#336699",
+  secondary: "#99cc33",
+} as const satisfies Record<string, `#${string}`>;
+
+type Route = { path: string; auth: boolean };
+const routes = {
+  home: { path: "/", auth: false },
+  admin: { path: "/admin", auth: true },
+} satisfies Record<string, Route>;
+
+type RouteKey = keyof typeof routes; // "home" | "admin"
+```
+
+```ts
+// Error: missing required field
+// const bad = { path: "/" } satisfies Route;
+```
+
+## ⚠️ Pitfalls
+
+- `satisfies` does not change the runtime value — validation is type-only.
+- Excess property checks still apply to fresh object literals against `T`.
+- Nested objects may still widen unless you also use `as const`.
+- Not a substitute for runtime validation of external input.
+- Older TS (<4.9) — use annotated helpers or dual variables instead.
+
+## 🔗 Related
+
+- [const_assertions.md](./const_assertions.md)
+- [literal_types.md](./literal_types.md)
+- [keyof_typeof.md](./keyof_typeof.md)
+- [type_assertions.md](./type_assertions.md)
+- [object_types.md](./object_types.md)

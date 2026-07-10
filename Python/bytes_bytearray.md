@@ -1,0 +1,78 @@
+# Bytes and Bytearray
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`bytes` is an immutable sequence of ints 0–255; `bytearray` is mutable. Use for binary protocols, files, and encodings. Text is `str` — convert explicitly with `.encode()` / `.decode()`.
+
+## 🔧 Core concepts
+
+| Type | Mutability | Create |
+| --- | --- | --- |
+| `bytes` | Immutable | `b"hi"`, `bytes([65])`, `bytes(10)` |
+| `bytearray` | Mutable | `bytearray(b"hi")` |
+| `memoryview` | View | Zero-copy slices |
+
+Encoding: `s.encode("utf-8")` → `bytes`; `b.decode("utf-8")` → `str`. Hex/base helpers: `.hex()`, `bytes.fromhex`.
+
+## 💡 Examples
+
+**Encode / decode:**
+
+```python
+text = "café"
+data = text.encode("utf-8")
+print(data)                 # b'caf\xc3\xa9'
+print(data.decode("utf-8"))
+```
+
+**bytearray mutation:**
+
+```python
+buf = bytearray(b"python")
+buf[0] = ord("P")
+buf.extend(b"!")
+print(buf)                  # bytearray(b'Python!')
+```
+
+**Binary file + memoryview:**
+
+```python
+from pathlib import Path
+
+path = Path("blob.bin")
+path.write_bytes(b"\x00\x01\x02\x03")
+raw = path.read_bytes()
+view = memoryview(raw)
+print(view[1:3].tobytes())  # b'\x01\x02'
+```
+
+**Struct packing:**
+
+```python
+import struct
+
+packet = struct.pack(">I4s", 42, b"ping")
+code, payload = struct.unpack(">I4s", packet)
+print(code, payload)
+```
+
+## ⚠️ Pitfalls
+
+- Indexing returns `int`, not a 1-length bytes: `b"ab"[0] == 97`.
+- Mixing `str` and `bytes` raises `TypeError`.
+- Wrong encoding (e.g. `latin-1` vs `utf-8`) corrupts text — be explicit.
+- `bytes(5)` is five zero bytes, not `b"5"`.
+- Large concatenations in a loop — prefer `bytearray` or `b"".join`.
+
+## 🔗 Related
+
+- [Strings](strings.md)
+- [Files I/O](files_io.md)
+- [Slicing](slicing.md)
+- [Types](types.md)
+- [Examples: encrypt](Examples/encrypt.md)
+- [Pathlib](pathlib.md)
