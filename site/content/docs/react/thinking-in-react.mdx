@@ -1,0 +1,107 @@
+---
+title: Thinking in React
+description: React · Reference cheat sheet
+---
+
+# Thinking in React
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+“Thinking in React” is a design approach: break the UI into a component hierarchy, decide what is state vs props, and let data flow downward. Build static UI first, then add interactivity.
+
+## 🔧 Core concepts
+
+| Step | What you do |
+| --- | --- |
+| 1. Mock / sketch | Know the screens and pieces |
+| 2. Split components | One responsibility per component |
+| 3. Static version | Render with hard-coded props/data |
+| 4. Find state | What changes over time? Minimize it |
+| 5. Place state | Own state in the closest common parent |
+| 6. Data flow | Props down; events up |
+
+If two components need the same changing data, lift state to their parent.
+
+## 💡 Examples
+
+**Component split (static):**
+
+```jsx
+function SearchBar({ query }) {
+  return <input value={query} readOnly />;
+}
+
+function ProductList({ products }) {
+  return (
+    <ul>
+      {products.map((p) => (
+        <li key={p.id}>{p.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+function FilterableList({ products }) {
+  return (
+    <>
+      <SearchBar query="" />
+      <ProductList products={products} />
+    </>
+  );
+}
+```
+
+**Add state in the parent:**
+
+```jsx
+import { useState } from "react";
+
+function FilterableList({ products }) {
+  const [query, setQuery] = useState("");
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search"
+      />
+      <ProductList products={filtered} />
+    </>
+  );
+}
+```
+
+**Props down, events up:**
+
+```jsx
+function SearchBar({ query, onQueryChange }) {
+  return (
+    <input
+      value={query}
+      onChange={(e) => onQueryChange(e.target.value)}
+    />
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Duplicating the same state in two places causes them to drift.
+- Derivable values (filtered lists) usually should not be stored as separate state.
+- Giant “god components” are hard to change — split earlier than you think.
+- Don’t fetch in every tiny child — load data near the top or in a dedicated module.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [hello_world.md](./hello_world)
+- [keys_lists.md](./keys_lists)
+- [conditional_rendering.md](./conditional_rendering)

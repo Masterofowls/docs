@@ -1,0 +1,93 @@
+---
+title: Glossary
+description: Django · Reference cheat sheet
+---
+
+# Glossary
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core Django terms for models, views, templates, auth, and the request/response cycle.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Admin | The built-in CRUD interface generated from registered models. |
+| App | A self-contained Django package under `INSTALLED_APPS` with models/views. |
+| ASGI | Async server gateway interface used for async Django and Channels. |
+| Authentication | Verifying who a user is, typically via sessions or tokens. |
+| CSRF | Cross-Site Request Forgery protection built into Django forms/middleware. |
+| Field | A model attribute that maps to a database column and validation rules. |
+| Form | A class that validates and cleans submitted input data. |
+| Management command | A CLI task run with `python manage.py <command>`. |
+| Manager | The interface attached to models for building QuerySets (`objects`). |
+| Middleware | Hooks that process requests and responses globally. |
+| Migration | A versioned schema change applied to the database. |
+| Model | A Python class mapping to a database table via the ORM. |
+| MVT | Model–View–Template, Django’s primary architectural pattern. |
+| ORM | Object-relational mapper that turns model APIs into SQL. |
+| Permission | A flag controlling whether a user may perform an action. |
+| Project | The top-level Django configuration package created by `startproject`. |
+| QuerySet | A lazy, chainable representation of a database query. |
+| Request | The `HttpRequest` object representing an incoming HTTP call. |
+| Serializer | DRF component that converts models to/from JSON (and validates). |
+| Settings | Project configuration module (`settings.py` / env-driven values). |
+| Signal | A dispatcher that notifies receivers when certain actions occur. |
+| Static files | CSS, JS, and images collected and served separately from media uploads. |
+| Template | An HTML file with Django template language tags and filters. |
+| URLConf | The URL routing table mapping paths to views. |
+| View | A callable that takes a request and returns a response. |
+| WSGI | Web Server Gateway Interface used by traditional sync Django deploys. |
+
+## 💡 Examples
+
+**Model and QuerySet:**
+
+```python
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    published = models.BooleanField(default=False)
+
+Post.objects.filter(published=True).order_by("-id")
+```
+
+**URL and view:**
+
+```python
+# urls.py
+path("posts/<int:pk>/", views.post_detail, name="post_detail")
+
+# views.py
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, "posts/detail.html", {"post": post})
+```
+
+**Migration workflow:**
+
+```shellscript
+python manage.py makemigrations
+python manage.py migrate
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **project** (site config) with **app** (feature package).
+- Mixing **Form** validation with **Serializer** validation in DRF projects.
+- Treating a **QuerySet** as immediately executed — it is lazy until evaluated.
+- Equating **authentication** (who you are) with **permission** (what you may do).
+- Assuming **static files** and **media uploads** are the same storage path.
+
+## 🔗 Related
+
+- [models](models)
+- [views](views)
+- [templates](templates)
+- [queryset](queryset)
+- [authentication](authentication)
+- [migrations](migrations)

@@ -16,6 +16,7 @@
     "email",
     "file-uploads",
     "forms",
+    "glossary",
     "i18n",
     "management-commands",
     "managers",
@@ -38,6 +39,7 @@
     "transactions-orm",
     "urls",
     "validators",
-    "views"
+    "views",
+    "...examples"
   ]
 }

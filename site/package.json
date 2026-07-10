@@ -5,6 +5,8 @@
   "scripts": {
     "sync:content": "node scripts/sync-content.mjs",
     "icons:pwa": "node scripts/generate-pwa-icons.mjs",
+    "note:new": "node scripts/new-note.mjs",
+    "mcp": "node mcp/server.mjs",
     "predev": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
     "prebuild": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
     "build": "next build",

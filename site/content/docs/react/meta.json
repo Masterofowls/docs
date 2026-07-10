@@ -18,6 +18,9 @@
     "forms",
     "forwardref",
     "fragments",
+    "getting-started",
+    "glossary",
+    "hello-world",
     "hooks",
     "import-export",
     "jsx",
@@ -36,6 +39,7 @@
     "suspense",
     "tag",
     "testing",
+    "thinking-in-react",
     "tsx",
     "usecallback",
     "usecontext",
@@ -47,6 +51,7 @@
     "usereducer",
     "useref",
     "usestate",
-    "usetransition"
+    "usetransition",
+    "...examples"
   ]
 }

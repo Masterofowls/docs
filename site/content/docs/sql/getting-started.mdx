@@ -1,0 +1,73 @@
+---
+title: Getting Started with SQL
+description: SQL · Reference cheat sheet
+---
+
+# Getting Started with SQL
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+SQL (Structured Query Language) is how you talk to relational databases: create tables, insert rows, and query data. Dialects (PostgreSQL, MySQL, SQLite, SQL Server) share a core language with small differences.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Database | Named collection of schemas/tables |
+| Table | Rows + named columns |
+| Row / record | One entry |
+| Column / field | One attribute with a data type |
+| Query | Statement that reads or changes data |
+| Primary key | Uniquely identifies a row |
+
+Beginners often practice on **SQLite** (a file DB) or a free Postgres instance.
+
+## 💡 Examples
+
+**SQLite quick start:**
+
+```shellscript
+sqlite3 practice.db
+```
+
+```sql
+SELECT 'Hello, SQL!' AS message;
+```
+
+**Create a tiny table and query it:**
+
+```sql
+CREATE TABLE friends (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+INSERT INTO friends (name) VALUES ('Ada'), ('Grace');
+SELECT * FROM friends;
+```
+
+**Filter rows:**
+
+```sql
+SELECT name
+FROM friends
+WHERE name LIKE 'A%';
+```
+
+## ⚠️ Pitfalls
+
+- SQL keywords are case-insensitive by convention; `SELECT` vs `select` both work.
+- String quotes are single quotes in standard SQL: `'Ada'`, not `"Ada"` (double quotes often mean identifiers).
+- Each dialect has quirks (`AUTOINCREMENT`, `SERIAL`, `LIMIT` vs `TOP`).
+- Never paste untrusted input into SQL strings — use parameterized queries in apps.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [tables_basics.md](./tables_basics)
+- [primary_keys_basics.md](./primary_keys_basics)
+- [null_basics.md](./null_basics)

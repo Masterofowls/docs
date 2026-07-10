@@ -1,0 +1,73 @@
+---
+title: Parametrize IDs
+description: Pytest · Example / how-to
+---
+
+# Parametrize IDs
+
+_Pytest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Use `@pytest.mark.parametrize` with explicit `ids=` so failure output names cases clearly.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `parametrize` | Run one test many ways |
+| `ids` | Human-readable case names |
+| `pytest.param` | Per-case marks / id |
+| Failure output | Shows id in nodeid |
+
+## 💡 Examples
+
+**test_parametrize_ids.py:**
+
+```python
+import pytest
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("  ada  ", "ada"),
+        ("ADA", "ada"),
+        ("", ""),
+    ],
+    ids=["trim", "lower", "empty"],
+)
+def test_normalize(raw: str, expected: str) -> None:
+    assert raw.strip().lower() == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(2, id="even"),
+        pytest.param(3, id="odd"),
+        pytest.param(-1, id="negative", marks=pytest.mark.xfail(reason="not yet")),
+    ],
+)
+def test_is_non_negative_even(value: int) -> None:
+    assert value >= 0 and value % 2 == 0
+```
+
+**Run:**
+
+```shellscript
+pytest -q test_parametrize_ids.py
+pytest -q test_parametrize_ids.py -k trim
+```
+
+## ⚠️ Pitfalls
+
+- Auto ids from values can be ugly or collide — set `ids` for clarity.
+- Too many combinations explode runtime — prefer focused tables.
+- Marks on `pytest.param` apply only to that case, not the whole matrix.
+
+## 🔗 Related
+
+- [tmp_path files](tmp_path_files)

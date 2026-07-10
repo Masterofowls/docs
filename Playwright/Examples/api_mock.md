@@ -1,0 +1,66 @@
+# API Mock
+
+_Playwright · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Intercept network calls with `page.route` so UI tests stay fast and deterministic without hitting a real backend.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `page.route` | Match URL pattern |
+| `route.fulfill` | Return stub JSON |
+| `route.abort` | Simulate failures |
+| Test isolation | Mock per test |
+
+## 💡 Examples
+
+**api_mock.spec.ts:**
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test("renders posts from mocked API", async ({ page }) => {
+  await page.route("**/api/posts", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([
+        { id: 1, title: "Hello" },
+        { id: 2, title: "World" },
+      ]),
+    });
+  });
+
+  await page.goto("/posts");
+  await expect(page.getByText("Hello")).toBeVisible();
+  await expect(page.getByText("World")).toBeVisible();
+});
+
+test("shows error when API fails", async ({ page }) => {
+  await page.route("**/api/posts", (route) =>
+    route.fulfill({
+      status: 500,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "boom" }),
+    }),
+  );
+
+  await page.goto("/posts");
+  await expect(page.getByRole("alert")).toContainText(/failed|error/i);
+});
+```
+
+## ⚠️ Pitfalls
+
+- Over-broad globs can mock unrelated requests — tighten the pattern.
+- Forgetting `await route.fulfill` leaves the request hanging.
+- Keep fixtures small; large snapshots are hard to maintain.
+
+## 🔗 Related
+
+- [Login flow](login_flow.md)

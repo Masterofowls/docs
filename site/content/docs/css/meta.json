@@ -10,8 +10,10 @@
     "aspect-ratio",
     "background",
     "box-model",
+    "box-model-basics",
     "button",
     "calc-min-max-clamp",
+    "cascade-basics",
     "cascade-layers",
     "color-functions",
     "column",
@@ -22,9 +24,12 @@
     "filter-backdrop",
     "flex",
     "font",
+    "getting-started",
+    "glossary",
     "gradient",
     "grid",
     "has-selector",
+    "hello-world",
     "hover",
     "icon",
     "image",
@@ -42,6 +47,7 @@
     "scroll",
     "scroll-snap",
     "selectors",
+    "selectors-basics",
     "specificity",
     "sticky",
     "table",
@@ -50,6 +56,7 @@
     "transform",
     "transitions",
     "variables",
-    "z-index"
+    "z-index",
+    "...examples"
   ]
 }

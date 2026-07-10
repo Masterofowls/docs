@@ -1,0 +1,62 @@
+# Export CSV Report
+
+_Powershell · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Query objects, project columns, and export a CSV report with `Export-Csv` and UTF-8 encoding.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Select-Object` | Choose / rename columns |
+| `Export-Csv` | Write spreadsheet-friendly file |
+| `-NoTypeInformation` | Cleaner CSV header |
+| Pipeline | Compose filters |
+
+## 💡 Examples
+
+**export_csv_report.ps1:**
+
+```powershell
+param(
+    [string]$OutFile = ".\report.csv",
+    [int]$Top = 50
+)
+
+$ErrorActionPreference = "Stop"
+
+$rows = Get-ChildItem -Path $PSScriptRoot -File -Recurse -ErrorAction SilentlyContinue |
+    Where-Object { $_.Extension -in ".md", ".ps1", ".ts", ".py" } |
+    Sort-Object Length -Descending |
+    Select-Object -First $Top @{
+        Name = "RelativePath"
+        Expression = { $_.FullName.Substring($PSScriptRoot.Length).TrimStart("\") }
+    }, Length, LastWriteTime, Extension
+
+$rows | Export-Csv -Path $OutFile -NoTypeInformation -Encoding utf8
+
+Write-Host "Wrote $($rows.Count) rows to $OutFile"
+```
+
+**From process list:**
+
+```powershell
+Get-Process |
+  Select-Object Name, Id, CPU, WorkingSet |
+  Export-Csv .\processes.csv -NoTypeInformation -Encoding utf8
+```
+
+## ⚠️ Pitfalls
+
+- Default encoding can confuse Excel — prefer `-Encoding utf8`.
+- Nested objects become strings poorly — flatten with calculated properties.
+- `Export-Csv` overwrites by default; confirm the path in scripts.
+
+## 🔗 Related
+
+- [REST get JSON](rest_get_json.md)
+- [Watch folder](watch_folder.md)

@@ -20,6 +20,7 @@
     "git-lfs",
     "gitattributes",
     "gitignore",
+    "glossary",
     "hooks",
     "init",
     "log",
@@ -38,6 +39,7 @@
     "status",
     "submodule",
     "tag",
-    "worktree"
+    "worktree",
+    "...examples"
   ]
 }

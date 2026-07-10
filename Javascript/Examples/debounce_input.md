@@ -1,0 +1,74 @@
+# Debounce Input
+
+_Javascript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Debounce a search input so filtering runs after the user pauses typing, not on every keystroke.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Debounce | Delay until quiet period |
+| `setTimeout` / `clearTimeout` | Schedule and cancel |
+| `input` event | Live typing |
+| Closure | Hold timer id |
+
+## 💡 Examples
+
+**debounce_input.js:**
+
+```javascript
+function debounce(fn, waitMs = 300) {
+  let timer;
+  return function debounced(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), waitMs);
+  };
+}
+
+const input = document.querySelector("#search");
+const status = document.querySelector("#status");
+const items = ["Apple", "Apricot", "Banana", "Blueberry", "Cherry"];
+
+function filterItems(query) {
+  const q = query.trim().toLowerCase();
+  const matches = items.filter((item) => item.toLowerCase().includes(q));
+  status.textContent = q
+    ? `Matches: ${matches.join(", ") || "(none)"}`
+    : "Type to filter…";
+}
+
+input.addEventListener(
+  "input",
+  debounce((event) => filterItems(event.target.value), 300),
+);
+```
+
+**Cancel on blur (optional):**
+
+```javascript
+function debounceCancelable(fn, waitMs = 300) {
+  let timer;
+  const wrapped = (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), waitMs);
+  };
+  wrapped.cancel = () => clearTimeout(timer);
+  return wrapped;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Debounce delays the last call; throttle limits rate — pick the right one.
+- Always `clearTimeout` before scheduling again or timers stack.
+- In SPAs, cancel pending timers on unmount to avoid setState-after-unmount.
+
+## 🔗 Related
+
+- [DOM todo](dom_todo.md)
+- [LocalStorage prefs](localstorage_prefs.md)

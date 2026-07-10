@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "report-join",
+    "upsert-inventory",
+    "window-rank"
+  ]
+}

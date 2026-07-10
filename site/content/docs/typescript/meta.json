@@ -5,6 +5,7 @@
   "root": true,
   "pages": [
     "index",
+    "annotating-basics",
     "any-unknown-never",
     "branded-types",
     "class",
@@ -17,6 +18,9 @@
     "discriminated-unions",
     "enums",
     "generic-types",
+    "getting-started",
+    "glossary",
+    "hello-world",
     "index-signatures",
     "infer",
     "interfaces",
@@ -33,6 +37,7 @@
     "strict-options",
     "template-literal-types",
     "this-types",
+    "tsconfig-basics",
     "tsx-react",
     "tuple-types",
     "type-assertions",
@@ -40,6 +45,8 @@
     "types",
     "union-types",
     "utility-types",
-    "zod-integration"
+    "why-typescript",
+    "zod-integration",
+    "...examples"
   ]
 }

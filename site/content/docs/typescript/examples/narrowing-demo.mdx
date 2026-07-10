@@ -1,0 +1,75 @@
+---
+title: Narrowing Demo
+description: Typescript · Example / how-to
+---
+
+# Narrowing Demo
+
+_Typescript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Use control-flow narrowing (`typeof`, `in`, discriminated unions) so TypeScript knows which fields are safe after a check.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `typeof` | Narrow primitives |
+| `in` operator | Narrow object shapes |
+| Discriminated union | Shared `kind` / `type` tag |
+| Exhaustiveness | `never` in default |
+
+## 💡 Examples
+
+**narrowing_demo.ts:**
+
+```typescript
+type Success = { kind: "ok"; value: string };
+type Failure = { kind: "err"; error: Error };
+type Result = Success | Failure;
+
+function handle(result: Result): string {
+  switch (result.kind) {
+    case "ok":
+      return result.value.toUpperCase();
+    case "err":
+      return `failed: ${result.error.message}`;
+    default: {
+      const _exhaustive: never = result;
+      return _exhaustive;
+    }
+  }
+}
+
+function label(input: string | number | { name: string }): string {
+  if (typeof input === "string") return input.trim();
+  if (typeof input === "number") return input.toFixed(2);
+  if ("name" in input) return input.name;
+  return "unknown";
+}
+
+function readId(payload: unknown): number | null {
+  if (typeof payload !== "object" || payload === null) return null;
+  if (!("id" in payload)) return null;
+  const id = (payload as { id: unknown }).id;
+  return typeof id === "number" ? id : null;
+}
+
+console.log(handle({ kind: "ok", value: "hello" }));
+console.log(label(42));
+console.log(readId({ id: 7 }));
+```
+
+## ⚠️ Pitfalls
+
+- `typeof null === "object"` — always null-check objects.
+- Casting with `as` skips narrowing; prefer guards.
+- Forgetting a union member breaks exhaustiveness — keep the `never` default.
+
+## 🔗 Related
+
+- [Typed fetch](typed_fetch)
+- [Zod form](zod_form)

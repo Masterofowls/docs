@@ -1,0 +1,81 @@
+---
+title: Hello World
+description: CSS · Reference cheat sheet
+---
+
+# Hello World
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS Hello World usually means styling a heading or page background so you can see a visible change. If the look updates when you refresh, your stylesheet is connected correctly.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Selector | Targets `h1`, `.class`, `#id`, … |
+| Declaration | `property: value;` |
+| Declaration block | `\{ ... \}` |
+| External CSS | Best default for learning |
+
+Change one obvious property first (color or background) to verify the link.
+
+## 💡 Examples
+
+**HTML + CSS pair:**
+
+```html
+<!-- index.html -->
+<h1>Hello, World!</h1>
+```
+
+```css
+/* styles.css */
+h1 {
+  color: darkslateblue;
+  text-align: center;
+}
+```
+
+**Background and body text:**
+
+```css
+body {
+  background-color: #fff7ed;
+  color: #1c1917;
+  font-family: Georgia, serif;
+}
+```
+
+**Class-based hello:**
+
+```html
+<p class="hello">Hello, World!</p>
+```
+
+```css
+.hello {
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+```
+
+**DevTools tip:** right-click the element → Inspect → watch which rules apply.
+
+## ⚠️ Pitfalls
+
+- Wrong path in `<link href="...">` means no styles — check the Network tab.
+- Caching can hide changes — hard refresh if needed.
+- `colour` is invalid; use `color` (American spelling in CSS).
+- Styling `html` vs `body` height differently can confuse full-page backgrounds.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [selectors_basics.md](./selectors_basics)
+- [cascade_basics.md](./cascade_basics)
+- [box_model_basics.md](./box_model_basics)

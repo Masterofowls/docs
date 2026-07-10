@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "backup-script",
+    "find-and-replace",
+    "healthcheck-loop"
+  ]
+}

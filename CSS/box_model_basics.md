@@ -1,0 +1,79 @@
+# Box Model Basics
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Every element is a **box** made of content, padding, border, and margin. Layout spacing bugs almost always come from misunderstanding this model. Prefer `box-sizing: border-box` in modern pages.
+
+## 🔧 Core concepts
+
+| Layer | Role |
+| --- | --- |
+| Content | Text or children; sized by `width` / `height` |
+| Padding | Space inside the border |
+| Border | Line around the padding |
+| Margin | Space outside the border |
+| `content-box` | Default: width = content only |
+| `border-box` | Width includes padding + border |
+
+Vertical margins can **collapse** between stacked blocks.
+
+## 💡 Examples
+
+**See the box:**
+
+```css
+.card {
+  width: 200px;
+  padding: 16px;
+  border: 4px solid #334155;
+  margin: 24px;
+  background: #f8fafc;
+}
+```
+
+**border-box (recommended):**
+
+```css
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+  /* total outer width stays 200px with border-box */
+}
+```
+
+**Margin vs padding:**
+
+```css
+.section {
+  padding: 1rem; /* space inside, keeps background */
+  margin-bottom: 2rem; /* space outside, separates from next block */
+  background: #e2e8f0;
+}
+```
+
+**Inspect in DevTools:** select an element and view the box model diagram.
+
+## ⚠️ Pitfalls
+
+- With `content-box`, `width: 200px` + padding + border grows past 200px.
+- `margin: auto` horizontal centering needs a defined width on block boxes.
+- Margin collapse can remove expected vertical gaps between siblings.
+- Inline elements ignore `width`/`height` differently than block elements.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [selectors_basics.md](./selectors_basics.md)
+- [cascade_basics.md](./cascade_basics.md)
+- [box_model.md](./box_model.md)

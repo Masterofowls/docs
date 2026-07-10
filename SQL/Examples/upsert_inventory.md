@@ -1,0 +1,72 @@
+# Upsert Inventory
+
+_SQL · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Insert or update inventory quantities atomically with `INSERT ... ON CONFLICT` (PostgreSQL) or equivalent upsert patterns.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Unique key | Conflict target (SKU) |
+| `ON CONFLICT` | Upsert branch |
+| `EXCLUDED` | Proposed row values |
+| Atomicity | Avoid racey read-modify-write |
+
+## 💡 Examples
+
+**PostgreSQL:**
+
+```sql
+CREATE TABLE inventory (
+  sku TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  qty INTEGER NOT NULL CHECK (qty >= 0),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO inventory (sku, name, qty)
+VALUES ('ABC-1', 'Widget', 10)
+ON CONFLICT (sku) DO UPDATE
+SET
+  name = EXCLUDED.name,
+  qty = inventory.qty + EXCLUDED.qty,
+  updated_at = NOW()
+RETURNING sku, name, qty, updated_at;
+```
+
+**Set absolute quantity instead of increment:**
+
+```sql
+INSERT INTO inventory (sku, name, qty)
+VALUES ('ABC-1', 'Widget', 25)
+ON CONFLICT (sku) DO UPDATE
+SET name = EXCLUDED.name,
+    qty = EXCLUDED.qty,
+    updated_at = NOW();
+```
+
+**SQLite (similar):**
+
+```sql
+INSERT INTO inventory (sku, name, qty)
+VALUES ('ABC-1', 'Widget', 10)
+ON CONFLICT(sku) DO UPDATE SET
+  qty = inventory.qty + excluded.qty,
+  name = excluded.name;
+```
+
+## ⚠️ Pitfalls
+
+- Without a unique constraint, `ON CONFLICT` cannot target the row.
+- Increment vs replace semantics differ — document which you mean.
+- Check constraints still apply on the final row after update.
+
+## 🔗 Related
+
+- [Report join](report_join.md)
+- [Window rank](window_rank.md)

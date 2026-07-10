@@ -1,0 +1,85 @@
+---
+title: Elements Basics
+description: HTML · Reference cheat sheet
+---
+
+# Elements Basics
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+An **element** is a node in the page tree, usually written with an opening tag, content, and a closing tag. Some elements are **void** (no closing tag), like `img` and `br`.
+
+## 🔧 Core concepts
+
+| Kind | Examples | Notes |
+| --- | --- | --- |
+| Block-ish | `h1`–`h6`, `p`, `ul`, `section` | Start on a new line by default (CSS dependent) |
+| Inline-ish | `a`, `strong`, `em`, `span` | Flow within text |
+| Void | `img`, `br`, `hr`, `input`, `meta` | No child content |
+| Semantic | `header`, `main`, `nav`, `footer` | Meaning for humans & assistive tech |
+
+Elements nest to form a tree; the browser builds the DOM from that tree.
+
+## 💡 Examples
+
+**Headings and text:**
+
+```html
+<h1>Site title</h1>
+<h2>Section</h2>
+<p>A paragraph of text with <strong>bold</strong> and <em>emphasis</em>.</p>
+```
+
+**Lists:**
+
+```html
+<ul>
+  <li>Apples</li>
+  <li>Bananas</li>
+</ul>
+<ol>
+  <li>Install editor</li>
+  <li>Write HTML</li>
+</ol>
+```
+
+**Void elements:**
+
+```html
+<p>Line one<br />Line two</p>
+<hr />
+<img src="cat.jpg" alt="A cat sitting on a laptop" />
+```
+
+**Document landmarks:**
+
+```html
+<body>
+  <header><h1>Notes</h1></header>
+  <main>
+    <article>
+      <h2>Elements</h2>
+      <p>Content goes here.</p>
+    </article>
+  </main>
+  <footer><p>© 2026</p></footer>
+</body>
+```
+
+## ⚠️ Pitfalls
+
+- Overusing `<div>` when a semantic tag fits better.
+- Putting block elements inside `<p>` incorrectly.
+- Self-closing `/>` is optional in HTML5 for void tags but fine to use.
+- Tag names are case-insensitive; lowercase is the convention.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [hello_world.md](./hello_world)
+- [attributes_basics.md](./attributes_basics)
+- [semantic.md](./semantic)

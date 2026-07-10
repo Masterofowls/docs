@@ -1,0 +1,60 @@
+# tmp_path Files
+
+_Pytest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Use the `tmp_path` fixture to create isolated files/directories per test without polluting the repo.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `tmp_path` | Unique `pathlib.Path` per test |
+| Write / read | Exercise file IO safely |
+| Cleanup | Pytest removes the dir |
+| `tmp_path_factory` | Session-scoped temps |
+
+## 💡 Examples
+
+**test_tmp_path_files.py:**
+
+```python
+from pathlib import Path
+
+
+def test_write_and_read_config(tmp_path: Path) -> None:
+    config = tmp_path / "config.ini"
+    config.write_text("[app]\ndebug = true\n", encoding="utf-8")
+
+    text = config.read_text(encoding="utf-8")
+    assert "debug = true" in text
+
+
+def test_nested_layout(tmp_path: Path) -> None:
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    sample = inbox / "note.md"
+    sample.write_text("# hi\n", encoding="utf-8")
+
+    files = sorted(p.name for p in inbox.iterdir())
+    assert files == ["note.md"]
+
+
+def test_factory_shared_seed(tmp_path_factory) -> None:
+    root = tmp_path_factory.mktemp("seed")
+    (root / "data.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+    assert (root / "data.csv").exists()
+```
+
+## ⚠️ Pitfalls
+
+- Do not hard-code `/tmp/...` paths — use the fixture for isolation.
+- Binary vs text: pass `encoding` for text; use `write_bytes` for binaries.
+- Tests must not assume leftover files from a previous run.
+
+## 🔗 Related
+
+- [Parametrize ids](parametrize_ids.md)

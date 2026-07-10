@@ -1,0 +1,83 @@
+---
+title: Getting Started with CSS
+description: CSS · Reference cheat sheet
+---
+
+# Getting Started with CSS
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS (Cascading Style Sheets) controls how HTML looks: colors, spacing, layout, and responsive behavior. You select elements and declare properties inside rules.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Rule | `selector \{ property: value; \}` |
+| Selector | Which elements the rule targets |
+| Property | What to change (`color`, `margin`, …) |
+| Cascade | How conflicting rules are resolved |
+| Stylesheet | A `.css` file or `<style>` block |
+
+Link CSS from HTML with `<link rel="stylesheet" href="styles.css" />`.
+
+## 💡 Examples
+
+**Inline link in HTML:**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CSS demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1 class="title">Hello, CSS</h1>
+  </body>
+</html>
+```
+
+**`styles.css`:**
+
+```css
+body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  background: #f6f7f9;
+}
+
+.title {
+  color: #0f172a;
+  font-size: 2rem;
+}
+```
+
+**Quick experiment in a `<style>` tag:**
+
+```html
+<style>
+  p {
+    line-height: 1.5;
+  }
+</style>
+```
+
+## ⚠️ Pitfalls
+
+- Typos in property names fail silently (nothing happens).
+- Specificity wars — prefer simple class selectors while learning.
+- Browser default styles differ; a small reset/normalize helps later.
+- Inline `style=""` attributes override stylesheets and are hard to maintain.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [selectors_basics.md](./selectors_basics)
+- [cascade_basics.md](./cascade_basics)
+- [box_model_basics.md](./box_model_basics)

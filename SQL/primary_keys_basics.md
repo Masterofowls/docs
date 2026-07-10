@@ -1,0 +1,81 @@
+# Primary Keys Basics
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A **primary key (PK)** uniquely identifies each row in a table. Most tables use a single column (often `id`). Databases enforce uniqueness and non-null for primary keys.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Uniqueness | No two rows share the same PK value |
+| Not null | PK columns cannot be NULL |
+| Surrogate key | Artificial `id` (common) |
+| Natural key | Real-world unique value (email, ISBN) — use carefully |
+| Auto-increment | DB generates the next id |
+| Composite key | PK made of multiple columns |
+
+Foreign keys in other tables often reference this primary key.
+
+## 💡 Examples
+
+**Integer primary key (SQLite style):**
+
+```sql
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL
+);
+
+INSERT INTO users (email, name) VALUES
+  ('ada@example.com', 'Ada'),
+  ('grace@example.com', 'Grace');
+
+SELECT id, email FROM users;
+```
+
+**Explicit ids:**
+
+```sql
+INSERT INTO users (id, email, name)
+VALUES (100, 'linus@example.com', 'Linus');
+```
+
+**Composite primary key:**
+
+```sql
+CREATE TABLE enrollment (
+  student_id INTEGER NOT NULL,
+  course_id INTEGER NOT NULL,
+  enrolled_on TEXT NOT NULL,
+  PRIMARY KEY (student_id, course_id)
+);
+
+INSERT INTO enrollment VALUES (1, 10, '2026-01-15');
+-- INSERT INTO enrollment VALUES (1, 10, '2026-02-01'); -- would fail
+```
+
+**Lookup by primary key:**
+
+```sql
+SELECT name FROM users WHERE id = 1;
+```
+
+## ⚠️ Pitfalls
+
+- Changing primary key values later breaks references — treat ids as stable.
+- Using mutable natural keys (email) as PK causes pain when they change.
+- Forgetting a PK makes updates/deletes harder and invites duplicate rows.
+- Auto-increment behavior and syntax differ (`SERIAL`, `IDENTITY`, `AUTO_INCREMENT`).
+
+## 🔗 Related
+
+- [tables_basics.md](./tables_basics.md)
+- [null_basics.md](./null_basics.md)
+- [foreign_keys.md](./foreign_keys.md)
+- [constraints.md](./constraints.md)

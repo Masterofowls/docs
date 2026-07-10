@@ -1,0 +1,76 @@
+# Mock Module
+
+_Jest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Replace a module dependency with `jest.mock` so unit tests control return values and assert call shapes.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `jest.mock` | Hoisted module stub |
+| `jest.fn` | Spy / stub function |
+| `mocked()` | Typed mock helpers (TS) |
+| `beforeEach` | Reset call history |
+
+## 💡 Examples
+
+**api.ts:**
+
+```typescript
+export async function fetchUser(id: string) {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error("fail");
+  return res.json();
+}
+```
+
+**userService.ts:**
+
+```typescript
+import { fetchUser } from "./api";
+
+export async function getUserLabel(id: string) {
+  const user = await fetchUser(id);
+  return `${user.name} <${user.email}>`;
+}
+```
+
+**userService.test.ts:**
+
+```typescript
+import { getUserLabel } from "./userService";
+import { fetchUser } from "./api";
+
+jest.mock("./api");
+
+const fetchUserMock = fetchUser as jest.MockedFunction<typeof fetchUser>;
+
+beforeEach(() => {
+  fetchUserMock.mockReset();
+});
+
+test("formats label from API user", async () => {
+  fetchUserMock.mockResolvedValue({
+    name: "Ada",
+    email: "ada@example.com",
+  });
+
+  await expect(getUserLabel("1")).resolves.toBe("Ada <ada@example.com>");
+  expect(fetchUserMock).toHaveBeenCalledWith("1");
+});
+```
+
+## ⚠️ Pitfalls
+
+- `jest.mock` is hoisted — keep factories self-contained.
+- Forget `mockReset` / `clearAllMocks` and tests leak state.
+- Mock the module boundary your unit owns; avoid mocking huge frameworks casually.
+
+## 🔗 Related
+
+- [Async user event](async_user_event.md)

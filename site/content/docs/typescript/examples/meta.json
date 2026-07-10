@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "narrowing-demo",
+    "typed-fetch",
+    "zod-form"
+  ]
+}

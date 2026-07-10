@@ -1,0 +1,73 @@
+# Getting Started with TypeScript
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+TypeScript (TS) is JavaScript plus a static type system. You write `.ts` / `.tsx` files; the compiler (`tsc`) checks types and emits plain JavaScript. Types exist at compile time — they are erased at runtime.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Type checker | Catches many bugs before running code |
+| `tsc` | Official TypeScript compiler CLI |
+| `tsconfig.json` | Project compiler options |
+| Emit | Output `.js` (and optional `.d.ts` declarations) |
+| Gradual typing | You can add types step by step |
+
+**Prereqs:** Node.js installed. Then `npm install -D typescript` in a project (or use `npx tsc`).
+
+## 💡 Examples
+
+**Install and check version:**
+
+```bash
+npm install -D typescript
+npx tsc --version
+```
+
+**Tiny file (`hello.ts`):**
+
+```ts
+const message: string = "Hello, TypeScript";
+console.log(message);
+```
+
+**Compile and run:**
+
+```bash
+npx tsc hello.ts
+node hello.js
+```
+
+**Minimal `tsconfig.json`:**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "strict": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
+```
+
+## ⚠️ Pitfalls
+
+- Running `.ts` directly needs `tsx`, `ts-node`, or a bundler — Node does not execute TS natively (without experimental flags).
+- Types do not exist at runtime: `typeof` still sees JS values only.
+- Skipping `"strict": true` hides the value of TypeScript.
+- Editing emitted `.js` by hand will be overwritten on next compile.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [why_typescript.md](./why_typescript.md)
+- [tsconfig_basics.md](./tsconfig_basics.md)
+- [annotating_basics.md](./annotating_basics.md)

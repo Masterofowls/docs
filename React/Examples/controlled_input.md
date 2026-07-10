@@ -1,0 +1,70 @@
+# Controlled Input
+
+_React · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Keep an input’s value in React state (controlled component) so validation and submit logic stay in sync with the UI.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Controlled value | `value` + `onChange` |
+| Single source of truth | State owns the string |
+| Validation | Derive errors from state |
+| Submit handler | Read state, not DOM |
+
+## 💡 Examples
+
+**ControlledInput.tsx:**
+
+```tsx
+import { FormEvent, useState } from "react";
+
+export function NameForm({ onSave }: { onSave: (name: string) => void }) {
+  const [name, setName] = useState("");
+  const error = name.trim().length === 0 ? "Name is required" : null;
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    if (error) return;
+    onSave(name.trim());
+    setName("");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="name">Name</label>
+      <input
+        id="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? "name-error" : undefined}
+      />
+      {error ? (
+        <p id="name-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <button type="submit" disabled={Boolean(error)}>
+        Save
+      </button>
+    </form>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Mixing `defaultValue` and `value` makes the input semi-controlled — pick one.
+- For checkboxes use `checked`, not `value`, as the controlled prop.
+- Resetting after submit should set state to `""`, not touch the DOM.
+
+## 🔗 Related
+
+- [Counter](counter.md)
+- [Fetch list](fetch_list.md)

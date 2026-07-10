@@ -1,0 +1,97 @@
+# Hello World
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React Native Hello World shows text on a screen using `View` + `Text`. With Expo, you scan a QR code (Expo Go) or use an emulator to see the result live.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `App` / screen | Root component Expo loads |
+| `View` | Container (like a non-text `div`) |
+| `Text` | Renders strings |
+| `StyleSheet.create` | Defines reusable styles |
+| Fast Refresh | Saves reload UI as you edit |
+
+Keep the first screen tiny so tooling issues are obvious.
+
+## 💡 Examples
+
+**Minimal screen:**
+
+```jsx
+import { View, Text, StyleSheet } from "react-native";
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Hello, World!</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
+```
+
+**Styled greeting:**
+
+```jsx
+import { View, Text, StyleSheet } from "react-native";
+
+export default function App() {
+  const name = "Ada";
+  return (
+    <View style={styles.container}>
+      <Text style={styles.hello}>Hello, {name}!</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  hello: { fontSize: 24, fontWeight: "600" },
+});
+```
+
+**Pressable interaction:**
+
+```jsx
+import { useState } from "react";
+import { Pressable, Text, View } from "react-native";
+
+export default function App() {
+  const [n, setN] = useState(0);
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Pressable onPress={() => setN(n + 1)}>
+        <Text>Hello taps: {n}</Text>
+      </Pressable>
+    </View>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Putting text directly in `View` without `Text` throws.
+- Web CSS class names don’t apply — use style objects.
+- Safe area / notches: later use `SafeAreaView` or safe-area libraries.
+- If the bundle fails, read the Metro/Expo terminal error first.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [reactnativeforweb.md](./reactnativeforweb.md)
+- [styling.md](./styling.md)
+- [pressable.md](./pressable.md)

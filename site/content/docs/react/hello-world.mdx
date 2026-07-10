@@ -1,0 +1,89 @@
+---
+title: Hello World
+description: React · Reference cheat sheet
+---
+
+# Hello World
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React Hello World is a component that returns a simple element (often an `<h1>`). Once it appears in the browser via your app’s root render, your toolchain is working.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Root | `createRoot(...).render(<App />)` mounts React |
+| `App` | Top-level component |
+| `return (...)` | JSX describing UI |
+| Export | Makes the component importable |
+
+In Vite, `main.jsx` mounts `<App />` into `#root`.
+
+## 💡 Examples
+
+**Minimal App:**
+
+```jsx
+export default function App() {
+  return <h1>Hello, World!</h1>;
+}
+```
+
+**With a child component:**
+
+```jsx
+function Hello() {
+  return <h1>Hello, World!</h1>;
+}
+
+export default function App() {
+  return (
+    <div>
+      <Hello />
+      <p>Welcome to React.</p>
+    </div>
+  );
+}
+```
+
+**Mount (Vite-style `main.jsx`):**
+
+```jsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+```
+
+**Expression in JSX:**
+
+```jsx
+const name = "Ada";
+export default function App() {
+  return <h1>Hello, {name}!</h1>;
+}
+```
+
+## ⚠️ Pitfalls
+
+- `getElementById("root")` must match an element in `index.html`.
+- Returning two sibling elements needs a wrapper or fragment (`&lt;>...&lt;/>`).
+- `class` in JSX is written `className`.
+- Browser console errors are your friend — read the first red message carefully.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [thinking_in_react.md](./thinking_in_react)
+- [fragments.md](./fragments)
+- [strict_mode.md](./strict_mode)

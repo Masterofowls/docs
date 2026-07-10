@@ -1,0 +1,92 @@
+---
+title: Typed Fetch
+description: Typescript · Example / how-to
+---
+
+# Typed Fetch
+
+_Typescript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Wrap `fetch` with generics and runtime checks so callers get typed JSON without trusting the network blindly.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Generics | `fetchJson<T>()` return type |
+| Type guards | Narrow unknown JSON |
+| `Response.ok` | HTTP error handling |
+| `unknown` first | Safer than `any` |
+
+## 💡 Examples
+
+**typed_fetch.ts:**
+
+```typescript
+export class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "HttpError";
+  }
+}
+
+export async function fetchJson<T>(
+  url: string,
+  init?: RequestInit,
+  guard?: (data: unknown) => data is T,
+): Promise<T> {
+  const response = await fetch(url, {
+    ...init,
+    headers: { Accept: "application/json", ...init?.headers },
+  });
+  if (!response.ok) {
+    throw new HttpError(response.status, `HTTP ${response.status} for ${url}`);
+  }
+  const data: unknown = await response.json();
+  if (guard && !guard(data)) {
+    throw new Error(`Unexpected JSON shape from ${url}`);
+  }
+  return data as T;
+}
+
+type User = { id: number; email: string; name: string };
+
+function isUser(data: unknown): data is User {
+  if (typeof data !== "object" || data === null) return false;
+  const u = data as Record<string, unknown>;
+  return (
+    typeof u.id === "number" &&
+    typeof u.email === "string" &&
+    typeof u.name === "string"
+  );
+}
+
+async function main() {
+  const user = await fetchJson<User>(
+    "https://jsonplaceholder.typicode.com/users/1",
+    undefined,
+    isUser,
+  );
+  console.log(user.email);
+}
+
+main();
+```
+
+## ⚠️ Pitfalls
+
+- `as T` without a guard lies to the type checker — prefer a type guard or Zod.
+- Generics do not validate at runtime by themselves.
+- Abort signals and timeouts still need to be passed via `init`.
+
+## 🔗 Related
+
+- [Narrowing demo](narrowing_demo)
+- [Zod form](zod_form)

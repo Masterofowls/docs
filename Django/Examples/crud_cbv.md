@@ -1,0 +1,96 @@
+# CRUD CBV
+
+_Django · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Implement list/create/update/delete for a model with Django class-based views and a simple URL conf.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `ListView` / `CreateView` | Read + create |
+| `UpdateView` / `DeleteView` | Edit + remove |
+| `get_success_url` | Post-action redirect |
+| `LoginRequiredMixin` | Gate mutations |
+
+## 💡 Examples
+
+**models.py:**
+
+```python
+from django.db import models
+
+class Note(models.Model):
+    title = models.CharField(max_length=200)
+    body = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.title
+```
+
+**views.py:**
+
+```python
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    ListView,
+    UpdateView,
+)
+
+from .models import Note
+
+
+class NoteListView(ListView):
+    model = Note
+    paginate_by = 20
+
+
+class NoteCreateView(LoginRequiredMixin, CreateView):
+    model = Note
+    fields = ["title", "body"]
+    success_url = reverse_lazy("note-list")
+
+
+class NoteUpdateView(LoginRequiredMixin, UpdateView):
+    model = Note
+    fields = ["title", "body"]
+    success_url = reverse_lazy("note-list")
+
+
+class NoteDeleteView(LoginRequiredMixin, DeleteView):
+    model = Note
+    success_url = reverse_lazy("note-list")
+```
+
+**urls.py:**
+
+```python
+from django.urls import path
+from .views import NoteCreateView, NoteDeleteView, NoteListView, NoteUpdateView
+
+urlpatterns = [
+    path("", NoteListView.as_view(), name="note-list"),
+    path("new/", NoteCreateView.as_view(), name="note-create"),
+    path("<int:pk>/edit/", NoteUpdateView.as_view(), name="note-update"),
+    path("<int:pk>/delete/", NoteDeleteView.as_view(), name="note-delete"),
+]
+```
+
+## ⚠️ Pitfalls
+
+- CBVs need templates named `<app>/<model>_form.html` etc. unless you set `template_name`.
+- Always authorize object ownership for multi-user data — mixin alone is not enough.
+- Prefer `reverse_lazy` at class level; `reverse` needs a request/ready URLconf.
+
+## 🔗 Related
+
+- [DRF list create](drf_list_create.md)
+- [Custom user snippet](custom_user_snippet.md)

@@ -52,6 +52,18 @@ export default function HomePage() {
             Search
           </Link>
           <Link
+            href="/gateway"
+            className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
+          >
+            API / MCP
+          </Link>
+          <Link
+            href="/notes/new"
+            className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
+          >
+            New note
+          </Link>
+          <Link
             href="/account"
             className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
           >

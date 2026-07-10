@@ -9,11 +9,17 @@
     "conditionals",
     "cron",
     "debugging",
+    "environment-basics",
     "exit-codes",
     "functions",
     "getopts",
+    "getting-started",
     "globbing",
+    "glossary",
+    "hello-world",
     "loops",
+    "navigation",
+    "permissions-basics",
     "pipes-redirection",
     "process-substitution",
     "quoting",
@@ -22,6 +28,7 @@
     "ssh",
     "string-ops",
     "subshells",
-    "variables"
+    "variables",
+    "...examples"
   ]
 }

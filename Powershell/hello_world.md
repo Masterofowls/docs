@@ -1,0 +1,70 @@
+# Hello World
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PowerShell Hello World prints a string to the host. Use `Write-Output` (pipeline-friendly) or `Write-Host` (host UI). A `.ps1` script stores commands for reuse.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Write-Output` | Sends objects down the pipeline / to success stream |
+| `Write-Host` | Writes directly to the host UI |
+| `.ps1` | PowerShell script file |
+| String | `"Hello"` or `'Hello'` |
+| Comment | `#` starts a line comment |
+
+For scripts that return data, prefer `Write-Output` (or just emit the value).
+
+## 💡 Examples
+
+**Interactive:**
+
+```powershell
+Write-Output "Hello, World!"
+"Hello, World!"
+```
+
+**Script file (`hello.ps1`):**
+
+```powershell
+# hello.ps1
+$name = "Ada"
+Write-Output "Hello, $name!"
+```
+
+```powershell
+pwsh ./hello.ps1
+```
+
+**Formatted string:**
+
+```powershell
+$version = $PSVersionTable.PSVersion
+Write-Output "Hello from PowerShell $version"
+```
+
+**Write-Host vs Output:**
+
+```powershell
+Write-Host "visible on screen" -ForegroundColor Green
+Write-Output "can be piped" | ForEach-Object { $_.ToUpper() }
+```
+
+## ⚠️ Pitfalls
+
+- Double quotes expand `$variables`; single quotes do not.
+- Running scripts may require a less restrictive execution policy in your user scope.
+- `echo` is an alias for `Write-Output` — fine, but learn the real name.
+- Saving with a wrong encoding can break non-ASCII characters.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [get_help.md](./get_help.md)
+- [variables.md](./variables.md)
+- [aliases_basics.md](./aliases_basics.md)

@@ -1,0 +1,75 @@
+# Template Literals Basics
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Template literals are strings wrapped in backticks (`` ` ``). They support interpolation with `${...}` and multi-line text without awkward `+` concatenation.
+
+## 🔧 Core concepts
+
+| Feature | Syntax | Purpose |
+| --- | --- | --- |
+| Template | `` `text` `` | String with superpowers |
+| Interpolation | `` `${expr}` `` | Embed any expression |
+| Multi-line | Newlines inside backticks | Readable paragraphs |
+| Nested | Templates inside `${}` | Advanced formatting |
+| Tagged templates | `tag\`...\`` | Advanced (libraries, i18n) |
+
+Prefer templates over `+` when building messages from variables.
+
+## 💡 Examples
+
+**Interpolation:**
+
+```js
+const name = "Ada";
+const score = 95;
+console.log(`Hello, ${name}! Score: ${score}`);
+```
+
+**Expressions inside ${}:**
+
+```js
+const a = 3;
+const b = 4;
+console.log(`${a} + ${b} = ${a + b}`);
+console.log(`Upper: ${"hi".toUpperCase()}`);
+```
+
+**Multi-line:**
+
+```js
+const html = `
+<section>
+  <h1>Title</h1>
+  <p>Hello</p>
+</section>
+`.trim();
+console.log(html);
+```
+
+**Compared to concatenation:**
+
+```js
+const user = "Sam";
+const oldWay = "Hi " + user + "!";
+const newWay = `Hi ${user}!`;
+console.log(oldWay === newWay); // true
+```
+
+## ⚠️ Pitfalls
+
+- Use backticks `` ` ``, not quotes — `"Hello ${name}"` does **not** interpolate.
+- Nested quotes are fine inside templates; escaping backticks needs `\``.
+- Huge templates with logic become hard to read — extract variables first.
+- Accidental leading indentation in multi-line templates is part of the string.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [variables_let_const.md](./variables_let_const.md)
+- [typeof_basics.md](./typeof_basics.md)
+- [string.md](./string.md)

@@ -1,0 +1,83 @@
+# LocalStorage Prefs
+
+_Javascript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Persist simple user preferences (theme, density) in `localStorage` with JSON encode/decode and safe defaults.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `localStorage` | Per-origin key/value strings |
+| `JSON.stringify` / `parse` | Structured prefs |
+| Defaults merge | Survive missing keys |
+| `storage` event | Sync across tabs |
+
+## 💡 Examples
+
+**localstorage_prefs.js:**
+
+```javascript
+const STORAGE_KEY = "app.prefs.v1";
+
+const DEFAULT_PREFS = {
+  theme: "system",
+  density: "comfortable",
+};
+
+function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_PREFS };
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_PREFS, ...parsed };
+  } catch {
+    return { ...DEFAULT_PREFS };
+  }
+}
+
+function savePrefs(prefs) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+}
+
+function applyTheme(theme) {
+  const resolved =
+    theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme;
+  document.documentElement.dataset.theme = resolved;
+}
+
+const prefs = loadPrefs();
+applyTheme(prefs.theme);
+
+document.querySelector("#theme").value = prefs.theme;
+document.querySelector("#theme").addEventListener("change", (event) => {
+  prefs.theme = event.target.value;
+  savePrefs(prefs);
+  applyTheme(prefs.theme);
+});
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== STORAGE_KEY || !event.newValue) return;
+  const next = { ...DEFAULT_PREFS, ...JSON.parse(event.newValue) };
+  applyTheme(next.theme);
+});
+```
+
+## ⚠️ Pitfalls
+
+- `localStorage` is sync and string-only — always JSON round-trip objects.
+- Quota / private mode can throw — wrap reads/writes in `try/catch`.
+- Do not store secrets; anything in `localStorage` is readable by XSS.
+
+## 🔗 Related
+
+- [DOM todo](dom_todo.md)
+- [Debounce input](debounce_input.md)

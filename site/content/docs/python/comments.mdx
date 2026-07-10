@@ -1,0 +1,80 @@
+---
+title: Comments
+description: Python · Reference cheat sheet
+---
+
+# Comments
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Comments are notes for humans. The interpreter ignores them. Use them to explain *why*, not to narrate obvious code. Python also has docstrings for documenting modules, classes, and functions.
+
+## 🔧 Core concepts
+
+| Form | Syntax | Use |
+| --- | --- | --- |
+| Line comment | `# ...` | Short notes on a line |
+| Inline comment | `code  # note` | Clarify one statement |
+| Docstring | `"""..."""` or `'''...'''` | Document APIs (not ignored by tools) |
+| Shebang | `#!/usr/bin/env python3` | Unix script runner hint (first line) |
+
+There is no dedicated multi-line comment syntax. Use multiple `#` lines, or a docstring at the top of a block when documenting.
+
+## 💡 Examples
+
+**Line and inline comments:**
+
+```python
+# Calculate weekly pay from hourly rate
+rate = 20
+hours = 37.5
+pay = rate * hours  # overtime not included yet
+print(pay)
+```
+
+**Docstring on a function:**
+
+```python
+def greet(name: str) -> str:
+    """Return a friendly greeting for name."""
+    return f"Hello, {name}!"
+
+
+print(greet("Ada"))
+print(greet.__doc__)
+```
+
+**Module header:**
+
+```python
+#!/usr/bin/env python3
+"""tiny_demo.py — practice script for comments and print."""
+
+# TODO: add command-line args later
+print("ready")
+```
+
+**Temporarily disable code (prefer Git, not huge comment blocks):**
+
+```python
+# old_way = compute_v1(data)
+result = compute_v2(data)
+```
+
+## ⚠️ Pitfalls
+
+- Commented-out code rots quickly — delete it and use version control.
+- Docstrings are *strings*, not comments; they become `__doc__`.
+- Nesting quotes wrong inside docstrings can break the string.
+- Over-commenting (`i = i + 1  # add one`) adds noise.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [hello_world.md](./hello_world)
+- [variables.md](./variables)
+- [indentation.md](./indentation)

@@ -1,0 +1,82 @@
+# Glossary
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core Bash terms for shells, scripting, expansion, pipelines, and process control.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Alias | A short name that expands to a longer command string. |
+| Argument | A token passed to a command after its name. |
+| Array | An indexed list of strings accessible as `${arr[i]}`. |
+| Brace expansion | Generating multiple strings from patterns like `{a,b}` or `{1..5}`. |
+| Builtin | A command implemented inside the shell, not as an external binary. |
+| Command substitution | Capturing a command’s output with `$(...)` or backticks. |
+| Conditional | An `if`/`[[ ]]`/`case` construct that branches on tests. |
+| Exit code | An integer status (`$?`) where `0` usually means success. |
+| Expansion | Transformations Bash applies before running a command (variables, globs, etc.). |
+| Function | A named compound command defined in the shell. |
+| Glob | A filename pattern using `*`, `?`, or `[]` that expands to matching paths. |
+| Here-doc | A multiline string redirected into a command via `<<EOF`. |
+| IFS | Internal Field Separator used for word splitting and some expansions. |
+| Job | A pipeline managed by the shell’s job control (`fg`, `bg`, `jobs`). |
+| Loop | A `for`, `while`, or `until` construct that repeats commands. |
+| Option | A flag such as `-x` or `set -e` that changes shell behavior. |
+| Pipe | Connecting one command’s stdout to another’s stdin with `|`. |
+| Process substitution | Treating a command’s output as a file via `<(...)` or `>(...)`. |
+| Quoting | Rules (`'`, `"`, `\`) that control whether expansion occurs. |
+| Redirection | Sending stdin/stdout/stderr to files or other descriptors (`>`, `2>`, `&>`). |
+| Shebang | The `#!/bin/bash` line that selects the interpreter for a script. |
+| Signal | An OS notification such as `SIGINT` that processes can trap or ignore. |
+| Subshell | A child shell environment created by `(...)` or some pipelines. |
+| Trap | A handler that runs commands when a signal or exit occurs. |
+| Variable | A named string storage slot such as `NAME=value` and `$NAME`. |
+| Word splitting | Breaking unquoted expansions on `IFS` characters into multiple fields. |
+
+## 💡 Examples
+
+**Variables, quoting, and exit codes:**
+
+```bash
+name="Ada Lovelace"
+echo "Hello, $name"
+grep -q pattern file.txt
+echo $?
+```
+
+**Pipes and redirection:**
+
+```bash
+ps aux | grep nginx | awk '{print $2}' > pids.txt 2>/dev/null
+```
+
+**Arrays and globbing:**
+
+```bash
+files=(*.md)
+echo "${#files[@]} files"
+printf '%s\n' "${files[@]}"
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **single quotes** (literal) with **double quotes** (allow `$` and `` ` `` expansion).
+- Mixing **array** indexing with string variables — unquoted `$arr` is not safe iteration.
+- Treating **exit code** `0` as false in `if` — in Bash, `0` is success/true.
+- Equating a **subshell** `(cd /tmp; ...)` with changing the parent shell’s directory.
+- Assuming **glob** failure always errors — unmatched globs may stay literal depending on options.
+
+## 🔗 Related
+
+- [variables](variables.md)
+- [quoting](quoting.md)
+- [pipes_redirection](pipes_redirection.md)
+- [arrays](arrays.md)
+- [functions](functions.md)
+- [exit_codes](exit_codes.md)

@@ -22,9 +22,13 @@
     "drawer",
     "flatlist",
     "gesture",
+    "getting-started",
+    "glossary",
     "haptics",
+    "hello-world",
     "image",
     "keyboard",
+    "launcher-shortcut-menu",
     "layout",
     "linking",
     "maps",
@@ -37,6 +41,7 @@
     "platform-specific",
     "player",
     "pressable",
+    "reactnativeforweb",
     "refresh-control",
     "request",
     "safe-area",
@@ -52,6 +57,7 @@
     "transition",
     "vibration",
     "widget",
+    "...examples",
     "...expo"
   ]
 }

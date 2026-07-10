@@ -43,6 +43,13 @@ site/
 - **Bookmarks** — per-page Bookmark button; list at `/bookmarks` (localStorage)
 - **Account** — `/account` sign-in with a GitHub personal access token (`read:user` only)
 
+## API, MCP, export & new notes
+
+- **Gateway UI** — `/gateway` (HTTP discovery + MCP config)
+- **Export** — `/export` or `GET /api/v1/export` (full library Markdown)
+- **MCP** — `npm run mcp` / `node site/mcp/server.mjs` (stdio tools); manifest at `/api/mcp`
+- **New note** — `/notes/new` (GitHub publish / download) or `npm run note:new -- --topic python --slug foo --title "Foo"`
+
 - Web app manifest (`src/app/manifest.ts`)
 - Service worker (`public/sw.js`) — network-first pages, SWR assets, offline fallback
 - Install prompt + offline banner (`src/components/pwa/`)

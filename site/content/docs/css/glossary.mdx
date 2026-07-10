@@ -1,0 +1,103 @@
+---
+title: Glossary
+description: CSS · Reference cheat sheet
+---
+
+# Glossary
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core CSS terms for the cascade, box model, layout, selectors, and modern styling features.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| At-rule | A CSS statement starting with `@`, such as `@media` or `@keyframes`. |
+| Box model | The content, padding, border, and margin layers that size an element. |
+| Cascade | The algorithm that resolves conflicting declarations by origin, layer, and specificity. |
+| Containing block | The ancestor box used as the reference for positioned layout. |
+| Container query | A rule that styles an element based on its container’s size, not the viewport. |
+| Declaration | A property–value pair inside a rule, such as `color: red`. |
+| Em | A length relative to the element’s own computed font size. |
+| Flexbox | A one-dimensional layout model for aligning items in a row or column. |
+| Grid | A two-dimensional layout model of rows and columns. |
+| Inheritance | Passing certain computed values from parent to child elements. |
+| Keyframes | Named animation frames defined with `@keyframes`. |
+| Logical property | Direction-relative properties like `margin-inline` instead of left/right. |
+| Media query | A condition that applies styles based on device or viewport features. |
+| Pseudo-class | A selector state such as `:hover`, `:focus`, or `:nth-child`. |
+| Pseudo-element | A selector for generated parts such as `::before` or `::after`. |
+| Rem | A length relative to the root element’s font size. |
+| Rule set | A selector plus its block of declarations. |
+| Selector | The pattern that matches which elements a rule applies to. |
+| Specificity | A weight used to decide which competing selector wins. |
+| Stacking context | A local layering scope that controls how `z-index` paints. |
+| Shorthand | A property that sets multiple related longhands at once, like `margin`. |
+| Transform | A visual change such as translate, rotate, scale, or skew. |
+| Transition | Smooth interpolation of property changes over time. |
+| Variable | A custom property declared with `--name` and read via `var()`. |
+| Viewport | The visible area of the page used by units like `vw` and `vh`. |
+| Z-index | A stacking order value within a stacking context. |
+
+## 💡 Examples
+
+**Flexbox and variables:**
+
+```css
+:root {
+  --gap: 1rem;
+}
+.row {
+  display: flex;
+  gap: var(--gap);
+  align-items: center;
+}
+```
+
+**Grid and media query:**
+
+```css
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: 240px 1fr;
+  }
+}
+```
+
+**Specificity and cascade layers:**
+
+```css
+@layer base, components;
+@layer base {
+  button { padding: 0.5rem; }
+}
+@layer components {
+  .btn { padding: 1rem; }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **margin** (outside border) with **padding** (inside border).
+- Mixing **flex** and **grid** goals — one axis vs two axes.
+- Treating **pseudo-class** (`:hover`) like a **pseudo-element** (`::before`).
+- Assuming higher **z-index** always wins — stacking contexts can trap layers.
+- Equating **em** and **rem** — em is relative to the element; rem to the root.
+
+## 🔗 Related
+
+- [box_model](box_model)
+- [flex](flex)
+- [grid](grid)
+- [specificity](specificity)
+- [variables](variables)
+- [media_queries](media_queries)

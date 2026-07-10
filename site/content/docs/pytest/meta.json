@@ -14,12 +14,14 @@
     "coverage",
     "django-pytest",
     "fixtures",
+    "glossary",
     "install",
     "markers",
     "mocking",
     "parametrize",
     "plugins",
     "tmp-path",
-    "xdist"
+    "xdist",
+    "...examples"
   ]
 }

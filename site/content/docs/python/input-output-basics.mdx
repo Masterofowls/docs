@@ -1,0 +1,78 @@
+---
+title: Input and Output Basics
+description: Python · Reference cheat sheet
+---
+
+# Input and Output Basics
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Programs talk to the outside world through **output** (showing results) and **input** (reading data). Beginners usually start with `print` for output and `input` for reading a line of text from the keyboard.
+
+## 🔧 Core concepts
+
+| Tool | Direction | Notes |
+| --- | --- | --- |
+| `print(*values)` | Out | Converts values to strings; default ends with newline |
+| `input(prompt)` | In | Always returns a `str` (even for numbers you type) |
+| f-strings | Out | `f"Hello \{name\}"` embeds expressions |
+| `sep` / `end` | Out | Control separators and line endings |
+| Casting | In | Use `int(...)`, `float(...)` after reading text |
+
+Standard streams: **stdout** (normal output), **stderr** (errors), **stdin** (input).
+
+## 💡 Examples
+
+**Basic print and input:**
+
+```python
+name = input("What is your name? ")
+print("Hello,", name)
+print(f"Welcome, {name}!")
+```
+
+**Convert typed text to numbers:**
+
+```python
+raw = input("Enter a whole number: ")
+n = int(raw)
+print(n, "squared is", n * n)
+```
+
+**print options:**
+
+```python
+print("a", "b", "c", sep="-")
+print("Loading", end="...")
+print(" done")
+```
+
+**Safe parse with a try/except:**
+
+```python
+raw = input("Price: ").strip()
+try:
+    price = float(raw)
+except ValueError:
+    print("Please enter a number like 9.99")
+else:
+    print(f"You entered {price:.2f}")
+```
+
+## ⚠️ Pitfalls
+
+- `input` returns strings: `"5" + "1"` is `"51"`, not `6`.
+- `int("3.14")` fails — use `float` first or validate.
+- EOF in redirected input can raise `EOFError`.
+- For real apps, prefer `logging` over scattered `print` debugging.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [variables.md](./variables)
+- [print_input.md](./print_input)
+- [none_and_truthy.md](./none_and_truthy)

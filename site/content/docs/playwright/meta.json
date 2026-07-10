@@ -13,6 +13,7 @@
     "codegen",
     "config",
     "fixtures",
+    "glossary",
     "install",
     "locators",
     "mobile-emulation",
@@ -22,6 +23,7 @@
     "parallel",
     "screenshots-video",
     "tracing",
-    "visual-comparisons"
+    "visual-comparisons",
+    "...examples"
   ]
 }

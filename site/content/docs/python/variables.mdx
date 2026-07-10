@@ -1,0 +1,83 @@
+---
+title: Variables
+description: Python · Reference cheat sheet
+---
+
+# Variables
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A variable is a name that refers to a value in memory. Python creates the binding when you assign with `=`. You do not declare types up front (though type hints are optional).
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Assignment | `name = value` binds a name to an object |
+| Rebinding | `name = other` points the name at a new object |
+| Dynamic typing | The same name can later hold a different type |
+| Naming | Letters, digits, `_`; cannot start with a digit |
+| Convention | `snake_case` for variables and functions |
+
+Common built-in types beginners meet first: `int`, `float`, `str`, `bool`, `list`, `dict`, `None`.
+
+## 💡 Examples
+
+**Create and use variables:**
+
+```python
+age = 30
+name = "Sam"
+height_m = 1.75
+is_student = True
+
+print(name, age)
+print(f"{name} is {age} years old")
+```
+
+**Rebind and swap:**
+
+```python
+x = 10
+x = x + 5          # now 15
+x += 1             # now 16
+
+a, b = 1, 2
+a, b = b, a        # swap
+print(a, b)        # 2 1
+```
+
+**Multiple assignment and unpacking:**
+
+```python
+city, country = "Lisbon", "Portugal"
+first, *rest = [10, 20, 30, 40]
+print(first, rest)  # 10 [20, 30, 40]
+```
+
+**Names are references:**
+
+```python
+nums = [1, 2, 3]
+alias = nums
+alias.append(4)
+print(nums)  # [1, 2, 3, 4] — same list object
+```
+
+## ⚠️ Pitfalls
+
+- `=` is assignment; `==` is comparison.
+- Using a name before assignment raises `NameError`.
+- Mutable defaults and shared list/dict aliases surprise beginners.
+- Avoid names that shadow builtins: `list`, `str`, `id`, `type`, `input`.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [comments.md](./comments)
+- [none_and_truthy.md](./none_and_truthy)
+- [scope_namespaces.md](./scope_namespaces)

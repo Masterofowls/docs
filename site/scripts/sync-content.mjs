@@ -11,24 +11,9 @@ const SITE_ROOT = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(SITE_ROOT, '..');
 const OUT_ROOT = path.join(SITE_ROOT, 'content', 'docs');
 
-const TOPIC_MAP = [
-  { src: 'Python', slug: 'python', title: 'Python', description: 'Language core, stdlib, tooling, examples', icon: 'Terminal' },
-  { src: 'Javascript', slug: 'javascript', title: 'JavaScript', description: 'Language, async, modules, DOM', icon: 'Code' },
-  { src: 'Typescript', slug: 'typescript', title: 'TypeScript', description: 'Types, generics, tooling', icon: 'FileType' },
-  { src: 'React', slug: 'react', title: 'React', description: 'Components, hooks, patterns', icon: 'Component' },
-  { src: 'React Native', slug: 'react-native', title: 'React Native', description: 'Mobile UI, APIs, Expo', icon: 'Smartphone' },
-  { src: 'CSS', slug: 'css', title: 'CSS', description: 'Layout, cascade, modern CSS', icon: 'Palette' },
-  { src: 'Html', slug: 'html', title: 'HTML', description: 'Semantic markup, media, a11y', icon: 'FileCode' },
-  { src: 'Django', slug: 'django', title: 'Django', description: 'ORM, views, auth, DRF', icon: 'Server' },
-  { src: 'Playwright', slug: 'playwright', title: 'Playwright', description: 'E2E browser testing', icon: 'Bug' },
-  { src: 'Pytest', slug: 'pytest', title: 'Pytest', description: 'Python testing framework', icon: 'Beaker' },
-  { src: 'Jest', slug: 'jest', title: 'Jest', description: 'JavaScript testing framework', icon: 'CircleCheck' },
-  { src: 'Bash', slug: 'bash', title: 'Bash', description: 'Shell scripting essentials', icon: 'Terminal' },
-  { src: 'Powershell', slug: 'powershell', title: 'PowerShell', description: 'Windows shell & automation', icon: 'Monitor' },
-  { src: 'Github Actions', slug: 'github-actions', title: 'GitHub Actions', description: 'CI/CD workflows', icon: 'Rocket' },
-  { src: 'Git', slug: 'git', title: 'Git', description: 'Everyday Git, recovery, GitHub CLI', icon: 'GitBranch' },
-  { src: 'SQL', slug: 'sql', title: 'SQL', description: 'Queries, schema, advanced SQL', icon: 'Database' },
-];
+const TOPIC_MAP = JSON.parse(
+  fs.readFileSync(path.join(SITE_ROOT, 'topics.json'), 'utf8'),
+);
 
 const SKIP_NAMES = new Set(['README.md', 'ACTIVITY_LOG.md']);
 

@@ -1,0 +1,85 @@
+# None and Truthiness
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`None` means “no value” (Python’s null). **Truthiness** means how values behave in `if` / `while` without an explicit comparison: some values count as false, everything else as true.
+
+## 🔧 Core concepts
+
+| Idea | Detail |
+| --- | --- |
+| `None` | Singleton object; type is `NoneType` |
+| Test for None | Use `x is None` / `x is not None` |
+| Falsy values | `None`, `False`, `0`, `0.0`, `""`, `[]`, `{}`, `set()`, … |
+| Truthy values | Non-empty containers, non-zero numbers, most objects |
+| `bool(x)` | Explicit conversion to `True`/`False` |
+
+Functions that “return nothing” actually return `None`.
+
+## 💡 Examples
+
+**None as a missing value:**
+
+```python
+user = None
+
+if user is None:
+    print("Please log in")
+else:
+    print(user)
+```
+
+**Default then assign:**
+
+```python
+def find_user(user_id):
+    # pretend lookup failed
+    return None
+
+
+result = find_user(42)
+name = result if result is not None else "anonymous"
+print(name)
+```
+
+**Truthiness in conditions:**
+
+```python
+items = []
+text = ""
+count = 0
+
+if not items:
+    print("list is empty")
+if not text:
+    print("no text")
+if count:
+    print("never runs for 0")
+```
+
+**Truthy gotchas with numbers and containers:**
+
+```python
+print(bool(0), bool(1), bool(-1))      # False True True
+print(bool(""), bool("0"))             # False True
+print(bool([]), bool([0]))             # False True
+print(bool(None))                      # False
+```
+
+## ⚠️ Pitfalls
+
+- `if x == None` works but style guides prefer `if x is None`.
+- Empty containers are falsy — that is often useful, sometimes surprising.
+- The string `"False"` and the number `0` inside a list `[0]` are truthy as containers/strings.
+- Returning `None` accidentally from a function that should return data is a common bug.
+
+## 🔗 Related
+
+- [boolean_logic.md](./boolean_logic.md)
+- [variables.md](./variables.md)
+- [truthiness.md](./truthiness.md)
+- [input_output_basics.md](./input_output_basics.md)

@@ -1,0 +1,88 @@
+# Card Layout
+
+_CSS · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Lay out a responsive card grid with CSS Grid, consistent gaps, and a flexible media + body structure inside each card.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `grid-template-columns` | Auto-fit columns |
+| `minmax` | Fluid card width |
+| Flex column card | Media on top, body grows |
+| Aspect ratio | Stable image boxes |
+
+## 💡 Examples
+
+```html
+<section class="card-grid">
+  <article class="card">
+    <img class="card-media" src="/img/a.jpg" alt="" />
+    <div class="card-body">
+      <h2>Title A</h2>
+      <p>Short description.</p>
+      <a href="/a">Read more</a>
+    </div>
+  </article>
+  <article class="card">
+    <img class="card-media" src="/img/b.jpg" alt="" />
+    <div class="card-body">
+      <h2>Title B</h2>
+      <p>Short description.</p>
+      <a href="/b">Read more</a>
+    </div>
+  </article>
+</section>
+```
+
+```css
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.card-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex: 1;
+}
+
+.card-body a {
+  margin-top: auto;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Fixed pixel columns break on small phones — prefer `minmax` + `auto-fit`.
+- Missing `alt` on meaningful images hurts accessibility; decorative images use `alt=""`.
+- Uneven text lengths: push CTAs with `margin-top: auto` in a flex column.
+
+## 🔗 Related
+
+- [Responsive nav](responsive_nav.md)
+- [Dark mode toggle](dark_mode_toggle.md)

@@ -1,0 +1,84 @@
+---
+title: Annotating Basics
+description: TypeScript · Reference cheat sheet
+---
+
+# Annotating Basics
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Type annotations tell TypeScript what shape a value should have. You can annotate variables, parameters, and return types. Often TS **infers** types, so you only annotate where it helps clarity or catches mistakes.
+
+## 🔧 Core concepts
+
+| Place | Example | Notes |
+| --- | --- | --- |
+| Variable | `let n: number = 1` | Often inferred from the right-hand side |
+| Parameter | `function f(x: string)` | Annotate public function inputs |
+| Return | `function f(): boolean` | Optional but useful for exports |
+| Array | `number[]` or `Array<number>` | Same idea |
+| Object | `\{ id: number; name: string \}` | Or a `type` / `interface` alias |
+| Union | `string \| null` | One of several types |
+
+Start with primitives, arrays, and simple object types before generics.
+
+## 💡 Examples
+
+**Variables and inference:**
+
+```ts
+const count: number = 3;
+const label = "docs"; // inferred as string
+// label = 1; // Error
+console.log(count, label);
+```
+
+**Functions:**
+
+```ts
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+console.log(clamp(15, 0, 10)); // 10
+```
+
+**Objects and arrays:**
+
+```ts
+type Point = { x: number; y: number };
+
+const origin: Point = { x: 0, y: 0 };
+const path: Point[] = [origin, { x: 1, y: 1 }];
+console.log(path.length);
+```
+
+**Union and optional:**
+
+```ts
+function titleCase(text: string | null): string {
+  if (text == null || text.length === 0) return "";
+  return text[0].toUpperCase() + text.slice(1);
+}
+
+console.log(titleCase("ada"));
+console.log(titleCase(null));
+```
+
+## ⚠️ Pitfalls
+
+- Redundant annotations (`const x: number = 1`) are fine while learning; later prefer inference.
+- `any` turns off checking — use `unknown` if you must accept “something.”
+- Optional (`?`) and `| undefined` interact with `strictNullChecks`.
+- Annotating the wrong type and forcing with `as` hides real bugs.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [why_typescript.md](./why_typescript)
+- [tsconfig_basics.md](./tsconfig_basics)
+- [getting_started.md](./getting_started)

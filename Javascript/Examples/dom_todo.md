@@ -1,0 +1,85 @@
+# DOM Todo
+
+_Javascript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Build a small todo list with vanilla DOM: add items, toggle done, and remove rows without a framework.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `querySelector` | Find form / list roots |
+| `createElement` | Build list items |
+| Event listeners | Submit, click, change |
+| `dataset` | Store item ids |
+
+## 💡 Examples
+
+**index.html (snippet):**
+
+```html
+<form id="todo-form">
+  <input id="todo-input" name="title" required placeholder="New task" />
+  <button type="submit">Add</button>
+</form>
+<ul id="todo-list"></ul>
+```
+
+**dom_todo.js:**
+
+```javascript
+const form = document.querySelector("#todo-form");
+const input = document.querySelector("#todo-input");
+const list = document.querySelector("#todo-list");
+
+let nextId = 1;
+
+function createItem(title) {
+  const id = String(nextId++);
+  const li = document.createElement("li");
+  li.dataset.id = id;
+
+  const label = document.createElement("label");
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.addEventListener("change", () => {
+    li.classList.toggle("done", checkbox.checked);
+  });
+
+  const text = document.createElement("span");
+  text.textContent = title;
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "Remove";
+  remove.addEventListener("click", () => li.remove());
+
+  label.append(checkbox, text);
+  li.append(label, remove);
+  return li;
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const title = input.value.trim();
+  if (!title) return;
+  list.append(createItem(title));
+  input.value = "";
+  input.focus();
+});
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `preventDefault` reloads the page on submit.
+- Building HTML with `innerHTML` + user text risks XSS — use `textContent`.
+- Attaching listeners only on the form/list (delegation) scales better for many items.
+
+## 🔗 Related
+
+- [Debounce input](debounce_input.md)
+- [LocalStorage prefs](localstorage_prefs.md)

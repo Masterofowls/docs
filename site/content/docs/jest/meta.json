@@ -9,6 +9,7 @@
     "config",
     "coverage",
     "custom-matchers",
+    "glossary",
     "install",
     "matchers",
     "migration-vitest",
@@ -20,6 +21,7 @@
     "spies",
     "timers",
     "typescript",
-    "watch-mode"
+    "watch-mode",
+    "...examples"
   ]
 }

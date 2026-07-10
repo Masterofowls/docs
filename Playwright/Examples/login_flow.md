@@ -1,0 +1,63 @@
+# Login Flow
+
+_Playwright · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Automate a login form with Playwright: fill credentials, submit, and assert a post-login URL or UI marker.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `page.goto` | Open login page |
+| Locators | Role/label-based selectors |
+| `fill` / `click` | Interact |
+| Assertions | `expect` URL or text |
+
+## 💡 Examples
+
+**login_flow.spec.ts:**
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test("user can sign in", async ({ page }) => {
+  await page.goto("/login");
+
+  await page.getByLabel("Email").fill("ada@example.com");
+  await page.getByLabel("Password").fill("correct-horse-battery");
+  await page.getByRole("button", { name: "Sign in" }).click();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+});
+
+test("shows error on bad password", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("ada@example.com");
+  await page.getByLabel("Password").fill("wrong");
+  await page.getByRole("button", { name: "Sign in" }).click();
+
+  await expect(page.getByRole("alert")).toContainText(/invalid/i);
+  await expect(page).toHaveURL(/\/login/);
+});
+```
+
+**Reuse auth via storage state (sketch):**
+
+```typescript
+await page.context().storageState({ path: "playwright/.auth/user.json" });
+```
+
+## ⚠️ Pitfalls
+
+- Prefer `getByRole` / `getByLabel` over brittle CSS selectors.
+- Hard waits (`waitForTimeout`) flake — assert on conditions instead.
+- Never commit real passwords; use env vars or test-only accounts.
+
+## 🔗 Related
+
+- [API mock](api_mock.md)

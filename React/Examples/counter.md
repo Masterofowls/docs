@@ -1,0 +1,66 @@
+# Counter
+
+_React · Example / how-to_
+
+---
+
+## 📋 Overview
+
+A minimal counter with `useState`: increment, decrement, and reset in a single component.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `useState` | Local numeric state |
+| Event handlers | Update on click |
+| Functional updates | `setCount(c => c + 1)` |
+| Derived UI | Render current value |
+
+## 💡 Examples
+
+**Counter.tsx:**
+
+```tsx
+import { useState } from "react";
+
+export function Counter({ initial = 0 }: { initial?: number }) {
+  const [count, setCount] = useState(initial);
+
+  return (
+    <div>
+      <p aria-live="polite">Count: {count}</p>
+      <button type="button" onClick={() => setCount((c) => c - 1)}>
+        −
+      </button>
+      <button type="button" onClick={() => setCount(initial)}>
+        Reset
+      </button>
+      <button type="button" onClick={() => setCount((c) => c + 1)}>
+        +
+      </button>
+    </div>
+  );
+}
+```
+
+**Usage:**
+
+```tsx
+import { Counter } from "./Counter";
+
+export default function App() {
+  return <Counter initial={0} />;
+}
+```
+
+## ⚠️ Pitfalls
+
+- `setCount(count + 1)` in rapid clicks can stale — prefer functional updates.
+- Do not store derived values in state if they can be computed from `count`.
+- Keys on lists of counters must be stable if you mount many instances.
+
+## 🔗 Related
+
+- [Controlled input](controlled_input.md)
+- [Theme context](theme_context.md)

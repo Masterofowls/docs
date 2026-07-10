@@ -1,0 +1,73 @@
+# Aliases Basics
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**Aliases** are short names for commands (`ls` → `Get-ChildItem`, `cd` → `Set-Location`). They help newcomers from Bash/cmd, but scripts should prefer full cmdlet names for clarity and portability.
+
+## 🔧 Core concepts
+
+| Idea | Detail |
+| --- | --- |
+| Built-in aliases | Ship with PowerShell |
+| Custom aliases | `Set-Alias` / `New-Alias` for your session |
+| Discovery | `Get-Alias`, `Alias:` drive |
+| Good practice | Use full names in `.ps1` files |
+| Gal | Alias for `Get-Alias` |
+
+Aliases do not support custom parameters the way functions do — use a function for anything non-trivial.
+
+## 💡 Examples
+
+**Common aliases:**
+
+```powershell
+ls          # Get-ChildItem
+cd $HOME    # Set-Location
+pwd         # Get-Location
+cat file.txt  # Get-Content (if file exists)
+echo "hi"   # Write-Output
+```
+
+**Resolve an alias:**
+
+```powershell
+Get-Alias ls
+Get-Alias | Where-Object Definition -Match "ChildItem"
+Get-Command ls
+```
+
+**Create a temporary alias:**
+
+```powershell
+Set-Alias -Name npp -Value notepad
+# npp .\readme.md
+Get-Alias npp
+```
+
+**Prefer full names in scripts:**
+
+```powershell
+# Good in scripts
+Get-ChildItem -Path . -File
+
+# Fine interactively
+ls -File
+```
+
+## ⚠️ Pitfalls
+
+- `curl` may alias to `Invoke-WebRequest` in Windows PowerShell — very different from real curl.
+- Aliases you set in a session vanish unless added to your profile.
+- Overloading familiar names can confuse teammates.
+- Aliases are not expanded in all remoting / constrained sessions the same way.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [get_help.md](./get_help.md)
+- [providers_basics.md](./providers_basics.md)
+- [cmdlets.md](./cmdlets.md)

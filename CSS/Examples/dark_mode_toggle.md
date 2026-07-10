@@ -1,0 +1,87 @@
+# Dark Mode Toggle
+
+_CSS · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Implement light/dark themes with CSS custom properties, `prefers-color-scheme`, and a class or `data-theme` override.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Custom properties | Tokenize colors |
+| `prefers-color-scheme` | System default |
+| `data-theme` | Manual override |
+| Cascade | Override beats system |
+
+## 💡 Examples
+
+```html
+<html lang="en" data-theme="system">
+  <body>
+    <button type="button" id="theme-toggle">Toggle theme</button>
+  </body>
+</html>
+```
+
+```css
+:root,
+[data-theme="light"] {
+  --bg: #f7f7f5;
+  --fg: #1a1a1a;
+  --accent: #0b6e4f;
+}
+
+[data-theme="dark"] {
+  --bg: #121212;
+  --fg: #f0f0f0;
+  --accent: #5eead4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --fg: #f0f0f0;
+    --accent: #5eead4;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+a {
+  color: var(--accent);
+}
+```
+
+```javascript
+const root = document.documentElement;
+const btn = document.querySelector("#theme-toggle");
+
+btn.addEventListener("click", () => {
+  const next = root.dataset.theme === "dark" ? "light" : "dark";
+  root.dataset.theme = next;
+  localStorage.setItem("theme", next);
+});
+
+const saved = localStorage.getItem("theme");
+if (saved === "light" || saved === "dark") {
+  root.dataset.theme = saved;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Hard-coded colors bypass tokens and break dark mode.
+- Flash of wrong theme: set `data-theme` in a tiny inline script in `<head>`.
+- Contrast: check WCAG for accent on both backgrounds.
+
+## 🔗 Related
+
+- [Responsive nav](responsive_nav.md)
+- [Card layout](card_layout.md)

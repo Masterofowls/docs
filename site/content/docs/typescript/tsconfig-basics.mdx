@@ -1,0 +1,88 @@
+---
+title: tsconfig Basics
+description: TypeScript · Reference cheat sheet
+---
+
+# tsconfig Basics
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`tsconfig.json` tells the TypeScript compiler how to check and emit your project. One config at the repo root (or package root) is the usual starting point.
+
+## 🔧 Core concepts
+
+| Option area | Examples | Role |
+| --- | --- | --- |
+| `compilerOptions` | `strict`, `target`, `module` | How to check/emit |
+| `include` / `exclude` | `["src"]` | Which files belong |
+| `files` | Rare | Explicit file list |
+| `extends` | `"@tsconfig/node20"` | Share base configs |
+| Project references | Advanced | Multi-package monorepos |
+
+Turn on **`strict`: true** early — it enables a bundle of safer checks.
+
+## 💡 Examples
+
+**Beginner-friendly Node config:**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
+```
+
+**Create a starter config via CLI:**
+
+```shellscript
+npx tsc --init
+```
+
+**Check without emitting JS:**
+
+```shellscript
+npx tsc --noEmit
+```
+
+**Browser / bundler-oriented snippet:**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["src"]
+}
+```
+
+## ⚠️ Pitfalls
+
+- Wrong `rootDir` / `include` pulls in `node_modules` or test junk.
+- `target` too old or too new can confuse beginners — ES2020+ is a solid default.
+- Mixing `"module": "CommonJS"` with ESM `import` needs care.
+- Editing `tsconfig` without restarting the editor language service can show stale errors.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [hello_world.md](./hello_world)
+- [why_typescript.md](./why_typescript)
+- [annotating_basics.md](./annotating_basics)

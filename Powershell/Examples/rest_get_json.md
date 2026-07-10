@@ -1,0 +1,68 @@
+# REST Get JSON
+
+_Powershell · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Call a JSON REST API with `Invoke-RestMethod`, handle errors, and select fields from the response.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Invoke-RestMethod` | Parse JSON automatically |
+| Headers | Accept / auth |
+| try/catch | Surface HTTP errors |
+| Pipeline select | Shape output |
+
+## 💡 Examples
+
+**rest_get_json.ps1:**
+
+```powershell
+param(
+    [string]$UserId = "1"
+)
+
+$ErrorActionPreference = "Stop"
+$url = "https://jsonplaceholder.typicode.com/users/$UserId"
+
+try {
+    $user = Invoke-RestMethod -Uri $url -Method Get -Headers @{
+        Accept = "application/json"
+    }
+} catch {
+    Write-Error "Request failed: $($_.Exception.Message)"
+    exit 1
+}
+
+[pscustomobject]@{
+    Id    = $user.id
+    Name  = $user.name
+    Email = $user.email
+    City  = $user.address.city
+} | Format-List
+```
+
+**With token:**
+
+```powershell
+$token = $env:API_TOKEN
+Invoke-RestMethod -Uri "https://api.example.com/v1/items" -Headers @{
+    Authorization = "Bearer $token"
+    Accept        = "application/json"
+}
+```
+
+## ⚠️ Pitfalls
+
+- Secrets in scripts should come from env vars / secret stores, not literals.
+- `Invoke-WebRequest` returns raw response; prefer `Invoke-RestMethod` for JSON.
+- TLS / proxy issues often need `[Net.ServicePointManager]` only as a last resort.
+
+## 🔗 Related
+
+- [Export CSV report](export_csv_report.md)
+- [Watch folder](watch_folder.md)

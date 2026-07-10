@@ -19,6 +19,18 @@ export function baseOptions(): BaseLayoutProps {
         url: '/search',
       },
       {
+        text: 'Gateway',
+        url: '/gateway',
+      },
+      {
+        text: 'Export',
+        url: '/export',
+      },
+      {
+        text: 'New note',
+        url: '/notes/new',
+      },
+      {
         text: 'Bookmarks',
         url: '/bookmarks',
       },

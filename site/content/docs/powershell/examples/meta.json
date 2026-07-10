@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "export-csv-report",
+    "rest-get-json",
+    "watch-folder"
+  ]
+}

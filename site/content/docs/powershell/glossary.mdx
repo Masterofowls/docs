@@ -1,0 +1,91 @@
+---
+title: Glossary
+description: Powershell · Reference cheat sheet
+---
+
+# Glossary
+
+_Powershell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core PowerShell terms for cmdlets, objects, pipelines, remoting, and scripting.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Alias | An alternate short name for a cmdlet or function, such as `gci` for `Get-ChildItem`. |
+| Array | An ordered collection of objects, often created with `@()` or comma lists. |
+| Cmdlet | A compiled .NET command following Verb-Noun naming, like `Get-Process`. |
+| Common parameter | Shared parameters such as `-ErrorAction` and `-Verbose` available on many commands. |
+| Execution policy | A setting that restricts which scripts may run on a machine. |
+| Filter | A scriptblock used in the pipeline to include/exclude objects. |
+| Function | A reusable named scriptblock defined with `function Name \{ \}`. |
+| Hash table | A key/value map written as `@\{ Key = Value \}`. |
+| Job | A background task started with `Start-Job` or `-AsJob`. |
+| Member | A property or method on a PowerShell object. |
+| Module | A package of commands loaded with `Import-Module`. |
+| Object | The structured .NET data item flowing through the PowerShell pipeline. |
+| Parameter | A named input to a command, often bound by name or position. |
+| Parameter binding | The process that maps pipeline input and arguments to parameters. |
+| Pipeline | The `|` chain that passes objects from one command to the next. |
+| Profile | A script that runs when a PowerShell host starts. |
+| Provider | A drive-like data store interface such as `FileSystem` or `Registry`. |
+| PSCredential | An object holding a username and secure password for auth. |
+| Remoting | Running commands on remote machines via WinRM/`Invoke-Command`. |
+| Scope | The visibility boundary for variables and functions (`Global`, `Script`, `Local`). |
+| Scriptblock | An anonymous block of code written as `\{ ... \}`. |
+| Splatting | Passing a hashtable of parameters with `@params`. |
+| Switch | A boolean parameter present when named, or a `switch` statement for branching. |
+| Variable | A named storage slot referenced as `$name`. |
+| Verb-Noun | The conventional cmdlet naming pattern (`Get-`, `Set-`, `New-`, …). |
+| WhatIf | A common risk-mitigation switch that previews changes without applying them. |
+
+## 💡 Examples
+
+**Cmdlets and pipeline:**
+
+```powershell
+Get-ChildItem -Path . -Filter *.md |
+  Where-Object { $_.Length -gt 1KB } |
+  Select-Object Name, Length
+```
+
+**Splatting and functions:**
+
+```powershell
+function Get-Greeting {
+  param([string]$Name)
+  "Hello, $Name"
+}
+$params = @{ Name = "Ada" }
+Get-Greeting @params
+```
+
+**Remoting:**
+
+```powershell
+Invoke-Command -ComputerName web01 -ScriptBlock {
+  Get-Service nginx
+}
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **text pipelines** (Bash) with **object pipelines** (PowerShell).
+- Mixing **aliases** in scripts with full **cmdlet** names — aliases hurt readability.
+- Treating **execution policy** as security boundary — it is a safety rail, not a sandbox.
+- Equating **`$null`**, empty string, and empty array in conditionals — truthiness differs.
+- Assuming **Where-Object** filters like SQL — it runs script logic per object.
+
+## 🔗 Related
+
+- [cmdlets](cmdlets)
+- [pipeline](pipeline)
+- [functions](functions)
+- [variables](variables)
+- [modules](modules)
+- [remoting](remoting)

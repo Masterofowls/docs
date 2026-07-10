@@ -1,0 +1,70 @@
+# Getting Started with PowerShell
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PowerShell is a cross-platform shell and scripting language from Microsoft. Commands are usually **cmdlets** named `Verb-Noun` (like `Get-ChildItem`). It works with .NET objects, not only text.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Cmdlet | Built-in command: `Get-Process` |
+| Pipeline | Pass objects between commands with `\|` |
+| Object | Structured data with properties/methods |
+| Profile | Startup script for customizations |
+| Execution policy | Controls which scripts may run (Windows) |
+
+Open **Windows PowerShell**, **PowerShell 7+** (`pwsh`), or the integrated terminal in VS Code / Cursor.
+
+## 💡 Examples
+
+**Version and help discovery:**
+
+```powershell
+$PSVersionTable.PSVersion
+Get-Command Get-ChildItem
+Get-Help Get-ChildItem -Examples
+```
+
+**List files (like `ls`):**
+
+```powershell
+Get-ChildItem
+Get-ChildItem -Force
+pwd
+```
+
+**Hello in the shell:**
+
+```powershell
+Write-Output "Hello from PowerShell"
+"Hello" | Write-Host
+```
+
+**Simple script (`hello.ps1`):**
+
+```powershell
+Write-Output "Hello, World!"
+```
+
+```powershell
+pwsh ./hello.ps1
+```
+
+## ⚠️ Pitfalls
+
+- Execution policy may block scripts — see `Get-ExecutionPolicy`; fix carefully, not by disabling security blindly.
+- Aliases like `ls` / `curl` may not match Linux behavior exactly.
+- Windows PowerShell 5.1 ≠ PowerShell 7 — prefer `pwsh` when possible.
+- Paths with spaces need quotes: `cd "C:\My Projects"`.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [get_help.md](./get_help.md)
+- [providers_basics.md](./providers_basics.md)
+- [aliases_basics.md](./aliases_basics.md)

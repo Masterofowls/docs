@@ -1,0 +1,87 @@
+# Getting Started with Python
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Python is a readable, general-purpose language used for scripting, web backends, data work, and automation. You write `.py` files (or use the interactive REPL) and run them with the `python` (or `python3`) interpreter.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Interpreter | Runs your code line by line |
+| REPL | Interactive prompt (`>>>`) for trying snippets |
+| Script | A `.py` file you run from the terminal |
+| Module | A reusable `.py` file you can `import` |
+| Package | A folder of modules (often with `__init__.py`) |
+
+**Install check:** open a terminal and run `python --version` (or `python3 --version`). Use a virtual environment (`venv`) so project packages stay isolated.
+
+**Typical first workflow:**
+
+1. Install Python 3 from [python.org](https://www.python.org/) (or your OS package manager).
+2. Create a folder for practice files.
+3. Write `hello.py`, then run `python hello.py`.
+
+## 💡 Examples
+
+**Check the version:**
+
+```bash
+python --version
+# Python 3.12.x
+```
+
+**Start the REPL:**
+
+```bash
+python
+```
+
+```python
+>>> 2 + 2
+4
+>>> print("hi")
+hi
+>>> exit()
+```
+
+**Create and run a script:**
+
+```python
+# hello.py
+print("Hello from a file!")
+```
+
+```bash
+python hello.py
+```
+
+**Create a virtual environment (recommended):**
+
+```bash
+python -m venv .venv
+# Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+# macOS/Linux:
+source .venv/bin/activate
+pip install requests
+```
+
+## ⚠️ Pitfalls
+
+- On some systems `python` is missing and you must use `python3`.
+- Mixing system Python and project packages without `venv` causes version conflicts.
+- Indentation is syntax in Python — tabs vs spaces can break files.
+- Saving as `.txt` or wrong encoding can confuse beginners; use UTF-8 `.py` files.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [variables.md](./variables.md)
+- [comments.md](./comments.md)
+- [indentation.md](./indentation.md)
+- [venv.md](./venv.md) · [pip.md](./pip.md)

@@ -1,0 +1,87 @@
+---
+title: Async User Event
+description: Jest · Example / how-to
+---
+
+# Async User Event
+
+_Jest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Test interactive React (or DOM) flows with `@testing-library/user-event` and async `findBy*` queries.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `userEvent.setup()` | Realistic interactions |
+| `await user.click` | Async event API |
+| `findBy*` | Wait for UI updates |
+| `await` assertions | Flush promises |
+
+## 💡 Examples
+
+**AsyncSearch.tsx (component under test):**
+
+```tsx
+import { useState } from "react";
+
+export function AsyncSearch({ onSearch }: { onSearch: (q: string) => Promise<string[]> }) {
+  const [items, setItems] = useState<string[]>([]);
+  const [status, setStatus] = useState("idle");
+
+  async function handleClick() {
+    setStatus("loading");
+    const next = await onSearch("ada");
+    setItems(next);
+    setStatus("done");
+  }
+
+  return (
+    <div>
+      <button type="button" onClick={handleClick}>
+        Search
+      </button>
+      <p>{status}</p>
+      <ul>
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**AsyncSearch.test.tsx:**
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { AsyncSearch } from "./AsyncSearch";
+
+test("loads results after click", async () => {
+  const user = userEvent.setup();
+  const onSearch = jest.fn().mockResolvedValue(["Ada Lovelace"]);
+
+  render(<AsyncSearch onSearch={onSearch} />);
+  await user.click(screen.getByRole("button", { name: "Search" }));
+
+  expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
+  expect(screen.getByText("done")).toBeInTheDocument();
+  expect(onSearch).toHaveBeenCalledWith("ada");
+});
+```
+
+## ⚠️ Pitfalls
+
+- Prefer `userEvent` over `fireEvent` for closer-to-real typing/clicking.
+- Use `findBy*` for async UI; `getBy*` throws immediately if missing.
+- Always `await` user-event methods in the v14+ async API.
+
+## 🔗 Related
+
+- [Mock module](mock_module)

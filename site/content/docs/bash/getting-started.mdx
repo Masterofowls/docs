@@ -1,0 +1,77 @@
+---
+title: Getting Started with Bash
+description: Bash · Reference cheat sheet
+---
+
+# Getting Started with Bash
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Bash (Bourne Again SHell) is a command-line shell and scripting language common on Linux and macOS. You type commands interactively or save them in a script (`*.sh`) starting with a shebang.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Shell | Program that reads commands and runs programs |
+| Prompt | Where you type (`$` often means a normal user) |
+| Command | Program name + arguments: `ls -la` |
+| Script | File of commands executed in order |
+| Shebang | `#!/usr/bin/env bash` on line 1 of scripts |
+| Exit status | `0` usually means success; non-zero means failure |
+
+On Windows you can use Git Bash, WSL, or another Unix-like environment.
+
+## 💡 Examples
+
+**Who am I / where am I:**
+
+```shellscript
+whoami
+pwd
+echo "Hello from Bash"
+```
+
+**Check Bash version:**
+
+```shellscript
+bash --version
+echo "$BASH_VERSION"
+```
+
+**Minimal script (`hello.sh`):**
+
+```shellscript
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Hello, World!"
+```
+
+```shellscript
+chmod +x hello.sh
+./hello.sh
+```
+
+**Run a one-liner without a file:**
+
+```shellscript
+bash -c 'echo hi; pwd'
+```
+
+## ⚠️ Pitfalls
+
+- Spaces matter: `cd My Dir` fails; use `cd "My Dir"`.
+- Your login shell might be zsh on macOS — scripts can still use Bash via shebang.
+- Copying Windows paths (`C:\...`) into Bash needs `/c/...` or WSL paths.
+- Forgetting `chmod +x` leads to “Permission denied” on `./script.sh`.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [navigation.md](./navigation)
+- [permissions_basics.md](./permissions_basics)
+- [environment_basics.md](./environment_basics)

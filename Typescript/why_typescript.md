@@ -1,0 +1,79 @@
+# Why TypeScript?
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+TypeScript exists to make JavaScript safer and clearer at scale. Static types document intent, unlock editor autocomplete, and catch whole classes of bugs before users see them.
+
+## 🔧 Core concepts
+
+| Benefit | What you gain |
+| --- | --- |
+| Early errors | Typos, wrong args, null misuse flagged in the editor |
+| Better tooling | Jump-to-definition, rename, accurate autocomplete |
+| Living docs | Signatures explain APIs without outdated comments |
+| Refactors | Change a type and follow red squiggles |
+| Gradual adoption | Rename `.js` → `.ts` and tighten types over time |
+
+TypeScript is not a different runtime language — it compiles to JS that engines already understand.
+
+## 💡 Examples
+
+**Bug caught at compile time:**
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// add("2", "3"); // Error: string not assignable to number
+console.log(add(2, 3));
+```
+
+**Autocomplete-friendly objects:**
+
+```ts
+type User = { id: number; name: string };
+
+const user: User = { id: 1, name: "Sam" };
+console.log(user.name.toUpperCase());
+```
+
+**Optional fields and null safety (with strict settings):**
+
+```ts
+type Profile = { bio?: string };
+
+function bioLength(p: Profile): number {
+  return p.bio?.length ?? 0;
+}
+
+console.log(bioLength({}));
+console.log(bioLength({ bio: "hi" }));
+```
+
+**Same idea in plain JS (fails later):**
+
+```js
+function add(a, b) {
+  return a + b;
+}
+console.log(add("2", "3")); // "23" — silent logic bug
+```
+
+## ⚠️ Pitfalls
+
+- Types are not runtime validation — still validate untrusted input (APIs, forms).
+- Over-complex types can obscure simple code; keep beginner types plain.
+- `as` assertions and `any` defeat the purpose when overused.
+- Build setup cost is real; for a one-line snippet, plain JS may be enough.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [hello_world.md](./hello_world.md)
+- [annotating_basics.md](./annotating_basics.md)
+- [tsconfig_basics.md](./tsconfig_basics.md)

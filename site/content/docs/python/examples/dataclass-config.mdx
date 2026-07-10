@@ -1,0 +1,93 @@
+---
+title: Dataclass Config
+description: Python · Example / how-to
+---
+
+# Dataclass Config
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Load app settings into a frozen `@dataclass` from environment variables with defaults and light validation.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `@dataclass(frozen=True)` | Immutable config snapshot |
+| `os.environ` | External configuration |
+| `classmethod` factory | `from_env()` constructor |
+| Validation | Fail fast on bad values |
+
+## 💡 Examples
+
+**dataclass_config.py:**
+
+```python
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, slots=True)
+class AppConfig:
+    app_name: str
+    debug: bool
+    port: int
+    database_url: str
+
+    @classmethod
+    def from_env(cls) -> AppConfig:
+        port_raw = os.environ.get("PORT", "8000")
+        try:
+            port = int(port_raw)
+        except ValueError as e:
+            raise ValueError(f"PORT must be an int, got {port_raw!r}") from e
+        if not 1 <= port <= 65535:
+            raise ValueError(f"PORT out of range: {port}")
+
+        debug = os.environ.get("DEBUG", "0").lower() in {"1", "true", "yes"}
+        database_url = os.environ.get("DATABASE_URL", "sqlite:///./app.db")
+        if not database_url:
+            raise ValueError("DATABASE_URL must not be empty")
+
+        return cls(
+            app_name=os.environ.get("APP_NAME", "demo"),
+            debug=debug,
+            port=port,
+            database_url=database_url,
+        )
+
+
+def main() -> None:
+    cfg = AppConfig.from_env()
+    print(cfg)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Usage:**
+
+```shellscript
+set PORT=9000
+set DEBUG=true
+python dataclass_config.py
+```
+
+## ⚠️ Pitfalls
+
+- Mutable defaults (`list`, `dict`) need `field(default_factory=...)`.
+- Frozen instances cannot be assigned after creation — rebuild instead.
+- Booleans from env are strings; `"False"` is truthy if you only check `bool(s)`.
+
+## 🔗 Related
+
+- [Dataclass pipeline](dataclass_pipeline)
+- [../dataclasses.md](../dataclasses)
+- [../enums.md](../enums)

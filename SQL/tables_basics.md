@@ -1,0 +1,77 @@
+# Tables Basics
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A **table** stores structured data in columns (schema) and rows (data). You define column names and types with `CREATE TABLE`, then add rows with `INSERT` and read them with `SELECT`.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Column type | `INTEGER`, `TEXT`, `REAL`, `BOOLEAN`, `DATE`, … |
+| `NOT NULL` | Column must have a value |
+| `DEFAULT` | Value used when insert omits the column |
+| `INSERT` | Add row(s) |
+| `SELECT` | Read row(s) |
+| `DROP TABLE` | Delete the table (destructive) |
+
+Design tables around one clear entity (users, orders, products).
+
+## 💡 Examples
+
+**Create and inspect:**
+
+```sql
+CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  pages INTEGER,
+  read INTEGER DEFAULT 0
+);
+
+INSERT INTO books (title, pages) VALUES
+  ('Dune', 412),
+  ('Foundation', 255);
+
+SELECT * FROM books;
+```
+
+**Select specific columns:**
+
+```sql
+SELECT title, pages
+FROM books
+ORDER BY pages DESC;
+```
+
+**Add a column later (shape varies by dialect):**
+
+```sql
+ALTER TABLE books ADD COLUMN author TEXT;
+UPDATE books SET author = 'Unknown' WHERE author IS NULL;
+SELECT title, author FROM books;
+```
+
+**Remove a practice table:**
+
+```sql
+DROP TABLE IF EXISTS books;
+```
+
+## ⚠️ Pitfalls
+
+- `DROP TABLE` deletes data permanently (unless you have backups).
+- Types differ by database — check docs for Postgres vs SQLite vs MySQL.
+- Wide “god tables” with dozens of unrelated columns become hard to query.
+- Omitting `NOT NULL` on required fields allows incomplete rows.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [hello_world.md](./hello_world.md)
+- [primary_keys_basics.md](./primary_keys_basics.md)
+- [null_basics.md](./null_basics.md)

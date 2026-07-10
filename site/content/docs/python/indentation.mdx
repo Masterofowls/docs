@@ -1,0 +1,91 @@
+---
+title: Indentation
+description: Python · Reference cheat sheet
+---
+
+# Indentation
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Python uses indentation (leading spaces) to define code blocks instead of braces `\{\}`. Consistent indentation is required syntax. The community standard is **4 spaces** per level (PEP 8).
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Block | Indented suite under `if`, `for`, `while`, `def`, `class`, `with`, `try` |
+| Indent | Move right to enter a block |
+| Dedent | Move left to leave a block |
+| Colon | Headers end with `:` then an indented body |
+| Suite | One or more indented statements (or `pass`) |
+
+Empty blocks need `pass`. Mixing tabs and spaces in one file causes `TabError` or confusing bugs.
+
+## 💡 Examples
+
+**if / else blocks:**
+
+```python
+score = 85
+
+if score >= 90:
+    print("A")
+elif score >= 80:
+    print("B")
+else:
+    print("keep practicing")
+```
+
+**Nested indentation:**
+
+```python
+for n in range(1, 4):
+    print(f"n={n}")
+    if n % 2 == 0:
+        print("  even")
+    else:
+        print("  odd")
+print("done")  # back at top level
+```
+
+**Functions and `pass`:**
+
+```python
+def todo_later():
+    pass  # placeholder body
+
+
+def add(a, b):
+    total = a + b
+    return total
+```
+
+**Wrong vs right (conceptually):**
+
+```python
+# Wrong — body not indented (IndentationError)
+# if True:
+# print("hi")
+
+# Right
+if True:
+    print("hi")
+```
+
+## ⚠️ Pitfalls
+
+- Mixing tabs and spaces — configure the editor to insert spaces.
+- Copy-pasting from the web can bring inconsistent indent widths.
+- Only indent when a block is required; random indent is a syntax error.
+- `IndentationError` / `TabError` messages point near the problem line — check the line *above* too.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [comments.md](./comments)
+- [boolean_logic.md](./boolean_logic)
+- [conditionals](./conditionals) (if present in your notes set)

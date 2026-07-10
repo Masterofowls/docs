@@ -1,0 +1,124 @@
+# React Native for Web
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**React Native for Web** (`react-native-web`) lets many React Native components and APIs run in the browser by mapping them to HTML/CSS. You keep `View` / `Text` / `StyleSheet` code and share UI across iOS, Android, and web — with platform-specific escapes when needed.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| `react-native-web` | Compatibility layer: RN primitives → DOM |
+| Alias | Bundler maps `react-native` → `react-native-web` |
+| Shared UI | One component tree for multiple targets |
+| Platform | `Platform.OS === "web"` for web-only branches |
+| Expo web | Expo can export/serve a web target with RN primitives |
+| Limits | Not every native module has a web equivalent |
+
+Typical stack: React + React DOM + `react-native-web` + Metro/Webpack/Vite/Expo.
+
+## 💡 Examples
+
+**Same component on native and web:**
+
+```jsx
+import { View, Text, StyleSheet, Platform } from "react-native";
+
+export function Banner() {
+  return (
+    <View style={styles.box}>
+      <Text style={styles.title}>Hello from {Platform.OS}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  box: {
+    padding: 16,
+    backgroundColor: "#e2e8f0",
+    // web accepts extra CSS-like props via RN-web in many setups
+    maxWidth: 480,
+  },
+  title: { fontSize: 18, fontWeight: "600" },
+});
+```
+
+**Platform-specific file** (`Button.web.js` vs `Button.native.js`):
+
+```jsx
+// Button.web.js
+export function Button({ label, onPress }) {
+  return (
+    <button type="button" onClick={onPress}>
+      {label}
+    </button>
+  );
+}
+```
+
+```jsx
+// Button.native.js
+import { Pressable, Text } from "react-native";
+
+export function Button({ label, onPress }) {
+  return (
+    <Pressable onPress={onPress}>
+      <Text>{label}</Text>
+    </Pressable>
+  );
+}
+```
+
+**Expo web (concept):**
+
+```bash
+npx create-expo-app@latest MyApp
+cd MyApp
+npx expo start --web
+```
+
+**Webpack/Vite alias sketch (concept):**
+
+```js
+// resolve.alias (tool-dependent)
+{
+  "react-native$": "react-native-web"
+}
+```
+
+**Safe branching:**
+
+```jsx
+import { Platform, Linking, Text } from "react-native";
+
+async function openDocs() {
+  const url = "https://necolas.github.io/react-native-web/";
+  if (Platform.OS === "web") {
+    window.open(url, "_blank", "noopener,noreferrer");
+  } else {
+    await Linking.openURL(url);
+  }
+}
+
+// <Text onPress={openDocs}>Docs</Text>
+```
+
+## ⚠️ Pitfalls
+
+- Native-only modules (camera, biometrics, some sensors) need web stubs or alternatives.
+- Accessibility and SEO differ on web — you may need real landmarks/`<a href>` for marketing pages.
+- Flexbox works, but browser scrolling, hover, and cursor need web-aware styling.
+- Don’t assume pixel-perfect parity; test on a real browser early.
+- Alias misconfiguration causes “Invalid hook call” or dual-React copies — keep a single `react` / `react-dom` version.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [hello_world.md](./hello_world.md)
+- [styling.md](./styling.md)
+- [linking.md](./linking.md)
+- [pressable.md](./pressable.md)

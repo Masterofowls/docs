@@ -1,0 +1,78 @@
+---
+title: Window Rank
+description: SQL · Example / how-to
+---
+
+# Window Rank
+
+_SQL · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Rank rows within partitions using window functions (`RANK`, `DENSE_RANK`, `ROW_NUMBER`) for leaderboards and top-N-per-group queries.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `OVER (PARTITION BY …)` | Group without collapsing |
+| `ORDER BY` in window | Rank order |
+| `ROW_NUMBER` | Unique sequence |
+| `RANK` / `DENSE_RANK` | Tie handling |
+
+## 💡 Examples
+
+```sql
+-- scores(player_id, game, points, played_at)
+
+SELECT
+  player_id,
+  game,
+  points,
+  ROW_NUMBER() OVER (
+    PARTITION BY game
+    ORDER BY points DESC, played_at ASC
+  ) AS row_num,
+  RANK() OVER (
+    PARTITION BY game
+    ORDER BY points DESC
+  ) AS rank,
+  DENSE_RANK() OVER (
+    PARTITION BY game
+    ORDER BY points DESC
+  ) AS dense_rank
+FROM scores;
+```
+
+**Top 3 per game:**
+
+```sql
+WITH ranked AS (
+  SELECT
+    player_id,
+    game,
+    points,
+    ROW_NUMBER() OVER (
+      PARTITION BY game
+      ORDER BY points DESC, played_at ASC
+    ) AS rn
+  FROM scores
+)
+SELECT player_id, game, points
+FROM ranked
+WHERE rn <= 3
+ORDER BY game, rn;
+```
+
+## ⚠️ Pitfalls
+
+- `RANK` skips numbers after ties; `DENSE_RANK` does not; `ROW_NUMBER` never ties.
+- Filtering on window results needs a subquery/CTE — `WHERE rank &lt;= 3` is invalid on the same select level in most engines.
+- Missing `ORDER BY` in `OVER` makes ranking nondeterministic.
+
+## 🔗 Related
+
+- [Report join](report_join)
+- [Upsert inventory](upsert_inventory)

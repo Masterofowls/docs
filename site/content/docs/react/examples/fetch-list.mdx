@@ -1,0 +1,88 @@
+---
+title: Fetch List
+description: React · Example / how-to
+---
+
+# Fetch List
+
+_React · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Load a remote list in `useEffect`, track loading/error/data states, and cancel in-flight requests on unmount.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `useEffect` | Trigger fetch on mount |
+| Loading / error / data | Explicit UI states |
+| `AbortController` | Cancel on cleanup |
+| Keys | Stable list rendering |
+
+## 💡 Examples
+
+**FetchList.tsx:**
+
+```tsx
+import { useEffect, useState } from "react";
+
+type Post = { id: number; title: string };
+
+export function FetchList() {
+  const [posts, setPosts] = useState<Post[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(
+          "https://jsonplaceholder.typicode.com/posts?_limit=5",
+          { signal: controller.signal },
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as Post[];
+        setPosts(data);
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        setError((err as Error).message);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => controller.abort();
+  }, []);
+
+  if (loading) return <p>Loading…</p>;
+  if (error) return <p role="alert">Error: {error}</p>;
+  if (!posts?.length) return <p>No posts</p>;
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Setting state after unmount without abort causes warnings/races.
+- Empty dependency arrays only run once — add deps when the URL depends on props.
+- Do not use array index as `key` if the list can reorder.
+
+## 🔗 Related
+
+- [Controlled input](controlled_input)
+- [Theme context](theme_context)

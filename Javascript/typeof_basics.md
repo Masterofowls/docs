@@ -1,0 +1,80 @@
+# typeof Basics
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`typeof` is an operator that returns a string describing a value’s type tag. It is useful for quick checks while learning, with a few famous quirks to memorize.
+
+## 🔧 Core concepts
+
+| Expression | Typical result |
+| --- | --- |
+| `typeof "hi"` | `"string"` |
+| `typeof 42` | `"number"` |
+| `typeof 42n` | `"bigint"` |
+| `typeof true` | `"boolean"` |
+| `typeof undefined` | `"undefined"` |
+| `typeof Symbol()` | `"symbol"` |
+| `typeof {}` / `[]` / `null` | `"object"` (see pitfalls) |
+| `typeof function () {}` | `"function"` |
+
+`typeof` never throws on an undeclared variable in older patterns like `typeof x` — it yields `"undefined"`. Prefer declared variables anyway.
+
+## 💡 Examples
+
+**Primitives:**
+
+```js
+console.log(typeof "hello"); // string
+console.log(typeof 3.14);    // number
+console.log(typeof true);    // boolean
+console.log(typeof undefined); // undefined
+```
+
+**Objects and functions:**
+
+```js
+console.log(typeof { a: 1 });     // object
+console.log(typeof [1, 2]);       // object
+console.log(typeof null);         // object  ← historical bug
+console.log(typeof (() => 1));    // function
+```
+
+**Guarding before use:**
+
+```js
+function double(n) {
+  if (typeof n !== "number" || Number.isNaN(n)) {
+    throw new TypeError("n must be a number");
+  }
+  return n * 2;
+}
+
+console.log(double(21));
+```
+
+**Optional value check:**
+
+```js
+let title;
+console.log(typeof title); // undefined
+title = "Docs";
+console.log(typeof title); // string
+```
+
+## ⚠️ Pitfalls
+
+- `typeof null === "object"` — check null with `value === null`.
+- Arrays are `"object"` — use `Array.isArray(x)`.
+- `typeof NaN` is `"number"`.
+- For class instances, prefer `instanceof` or brand checks over `typeof`.
+
+## 🔗 Related
+
+- [variables_let_const.md](./variables_let_const.md)
+- [null_undefined.md](./null_undefined.md)
+- [hello_world.md](./hello_world.md)
+- [equality.md](./equality.md)

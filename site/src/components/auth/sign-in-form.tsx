@@ -106,8 +106,10 @@ export function SignInForm() {
             (or classic PATs).
           </li>
           <li>
-            Grant only <code className="text-xs">read:user</code> (classic) or Account
-            permissions → Profile: Read (fine-grained).
+            Grant <code className="text-xs">read:user</code> for sign-in. To publish notes
+            from the UI, also grant Contents <strong>Read and write</strong> on{' '}
+            <code className="text-xs">Masterofowls/docs</code> (or classic{' '}
+            <code className="text-xs">repo</code>).
           </li>
           <li>Paste the token here. It is stored in <code className="text-xs">localStorage</code> on this device.</li>
         </ol>

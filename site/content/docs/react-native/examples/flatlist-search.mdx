@@ -1,0 +1,97 @@
+---
+title: FlatList Search
+description: React Native · Example / how-to
+---
+
+# FlatList Search
+
+_React Native · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Filter a `FlatList` from a search `TextInput` with memoized data and stable `keyExtractor`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `FlatList` | Virtualized list |
+| `TextInput` | Query string |
+| `useMemo` | Filter without extra renders cost |
+| `keyExtractor` | Stable row ids |
+
+## 💡 Examples
+
+**FlatListSearch.tsx:**
+
+```tsx
+import { useMemo, useState } from "react";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+
+type Item = { id: string; title: string };
+
+const DATA: Item[] = [
+  { id: "1", title: "Alpha" },
+  { id: "2", title: "Beta" },
+  { id: "3", title: "Gamma" },
+  { id: "4", title: "Delta" },
+];
+
+export function FlatListSearch() {
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return DATA;
+    return DATA.filter((item) => item.title.toLowerCase().includes(q));
+  }, [query]);
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search…"
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+        style={styles.input}
+      />
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={<Text>No matches</Text>}
+        renderItem={({ item }) => (
+          <Text style={styles.row}>{item.title}</Text>
+        )}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  row: { paddingVertical: 12, fontSize: 16 },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Inline `renderItem` recreates each render — extract a memoized row if profiling shows cost.
+- Without `keyboardShouldPersistTaps`, taps on rows may dismiss the keyboard first.
+- For remote search, debounce the query before fetching.
+
+## 🔗 Related
+
+- [Form keyboard](form_keyboard)
+- [Dark mode toggle](dark_mode_toggle)

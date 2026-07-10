@@ -7,16 +7,21 @@
     "index",
     "accessibility",
     "aria",
+    "attributes-basics",
     "button",
     "canvas",
     "data-attributes",
     "details-summary",
     "dialog",
     "div",
+    "elements-basics",
     "embedding",
     "footer",
     "form",
+    "getting-started",
+    "glossary",
     "head",
+    "hello-world",
     "iframe",
     "images",
     "input",
@@ -38,6 +43,7 @@
     "url",
     "video-audio",
     "web-components",
-    "xml"
+    "xml",
+    "...examples"
   ]
 }

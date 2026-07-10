@@ -5,11 +5,16 @@
   "root": true,
   "pages": [
     "index",
+    "aliases-basics",
     "cmdlets",
     "conditionals",
     "error-handling",
     "execution-policy",
     "functions",
+    "get-help",
+    "getting-started",
+    "glossary",
+    "hello-world",
     "jobs",
     "json-csv",
     "loops",
@@ -17,11 +22,13 @@
     "objects",
     "pipeline",
     "profiles",
+    "providers-basics",
     "remoting",
     "rest-api",
     "scripting",
     "useful-commands",
     "variables",
-    "vs-bash"
+    "vs-bash",
+    "...examples"
   ]
 }

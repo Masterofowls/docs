@@ -1,0 +1,84 @@
+---
+title: Getting Started with JavaScript
+description: JavaScript · Reference cheat sheet
+---
+
+# Getting Started with JavaScript
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+JavaScript (JS) is the language of the web browser and a popular choice on servers via Node.js. You write `.js` (or `.mjs`) files, or run snippets in browser DevTools / Node’s REPL.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| ECMAScript (ES) | The language standard JS implements |
+| Browser runtime | JS + DOM + Web APIs |
+| Node.js | JS outside the browser (files, servers, CLIs) |
+| Engine | V8, SpiderMonkey, etc. execute your code |
+| Module | Reusable file using `import` / `export` |
+
+**Ways to try JS:** browser console (F12), Node (`node`), or a simple HTML file with a `<script>` tag.
+
+## 💡 Examples
+
+**Check Node version:**
+
+```shellscript
+node --version
+```
+
+**REPL one-liner:**
+
+```shellscript
+node
+```
+
+```js
+> console.log("Hello")
+Hello
+> 2 + 2
+4
+```
+
+**Script file (`hello.js`):**
+
+```js
+console.log("Hello from Node");
+```
+
+```shellscript
+node hello.js
+```
+
+**In the browser (inline):**
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      console.log("Hello from the browser");
+    </script>
+  </body>
+</html>
+```
+
+## ⚠️ Pitfalls
+
+- Browser JS and Node share the language but not all APIs (`document` vs `fs`).
+- Old tutorials use `var` everywhere — prefer `let` / `const`.
+- Forgetting to open the console makes `console.log` look like “nothing happened.”
+- File protocol + modules can be awkward; use a tiny local server when learning modules.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world)
+- [variables_let_const.md](./variables_let_const)
+- [comments.md](./comments)
+- [typeof_basics.md](./typeof_basics)

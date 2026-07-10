@@ -1,0 +1,88 @@
+---
+title: DRF List Create
+description: Django · Example / how-to
+---
+
+# DRF List Create
+
+_Django · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Expose a JSON list + create endpoint with Django REST Framework `ListCreateAPIView` and a ModelSerializer.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `ModelSerializer` | Map model ↔ JSON |
+| `ListCreateAPIView` | GET list, POST create |
+| Permissions | Who can write |
+| Pagination | Bound list size |
+
+## 💡 Examples
+
+**serializers.py:**
+
+```python
+from rest_framework import serializers
+from .models import Note
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ["id", "title", "body", "created_at"]
+        read_only_fields = ["id", "created_at"]
+```
+
+**views.py:**
+
+```python
+from rest_framework import generics, permissions
+from .models import Note
+from .serializers import NoteSerializer
+
+
+class NoteListCreateView(generics.ListCreateAPIView):
+    queryset = Note.objects.all().order_by("-created_at")
+    serializer_class = NoteSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save()
+```
+
+**urls.py:**
+
+```python
+from django.urls import path
+from .views import NoteListCreateView
+
+urlpatterns = [
+    path("api/notes/", NoteListCreateView.as_view(), name="api-note-list"),
+]
+```
+
+**curl:**
+
+```shellscript
+curl -s http://127.0.0.1:8000/api/notes/
+curl -s -X POST http://127.0.0.1:8000/api/notes/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token <token>" \
+  -d '{"title":"Hello","body":"World"}'
+```
+
+## ⚠️ Pitfalls
+
+- Default permissions may be wide open — set project defaults in settings.
+- N+1 queries: use `select_related` / `prefetch_related` on the queryset.
+- Validation errors return 400 with field keys — match your client expectations.
+
+## 🔗 Related
+
+- [CRUD CBV](crud_cbv)
+- [Custom user snippet](custom_user_snippet)

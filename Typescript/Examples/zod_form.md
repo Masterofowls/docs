@@ -1,0 +1,84 @@
+# Zod Form
+
+_Typescript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Validate form input with Zod: define a schema, parse values, and map field errors for the UI.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `z.object` | Schema for form fields |
+| `safeParse` | Non-throwing validation |
+| `flatten().fieldErrors` | Per-field messages |
+| `z.infer` | Derive TypeScript type |
+
+## 💡 Examples
+
+**zod_form.ts:**
+
+```typescript
+import { z } from "zod";
+
+const SignupSchema = z
+  .object({
+    email: z.string().email("Invalid email"),
+    password: z.string().min(8, "At least 8 characters"),
+    confirm: z.string(),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "Passwords must match",
+    path: ["confirm"],
+  });
+
+type SignupInput = z.infer<typeof SignupSchema>;
+
+export function validateSignup(raw: unknown): {
+  ok: true;
+  data: SignupInput;
+} | {
+  ok: false;
+  fieldErrors: Record<string, string[]>;
+  formErrors: string[];
+} {
+  const result = SignupSchema.safeParse(raw);
+  if (result.success) {
+    return { ok: true, data: result.data };
+  }
+  const flat = result.error.flatten();
+  return {
+    ok: false,
+    fieldErrors: flat.fieldErrors,
+    formErrors: flat.formErrors,
+  };
+}
+
+// Example usage with FormData-like object
+const outcome = validateSignup({
+  email: "ada@example.com",
+  password: "hunter2!!",
+  confirm: "hunter2!!",
+});
+
+if (outcome.ok) {
+  console.log("create user", outcome.data.email);
+} else {
+  console.log(outcome.fieldErrors);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Use `safeParse` in UI code — `parse` throws and is awkward in forms.
+- Refine/superRefine errors need a `path` to attach to a field.
+- Coerce numbers from inputs with `z.coerce.number()` when values are strings.
+
+## 🔗 Related
+
+- [Typed fetch](typed_fetch.md)
+- [Narrowing demo](narrowing_demo.md)
+- [../zod-integration.md](../zod-integration.md)

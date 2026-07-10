@@ -1,0 +1,83 @@
+---
+title: NULL Basics
+description: SQL · Reference cheat sheet
+---
+
+# NULL Basics
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`NULL` means **unknown / missing**, not the number zero and not an empty string. SQL uses three-valued logic (`TRUE`, `FALSE`, `UNKNOWN`), so comparisons with `NULL` need special operators.
+
+## 🔧 Core concepts
+
+| Idea | Detail |
+| --- | --- |
+| `NULL` | Missing value |
+| `IS NULL` / `IS NOT NULL` | Correct null tests |
+| `=` with NULL | Yields UNKNOWN, not TRUE |
+| `COALESCE(a, b)` | First non-null among args |
+| `NOT NULL` column | Disallow missing values |
+
+Aggregates like `COUNT(column)` ignore nulls; `COUNT(*)` counts rows.
+
+## 💡 Examples
+
+**Insert and test nulls:**
+
+```sql
+CREATE TABLE tasks (
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  due_date TEXT
+);
+
+INSERT INTO tasks (title, due_date) VALUES
+  ('Write notes', '2026-07-12'),
+  ('Review PR', NULL);
+
+SELECT * FROM tasks WHERE due_date IS NULL;
+SELECT * FROM tasks WHERE due_date IS NOT NULL;
+```
+
+**Why `=` fails:**
+
+```sql
+-- Usually returns no rows, even if due_date is NULL
+SELECT * FROM tasks WHERE due_date = NULL;
+```
+
+**COALESCE for defaults:**
+
+```sql
+SELECT
+  title,
+  COALESCE(due_date, 'No due date') AS due_label
+FROM tasks;
+```
+
+**Counts:**
+
+```sql
+SELECT COUNT(*) AS all_rows,
+       COUNT(due_date) AS with_due_date
+FROM tasks;
+```
+
+## ⚠️ Pitfalls
+
+- `NULL = NULL` is not true — use `IS NULL`.
+- Empty string `''` is not NULL (unless your app treats them the same).
+- `NOT IN (SELECT ...)` with nulls in the list can surprise you.
+- Nullable foreign keys / optional fields are fine — document the meaning of “missing.”
+
+## 🔗 Related
+
+- [tables_basics.md](./tables_basics)
+- [primary_keys_basics.md](./primary_keys_basics)
+- [nulls.md](./nulls)
+- [getting_started.md](./getting_started)

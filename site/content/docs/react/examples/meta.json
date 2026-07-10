@@ -1,0 +1,10 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "controlled-input",
+    "counter",
+    "fetch-list",
+    "theme-context"
+  ]
+}

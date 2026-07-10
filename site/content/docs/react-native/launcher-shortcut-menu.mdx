@@ -1,0 +1,197 @@
+---
+title: React Native Launcher Shortcuts
+description: React Native · Quick Reference
+---
+
+# React Native Launcher Shortcuts 
+
+_React Native · Quick Reference_
+
+---
+
+## 📋 Overview
+
+Android App Shortcuts allow users to long-press your app icon to access quick actions directly from the launcher. Supported on Android 7.1+ (API 25+).
+
+---
+
+## 🔧 Core Concepts
+
+| Shortcut Type     | Description                                                            |
+| ----------------- | ---------------------------------------------------------------------- |
+| **Static**  | Defined in `AndroidManifest.xml`, fixed at build time                |
+| **Dynamic** | Added/removed at runtime via JavaScript                                |
+| **Pinned**  | User manually pins to home screen (cannot be removed programmatically) |
+
+---
+
+## 🚀 Libraries
+
+### Recommended: `@rn-org/react-native-shortcuts`
+
+```shellscript
+npm install @rn-org/react-native-shortcuts
+# or
+yarn add @rn-org/react-native-shortcuts
+```
+
+### Alternative: `@mobigaurav/react-native-quick-actions`
+
+```shellscript
+npm install @mobigaurav/react-native-quick-actions
+```
+
+---
+
+## 💡 Basic Implementation
+
+### Check Support & Add Shortcuts
+
+```tsx
+import Shortcuts from '@rn-org/react-native-shortcuts'
+
+// Check if supported (Android 7.1+)
+const supported = await Shortcuts.isShortcutSupported()
+
+// Add shortcuts
+await Shortcuts.addShortcut({
+  id: 'compose',
+  title: 'Compose',
+  longLabel: 'Start new message', // Max 25 chars
+  iconName: 'ic_compose'          // Drawable resource name
+})
+
+await Shortcuts.addShortcut({
+  id: 'search', 
+  title: 'Search',
+  iconName: 'ic_search'
+})
+
+// Remove all shortcuts
+await Shortcuts.removeAllShortcuts()
+
+// Remove specific shortcut
+await Shortcuts.removeShortcut('compose')
+```
+
+### Handle Shortcut Navigation
+
+```tsx
+import { useEffect, useRef } from 'react'
+import Shortcuts from '@rn-org/react-native-shortcuts'
+
+function App() {
+  // Handle initial launch via shortcut (cold start)
+  useEffect(() => {
+    const checkInitial = async () => {
+      const id = await Shortcuts.getInitialShortcutId()
+      if (id) navigateToShortcut(id)
+    }
+    checkInitial()
+  }, [])
+
+  // Handle shortcut when app is in background (warm start)
+  useEffect(() => {
+    const sub = Shortcuts.addOnShortcutUsedListener((id) => {
+      navigateToShortcut(id)
+    })
+    return () => sub.remove()
+  }, [])
+
+  const navigateToShortcut = (id: string) => {
+    switch(id) {
+      case 'compose': navigation.navigate('Compose'); break
+      case 'search': navigation.navigate('Search'); break
+    }
+  }
+
+  return <YourApp />
+}
+```
+
+---
+
+## 🎨 Android Icons
+
+Add icons to `android/app/src/main/res/drawable/`:
+
+```
+android/app/src/main/res/drawable/
+  ├── ic_compose.xml      # Vector drawable
+  ├── ic_search.png       # PNG image
+  └── ic_settings.xml
+```
+
+**Requirements:**
+
+- Material Design guidelines
+- Vector (XML) preferred over raster (PNG)
+- 48dp x 48dp recommended
+
+---
+
+## 📋 Android Manifest Setup
+
+For **static** shortcuts (optional - pre-defined at build time):
+
+```xml
+<!-- android/app/src/main/AndroidManifest.xml -->
+<application ...>
+  <activity android:name=".MainActivity">
+    <intent-filter>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+
+    <!-- Static shortcuts -->
+    <meta-data
+      android:name="android.app.shortcuts"
+      android:resource="@xml/shortcuts" />
+  </activity>
+</application>
+```
+
+```xml
+<!-- android/app/src/main/res/xml/shortcuts.xml -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+  <shortcut
+    android:shortcutId="compose"
+    android:enabled="true"
+    android:icon="@drawable/ic_compose"
+    android:shortcutShortLabel="Compose"
+    android:shortcutLongLabel="Compose Message">
+    <intent
+      android:action="android.intent.action.VIEW"
+      android:targetPackage="com.yourapp"
+      android:targetClass="com.yourapp.MainActivity" />
+    <categories android:name="android.shortcut.conversation" />
+  </shortcut>
+</shortcuts>
+```
+
+---
+
+## ⚠️ Pitfalls
+
+| Issue                                                         | Solution                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------ |
+| **Pinned shortcuts** cannot be removed programmatically | User must unpin manually                               |
+| **4 shortcut limit** (dynamic + static)                 | Prioritize most used actions                           |
+| **Launch mode issues**                                  | Check `android:launchMode` in manifest               |
+| **Icon not showing**                                    | Verify drawable resource exists and is correctly named |
+
+---
+
+## 🔗 Related
+
+- [deep_linking.md](./deep_linking) — Navigation from shortcuts
+- [notifications.md](./notifications) — Push notifications
+- [keyboard.md](./keyboard) — Keyboard handling
+
+---
+
+## 📚 Documentation
+
+- [Android App Shortcuts](https://developer.android.com/develop/ui/views/launch/shortcuts)
+- [react-native-shortcuts](https://github.com/rn-org/react-native-shortcuts)
+- [react-native-quick-actions](https://github.com/mobigaurav/react-native-quick-actions)

@@ -1,0 +1,92 @@
+---
+title: Decorators Timing
+description: Python · Example / how-to
+---
+
+# Decorators Timing
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Time function calls with a reusable decorator that preserves the wrapped signature via `functools.wraps`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Decorator | Wrap callable, return wrapper |
+| `functools.wraps` | Keep `__name__` / docstring |
+| `time.perf_counter` | High-resolution elapsed time |
+| `*args, **kwargs` | Forward any signature |
+
+## 💡 Examples
+
+**decorators_timing.py:**
+
+```python
+from __future__ import annotations
+
+import functools
+import time
+from collections.abc import Callable
+from typing import ParamSpec, TypeVar
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def timed(fn: Callable[P, R]) -> Callable[P, R]:
+    @functools.wraps(fn)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        start = time.perf_counter()
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            elapsed_ms = (time.perf_counter() - start) * 1000
+            print(f"{fn.__name__} took {elapsed_ms:.2f} ms")
+
+    return wrapper
+
+
+@timed
+def slow_add(a: int, b: int) -> int:
+    time.sleep(0.05)
+    return a + b
+
+
+if __name__ == "__main__":
+    print(slow_add(2, 3))
+```
+
+**Optional label / logger:**
+
+```python
+import logging
+
+log = logging.getLogger(__name__)
+
+def timed_log(fn: Callable[P, R]) -> Callable[P, R]:
+    @functools.wraps(fn)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        start = time.perf_counter()
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            log.info("%s %.2fms", fn.__name__, (time.perf_counter() - start) * 1000)
+    return wrapper
+```
+
+## ⚠️ Pitfalls
+
+- Without `@wraps`, tests and docs see `wrapper` instead of the real name.
+- Timing includes exceptions — use `finally` so failures still report duration.
+- Decorators on methods need care with `self`; this pattern still works.
+
+## 🔗 Related
+
+- [../decorators.md](../decorators)
+- [../functions.md](../functions)
+- [../typing_hints.md](../typing_hints)

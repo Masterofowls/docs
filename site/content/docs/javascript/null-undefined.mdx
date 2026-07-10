@@ -1,0 +1,82 @@
+---
+title: null and undefined
+description: JavaScript · Reference cheat sheet
+---
+
+# null and undefined
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+JavaScript has two empty-ish values: `undefined` (missing / not set) and `null` (intentional empty). Beginners should treat them as related but not identical, and prefer strict equality.
+
+## 🔧 Core concepts
+
+| Value | Usual meaning | How you get it |
+| --- | --- | --- |
+| `undefined` | Not assigned / missing property / no return | Default state |
+| `null` | Deliberate “no object” | You (or an API) set it |
+| `==` | Loose equality | `null == undefined` is `true` |
+| `===` | Strict equality | Prefer this |
+
+Optional chaining (`?.`) and nullish coalescing (`??`) help handle both safely.
+
+## 💡 Examples
+
+**undefined by default:**
+
+```js
+let x;
+console.log(x);            // undefined
+console.log(typeof x);     // undefined
+
+function f() {}
+console.log(f());          // undefined
+```
+
+**null as intentional empty:**
+
+```js
+let user = null;
+if (user === null) {
+  console.log("logged out");
+}
+user = { name: "Ada" };
+console.log(user.name);
+```
+
+**Loose vs strict:**
+
+```js
+console.log(null == undefined);  // true
+console.log(null === undefined); // false
+console.log(null === null);      // true
+```
+
+**Nullish coalescing and optional chaining:**
+
+```js
+const input = null;
+const label = input ?? "default";
+console.log(label); // default
+
+const settings = undefined;
+console.log(settings?.theme ?? "light"); // light
+```
+
+## ⚠️ Pitfalls
+
+- Prefer `===` so you do not conflate `null` and `undefined` accidentally.
+- `??` only falls through for `null`/`undefined`; `||` also treats `0`, `""`, `false` as missing.
+- `typeof null` is `"object"` — do not use typeof to detect null.
+- Reading missing nested props without `?.` throws: `obj.a.b`.
+
+## 🔗 Related
+
+- [typeof_basics.md](./typeof_basics)
+- [variables_let_const.md](./variables_let_const)
+- [nullish_coalescing.md](./nullish_coalescing)
+- [equality.md](./equality)

@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "crud-cbv",
+    "custom-user-snippet",
+    "drf-list-create"
+  ]
+}

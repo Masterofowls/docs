@@ -1,0 +1,88 @@
+# Getting Started with React
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React is a JavaScript library for building user interfaces from **components** — reusable pieces of UI that describe what should appear for a given state. You write components with JSX (HTML-like syntax in JS) and React updates the DOM efficiently.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Component | Function that returns UI |
+| JSX | Syntax extension: `<Button />` in JS |
+| Props | Inputs passed into a component |
+| State | Data that can change over time |
+| Render | Computing UI from props + state |
+| Hook | `useState`, `useEffect`, … for state/effects |
+
+Beginners usually start with **Vite + React** or Next.js, not CDN scripts alone.
+
+## 💡 Examples
+
+**Create a Vite React app:**
+
+```bash
+npm create vite@latest my-app -- --template react
+cd my-app
+npm install
+npm run dev
+```
+
+**A tiny component:**
+
+```jsx
+function Hello() {
+  return <h1>Hello, React</h1>;
+}
+
+export default function App() {
+  return (
+    <main>
+      <Hello />
+    </main>
+  );
+}
+```
+
+**Props:**
+
+```jsx
+function Greeting({ name }) {
+  return <p>Hello, {name}!</p>;
+}
+
+// <Greeting name="Ada" />
+```
+
+**State with useState:**
+
+```jsx
+import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button type="button" onClick={() => setCount(count + 1)}>
+      Clicked {count}
+    </button>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- JSX requires a build step (or a modern toolchain) — browsers don’t run raw JSX.
+- Mutating state in place won’t re-render — use the setter (`setCount`).
+- Component names must start with a **Capital** letter.
+- Don’t forget to import React hooks from `"react"`.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [thinking_in_react.md](./thinking_in_react.md)
+- [conditional_rendering.md](./conditional_rendering.md)
+- [keys_lists.md](./keys_lists.md)

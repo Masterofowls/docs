@@ -1,0 +1,70 @@
+# Permissions Basics
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Unix files have permission bits controlling who can read, write, or execute them. Understanding `ls -l`, `chmod`, and ownership prevents “Permission denied” confusion.
+
+## 🔧 Core concepts
+
+| Symbol | Meaning |
+| --- | --- |
+| `r` | Read |
+| `w` | Write |
+| `x` | Execute (run file / enter directory) |
+| User / Group / Other | Three permission triples |
+| `chmod` | Change mode bits |
+| `chown` | Change owner (often needs admin) |
+
+Example `ls -l` mode: `-rwxr-xr--` → file; owner `rwx`, group `r-x`, others `r--`.
+
+## 💡 Examples
+
+**Inspect permissions:**
+
+```bash
+ls -l hello.sh
+# -rw-r--r-- 1 sam sam 40 Jul 10 09:00 hello.sh
+```
+
+**Make a script executable:**
+
+```bash
+chmod +x hello.sh
+ls -l hello.sh
+./hello.sh
+```
+
+**Numeric modes (common):**
+
+```bash
+chmod 644 notes.txt   # rw-r--r--
+chmod 755 script.sh   # rwxr-xr-x
+chmod 600 secret.env  # rw-------
+```
+
+**Directories need execute to enter:**
+
+```bash
+mkdir private
+chmod 700 private
+cd private
+pwd
+```
+
+## ⚠️ Pitfalls
+
+- Execute bit on a directory means “traverse,” not “run like a program.”
+- `chmod -R` is powerful — easy to lock yourself out of a tree.
+- Scripts need both read and execute for `./script`; `bash script` only needs read.
+- On Windows filesystems mounted in WSL/Git Bash, permission bits may not behave like native Linux.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [hello_world.md](./hello_world.md)
+- [navigation.md](./navigation.md)
+- [environment_basics.md](./environment_basics.md)

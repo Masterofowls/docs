@@ -1,0 +1,68 @@
+# Array Pipeline
+
+_Javascript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Transform collections with a readable `filter` → `map` → `reduce` pipeline instead of nested loops.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `filter` | Keep matching items |
+| `map` | Project shape |
+| `reduce` | Aggregate to one value |
+| Immutability | Prefer new arrays over mutate |
+
+## 💡 Examples
+
+**array_pipeline.js:**
+
+```javascript
+const orders = [
+  { id: 1, status: "paid", total: 42.5, tags: ["books"] },
+  { id: 2, status: "pending", total: 10, tags: ["toys"] },
+  { id: 3, status: "paid", total: 19.99, tags: ["books", "sale"] },
+  { id: 4, status: "paid", total: 5, tags: ["sale"] },
+];
+
+const paidBookRevenue = orders
+  .filter((o) => o.status === "paid")
+  .filter((o) => o.tags.includes("books"))
+  .map((o) => ({ id: o.id, total: o.total }))
+  .reduce((sum, o) => sum + o.total, 0);
+
+console.log(paidBookRevenue); // 62.49
+
+const byTag = orders
+  .flatMap((o) => o.tags.map((tag) => [tag, o.total]))
+  .reduce((acc, [tag, total]) => {
+    acc[tag] = (acc[tag] ?? 0) + total;
+    return acc;
+  }, {});
+
+console.log(byTag);
+```
+
+**Readable helpers:**
+
+```javascript
+const isPaid = (o) => o.status === "paid";
+const hasTag = (tag) => (o) => o.tags.includes(tag);
+
+const total = orders.filter(isPaid).filter(hasTag("sale")).reduce((s, o) => s + o.total, 0);
+```
+
+## ⚠️ Pitfalls
+
+- Chaining many `filter`/`map` passes over large arrays — combine when hot.
+- `reduce` without an initial value fails on empty arrays for objects.
+- Mutating inside `map` surprises callers — return new objects.
+
+## 🔗 Related
+
+- [Fetch JSON](fetch_json.md)
+- [Debounce input](debounce_input.md)

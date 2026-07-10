@@ -1,0 +1,84 @@
+# Glossary
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core Git terms for commits, branches, remotes, history rewriting, and collaboration workflows.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Amend | Rewriting the latest commit by adding staged changes or editing its message. |
+| Branch | A movable pointer to a commit, usually representing a line of development. |
+| Cherry-pick | Copying a commit’s changes onto another branch as a new commit. |
+| Clone | Creating a local copy of a remote repository including history. |
+| Commit | A snapshot of the staged project state with metadata and a parent link. |
+| Conflict | Overlapping changes Git cannot auto-merge and must be resolved by hand. |
+| Detached HEAD | A state where HEAD points at a commit, not a branch name. |
+| Diff | A patch showing line-level changes between two trees or commits. |
+| Fast-forward | A merge that simply moves a branch pointer forward with no merge commit. |
+| Fetch | Downloading remote commits and refs without updating local branches. |
+| HEAD | The symbolic ref pointing at the current branch or checked-out commit. |
+| Hook | A script Git runs on events like `pre-commit` or `pre-push`. |
+| Index | The staging area holding the next commit’s proposed snapshot. |
+| Merge | Combining histories from two branches into one. |
+| Origin | The conventional default name for a cloned remote. |
+| Pull | Fetching from a remote and integrating into the current branch. |
+| Push | Uploading local commits to a remote branch. |
+| Rebase | Replaying commits onto another base to linearize history. |
+| Reflog | A local log of where HEAD and branch tips have pointed. |
+| Remote | A named URL pointing at another repository copy. |
+| Reset | Moving a branch pointer (and optionally index/worktree) to another commit. |
+| Revert | Creating a new commit that undoes a previous commit’s changes. |
+| Stash | Temporarily shelving uncommitted worktree changes. |
+| Tag | A named marker for a specific commit, often used for releases. |
+| Worktree | An additional working directory attached to the same repository. |
+
+## 💡 Examples
+
+**Stage and commit:**
+
+```bash
+git status
+git add README.md
+git commit -m "docs: clarify install steps"
+```
+
+**Branch, merge, and push:**
+
+```bash
+git switch -c feature/login
+# ... edits ...
+git switch main
+git merge feature/login
+git push origin main
+```
+
+**Stash and rebase:**
+
+```bash
+git stash push -m "wip"
+git pull --rebase origin main
+git stash pop
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **reset** (moves branch/history locally) with **revert** (adds an undo commit).
+- Mixing **fetch** (download only) with **pull** (download + integrate).
+- Treating **merge** and **rebase** as identical — history shape and conflict timing differ.
+- Equating **amend** on a pushed commit with a safe local edit — rewriting published history needs force-push care.
+- Assuming **stash** is a backup — it is local and easy to drop accidentally.
+
+## 🔗 Related
+
+- [commit](commit.md)
+- [branch](branch.md)
+- [merge](merge.md)
+- [rebase](rebase.md)
+- [stash](stash.md)
+- [remote](remote.md)

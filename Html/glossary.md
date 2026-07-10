@@ -1,0 +1,94 @@
+# Glossary
+
+_Html · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core HTML terms for document structure, semantics, forms, media, and accessibility.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Accessibility | Designing markup so assistive technologies can perceive and operate content. |
+| Anchor | An `<a>` element that creates a hyperlink to a URL or page fragment. |
+| ARIA | Attributes that expose roles, states, and properties to assistive tech. |
+| Attribute | A name/value pair on a start tag that configures an element. |
+| Block element | An element that typically starts on a new line and fills available width. |
+| Body | The `<body>` element containing visible page content. |
+| Canvas | An `<canvas>` element providing a drawing surface via JavaScript. |
+| Doctype | The `<!DOCTYPE html>` declaration that puts browsers in standards mode. |
+| Document | The full HTML tree rooted at `<html>` and represented as the DOM. |
+| DOM | The in-memory tree of nodes browsers build from HTML. |
+| Element | A node created by a start tag, optional content, and an end tag. |
+| Form | An `<form>` that collects controls and submits data to a server or script. |
+| Head | The `<head>` section for metadata, links, scripts, and title. |
+| Heading | Ranked titles `<h1>`–`<h6>` that outline document structure. |
+| Iframe | An `<iframe>` that embeds another browsing context/document. |
+| Inline element | An element that flows within text without forcing a new line. |
+| Input | A form control (`<input>`) whose behavior depends on its `type`. |
+| Landmark | A region role such as `nav`, `main`, or `aside` for page navigation. |
+| Meta | Metadata elements describing charset, viewport, SEO, and more. |
+| Semantic HTML | Using elements whose meaning matches content, not just presentation. |
+| Slot | A placeholder in a shadow tree filled by light-DOM children. |
+| SVG | Scalable vector graphics markup embeddable in HTML. |
+| Table | Markup (`<table>`, `<tr>`, `<th>`, `<td>`) for tabular data. |
+| Template | An inert `<template>` whose content can be cloned into the document. |
+| Void element | An element that cannot have children, such as `<img>` or `<br>`. |
+| Web component | Custom elements, shadow DOM, and templates used as reusable widgets. |
+
+## 💡 Examples
+
+**Semantic landmarks:**
+
+```html
+<header>
+  <nav aria-label="Primary">
+    <a href="/">Home</a>
+  </nav>
+</header>
+<main>
+  <h1>Docs</h1>
+  <article>...</article>
+</main>
+```
+
+**Form controls:**
+
+```html
+<form action="/signup" method="post">
+  <label>
+    Email
+    <input type="email" name="email" required />
+  </label>
+  <button type="submit">Join</button>
+</form>
+```
+
+**Picture and responsive images:**
+
+```html
+<picture>
+  <source srcset="hero.avif" type="image/avif" />
+  <img src="hero.jpg" alt="Product hero" width="1200" height="600" />
+</picture>
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **`<div>`** (generic box) with **semantic** elements like `<section>` or `<article>`.
+- Mixing **block** and **inline** mental models with modern CSS `display` — HTML defaults are only defaults.
+- Using **ARIA** to “fix” bad markup instead of preferring native semantics.
+- Treating **`<iframe>`** like a simple include — it is a separate document with security boundaries.
+- Equating **`<template>`** content with live DOM — it stays inert until cloned.
+
+## 🔗 Related
+
+- [semantic](semantic.md)
+- [form](form.md)
+- [accessibility](accessibility.md)
+- [aria](aria.md)
+- [meta](meta.md)
+- [web_components](web_components.md)

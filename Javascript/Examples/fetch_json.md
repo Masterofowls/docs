@@ -1,0 +1,74 @@
+# Fetch JSON
+
+_Javascript · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Load JSON from an API with `fetch`, handle HTTP errors, and render a simple list in the DOM.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `fetch` | Network request |
+| `response.ok` | Detect non-2xx |
+| `response.json()` | Parse body |
+| `async` / `await` | Linear async flow |
+
+## 💡 Examples
+
+**fetch_json.js:**
+
+```javascript
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, {
+    headers: { Accept: "application/json", ...options.headers },
+    ...options,
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for ${url}`);
+  }
+  return response.json();
+}
+
+async function loadPosts(target) {
+  target.textContent = "Loading…";
+  try {
+    const posts = await fetchJson(
+      "https://jsonplaceholder.typicode.com/posts?_limit=5",
+    );
+    target.replaceChildren();
+    for (const post of posts) {
+      const li = document.createElement("li");
+      li.textContent = post.title;
+      target.append(li);
+    }
+  } catch (err) {
+    target.textContent = `Failed: ${err.message}`;
+  }
+}
+
+const list = document.querySelector("#posts");
+loadPosts(list);
+```
+
+**Abort on unmount / navigation:**
+
+```javascript
+const controller = new AbortController();
+const data = await fetchJson(url, { signal: controller.signal });
+// later: controller.abort();
+```
+
+## ⚠️ Pitfalls
+
+- `fetch` only rejects on network failure — check `response.ok` yourself.
+- Calling `.json()` twice on the same body fails; clone or read once.
+- CORS blocks browser calls to many APIs — use a proxy or same-origin route.
+
+## 🔗 Related
+
+- [Array pipeline](array_pipeline.md)
+- [DOM todo](dom_todo.md)

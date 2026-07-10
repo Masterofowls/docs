@@ -1,0 +1,96 @@
+---
+title: Glossary
+description: Typescript · Reference cheat sheet
+---
+
+# Glossary
+
+_Typescript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core TypeScript terms for types, narrowing, generics, modules, and compiler options.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Any | An escape-hatch type that disables most type checking for a value. |
+| Assertion | A `as Type` or angle-bracket cast that tells the checker to trust a type. |
+| Branded type | A nominal-style type created by intersecting a primitive with a unique tag. |
+| Conditional type | A type that chooses between alternatives with `T extends U ? X : Y`. |
+| Const assertion | `as const` that infers the narrowest literal and readonly types. |
+| Declaration file | A `.d.ts` file that describes types for JavaScript or ambient APIs. |
+| Discriminated union | A union of object types sharing a common literal “tag” property. |
+| Enum | A named set of related constants, numeric or string-based. |
+| Generic | A type or function parameterized by one or more type variables. |
+| Infer | A keyword inside conditional types that extracts a nested type into a variable. |
+| Interface | A named object shape that can be extended and merged by declaration. |
+| Intersection | A type combining members of several types with `&`. |
+| Keyof | An operator producing a union of an object type’s property names. |
+| Literal type | A type that is exactly one specific string, number, or boolean value. |
+| Mapped type | A type that transforms each property of another type via `[K in Keys]`. |
+| Module | A file with import/export that creates its own scope and type namespace. |
+| Narrowing | Refining a broad type to a more specific one via checks. |
+| Never | The empty type for values that never occur, such as exhausted switches. |
+| Readonly | A modifier or utility that makes properties immutable at the type level. |
+| Satisfies | An operator that checks a value against a type without widening inference. |
+| Strict mode | Compiler flags like `strictNullChecks` that tighten soundness. |
+| Tuple | A fixed-length array type where each index may have its own type. |
+| Type alias | A `type` name that refers to any type expression. |
+| Type guard | A check (including user-defined predicates) that narrows types. |
+| Typeof | An operator that produces the type of a value in type position. |
+| Union | A type that may be one of several alternatives joined with `|`. |
+| Unknown | A type-safe top type that must be narrowed before use. |
+| Utility type | Built-in helpers such as `Partial`, `Pick`, `Omit`, and `Record`. |
+| Zod | A popular runtime schema library often paired with TypeScript inference. |
+
+## 💡 Examples
+
+**Discriminated union and narrowing:**
+
+```ts
+type Result =
+  | { ok: true; data: string }
+  | { ok: false; error: string };
+
+function message(r: Result) {
+  return r.ok ? r.data : r.error;
+}
+```
+
+**Generics and utility types:**
+
+```ts
+function pickId<T extends { id: string }>(item: T): Pick<T, "id"> {
+  return { id: item.id };
+}
+```
+
+**Satisfies vs assertion:**
+
+```ts
+const routes = {
+  home: "/",
+  about: "/about",
+} satisfies Record<string, `/${string}`>;
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **any** (unchecked) with **unknown** (must narrow before use).
+- Mixing **interface** and **type alias** — interfaces merge; aliases are more flexible for unions.
+- Using a **type assertion** when a **type guard** or refactor would be safer.
+- Treating **enum** and **union of literals** as interchangeable — emit and ergonomics differ.
+- Assuming **satisfies** changes the value’s inferred type the same way `as` does — it validates without forcing the annotation type.
+
+## 🔗 Related
+
+- [union_types](union_types)
+- [generic_types](generic_types)
+- [type_guards](type_guards)
+- [discriminated_unions](discriminated_unions)
+- [utility_types](utility_types)
+- [satisfies](satisfies)

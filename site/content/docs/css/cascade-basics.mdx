@@ -1,0 +1,93 @@
+---
+title: Cascade Basics
+description: CSS · Reference cheat sheet
+---
+
+# Cascade Basics
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The **cascade** decides which CSS rule wins when several apply to the same element. Browsers combine origin, importance, **specificity**, and source order. Understanding this stops “why didn’t my style apply?” frustration.
+
+## 🔧 Core concepts
+
+| Factor | Simple takeaway |
+| --- | --- |
+| Importance | `!important` beats normal rules (avoid while learning) |
+| Specificity | Id > class > type (roughly) |
+| Source order | Later rule wins if specificity is equal |
+| Inheritance | Some properties flow to children (`color`, `font`) |
+| Inline style | `style=""` is very specific |
+
+When two class selectors conflict, the one that appears **last** in the CSS usually wins.
+
+## 💡 Examples
+
+**Source order:**
+
+```css
+.title {
+  color: blue;
+}
+.title {
+  color: crimson; /* wins */
+}
+```
+
+**Specificity sketch:**
+
+```css
+p {
+  color: black;
+} /* type: low */
+.note {
+  color: green;
+} /* class: medium */
+#intro {
+  color: purple;
+} /* id: high */
+```
+
+```html
+<p id="intro" class="note">Which color?</p>
+<!-- purple — id wins -->
+```
+
+**Inheritance:**
+
+```css
+article {
+  color: #334155;
+  font-family: Georgia, serif;
+}
+/* paragraphs inside article inherit color/font unless overridden */
+```
+
+**Equal specificity — last wins:**
+
+```css
+.btn {
+  background: gray;
+}
+.btn {
+  background: teal;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Fighting with `#id` and `!important` creates unmaintainable CSS.
+- Browser DevTools “Computed” panel shows the winner — use it.
+- Not all properties inherit (`margin` does not).
+- Linked stylesheets order in HTML matters for equal-specificity ties.
+
+## 🔗 Related
+
+- [selectors_basics.md](./selectors_basics)
+- [box_model_basics.md](./box_model_basics)
+- [specificity.md](./specificity)
+- [cascade_layers.md](./cascade_layers)

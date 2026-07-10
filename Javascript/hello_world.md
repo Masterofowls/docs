@@ -1,0 +1,69 @@
+# Hello World
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Hello World confirms your JS environment works. The usual first call is `console.log`, which writes to the browser console or the terminal (Node).
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `console.log(...)` | Print values for humans / debugging |
+| String literal | `"text"` or `'text'` or `` `text` `` |
+| Statement | An instruction, often ending with `;` (ASI may insert them) |
+| Script | Code loaded by Node or a browser |
+
+Semicolons are recommended for beginners even though Automatic Semicolon Insertion exists.
+
+## 💡 Examples
+
+**Node script:**
+
+```js
+console.log("Hello, World!");
+```
+
+```bash
+node hello.js
+```
+
+**Multiple values:**
+
+```js
+const name = "Ada";
+console.log("Hello,", name);
+console.log(`Hello, ${name}!`);
+```
+
+**Browser alert (UI, not for real apps):**
+
+```js
+alert("Hello, World!");
+```
+
+**Log different types:**
+
+```js
+console.log(42);
+console.log(true);
+console.log({ ok: true });
+console.log(["a", "b"]);
+```
+
+## ⚠️ Pitfalls
+
+- In the browser, look at the **Console** tab — not the page body — for `console.log`.
+- `alert` blocks the UI; use it sparingly while learning.
+- Smart quotes from documents break string literals.
+- Running TypeScript (`.ts`) needs a toolchain; plain Hello World should be `.js`.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [variables_let_const.md](./variables_let_const.md)
+- [template_basics.md](./template_basics.md)
+- [console.md](./console.md)

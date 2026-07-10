@@ -1,0 +1,100 @@
+# Glossary
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core React Native terms for components, navigation, native modules, and mobile UI patterns.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| ActivityIndicator | A built-in spinner component for indeterminate loading states. |
+| AppRegistry | The JS entry that registers the root component with the native runtime. |
+| AppState | An API reporting whether the app is active, background, or inactive. |
+| Bridge | The legacy message channel between JavaScript and native modules. |
+| Dimensions | An API that reads window or screen width and height. |
+| Expo | A toolchain and SDK that simplifies React Native development and builds. |
+| FlatList | A performant scrolling list that virtualizes large data sets. |
+| Flexbox | The default layout system used by React Native styles. |
+| Gesture | Touch interaction handling, often via Gesture Handler or Pressable. |
+| Hermes | A JavaScript engine optimized for React Native startup and memory. |
+| Linking | An API for opening URLs and handling deep links into the app. |
+| Metro | The JavaScript bundler commonly used by React Native projects. |
+| Modal | A component that presents content above the current screen. |
+| Native module | Platform code (Swift/Kotlin/etc.) exposed to JavaScript. |
+| Navigation | Moving between screens, typically via React Navigation stacks/tabs. |
+| New Architecture | Fabric renderer and TurboModules replacing the legacy bridge path. |
+| Platform | Helpers to branch behavior for iOS, Android, or web. |
+| Pressable | A core component for detecting presses with fine-grained feedback. |
+| SafeAreaView | A view that insets content away from notches and system UI. |
+| ScrollView | A scrollable container for content that fits reasonably in memory. |
+| SectionList | A virtualized list organized into titled sections. |
+| StatusBar | Control over the system status bar style and visibility. |
+| StyleSheet | An API that creates optimized style objects for components. |
+| TextInput | A core editable text field component. |
+| Touchable | Legacy press wrappers (`TouchableOpacity`, etc.) largely replaced by Pressable. |
+| View | The fundamental container component, analogous to a `div` on web. |
+| Yoga | The cross-platform layout engine implementing Flexbox for native views. |
+
+## 💡 Examples
+
+**View, Text, and StyleSheet:**
+
+```tsx
+import { StyleSheet, Text, View } from "react-native";
+
+const styles = StyleSheet.create({
+  box: { padding: 16, flex: 1 },
+  title: { fontSize: 18, fontWeight: "600" },
+});
+
+export function Card() {
+  return (
+    <View style={styles.box}>
+      <Text style={styles.title}>Hello</Text>
+    </View>
+  );
+}
+```
+
+**FlatList:**
+
+```tsx
+<FlatList
+  data={users}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => <Text>{item.name}</Text>}
+/>
+```
+
+**AppState:**
+
+```tsx
+useEffect(() => {
+  const sub = AppState.addEventListener("change", (next) => {
+    console.log(next);
+  });
+  return () => sub.remove();
+}, []);
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **ScrollView** (simple, all-in-memory) with **FlatList** (virtualized).
+- Mixing web **CSS** assumptions with React Native **StyleSheet** — many properties differ.
+- Treating **Touchable*** and **Pressable** as identical — Pressable is the modern API.
+- Assuming **Linking** alone equals full **navigation** — deep links still need a navigator.
+- Equating **Expo** managed workflow with bare React Native — tooling and native access differ.
+
+## 🔗 Related
+
+- [basic_primitives](basic_primitives.md)
+- [flatlist](flatlist.md)
+- [navigation](navigation.md)
+- [styling](styling.md)
+- [appstate](appstate.md)
+- [safe_area](safe_area.md)

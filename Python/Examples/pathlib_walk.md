@@ -1,0 +1,78 @@
+# Pathlib Walk
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Walk a directory tree with `pathlib.Path.rglob`, filter by suffix, and collect file sizes without `os.walk`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Path` | Cross-platform paths |
+| `rglob` | Recursive glob |
+| `is_file()` | Skip directories / broken links |
+| `stat().st_size` | Byte size |
+
+## 💡 Examples
+
+**pathlib_walk.py:**
+
+```python
+from __future__ import annotations
+
+from pathlib import Path
+
+
+def list_py_files(root: Path) -> list[tuple[Path, int]]:
+    root = root.resolve()
+    results: list[tuple[Path, int]] = []
+    for path in root.rglob("*.py"):
+        if not path.is_file():
+            continue
+        results.append((path.relative_to(root), path.stat().st_size))
+    return sorted(results, key=lambda t: str(t[0]))
+
+
+def main() -> None:
+    root = Path(".")
+    rows = list_py_files(root)
+    total = sum(size for _, size in rows)
+    for rel, size in rows:
+        print(f"{size:>8}  {rel}")
+    print(f"\n{len(rows)} files, {total} bytes")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Exclude folders:**
+
+```python
+SKIP = {".git", ".venv", "node_modules", "__pycache__"}
+
+def list_py_files_filtered(root: Path) -> list[Path]:
+    out: list[Path] = []
+    for path in root.rglob("*.py"):
+        if any(part in SKIP for part in path.parts):
+            continue
+        if path.is_file():
+            out.append(path)
+    return out
+```
+
+## ⚠️ Pitfalls
+
+- `rglob` follows symlinks on some platforms — guard against cycles if needed.
+- Calling `stat()` on every file can be slow on huge trees; batch or cache.
+- Relative vs absolute: resolve once at the start for stable `relative_to`.
+
+## 🔗 Related
+
+- [Manage files](manage_files.md)
+- [../pathlib.md](../pathlib.md)
+- [../files_io.md](../files_io.md)

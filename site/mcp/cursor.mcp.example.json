@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "code-reference": {
+      "command": "node",
+      "args": ["mcp/server.mjs"],
+      "cwd": "site"
+    }
+  }
+}

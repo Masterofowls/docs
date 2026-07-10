@@ -1,0 +1,67 @@
+# Hello World
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+SQL Hello World is usually a `SELECT` that returns a constant, or creating a one-column table and reading it back. It proves your client can connect and run statements.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `SELECT` | Read data / expressions |
+| `AS` | Alias a column name in the result |
+| Statement | One SQL command (often ends with `;`) |
+| Result set | Table-like output of a query |
+
+Many tools (sqlite3, psql, GUI clients) show results as a grid.
+
+## 💡 Examples
+
+**Constant select:**
+
+```sql
+SELECT 'Hello, World!' AS greeting;
+```
+
+**Math and aliases:**
+
+```sql
+SELECT 2 + 2 AS four;
+SELECT 'Ada' AS name, 1815 AS birth_year;
+```
+
+**Round-trip with a table (SQLite-friendly):**
+
+```sql
+CREATE TABLE hello (
+  id INTEGER PRIMARY KEY,
+  message TEXT NOT NULL
+);
+
+INSERT INTO hello (message) VALUES ('Hello, World!');
+SELECT message FROM hello;
+```
+
+**Current time (Postgres example):**
+
+```sql
+SELECT NOW() AS right_now;
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `;` in interactive clients that require it.
+- Connecting to the wrong database/schema and thinking the query “failed.”
+- `SELECT *` is fine for learning; be specific in real apps.
+- Dialect functions differ (`NOW()`, `datetime('now')`, `GETDATE()`).
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [tables_basics.md](./tables_basics.md)
+- [primary_keys_basics.md](./primary_keys_basics.md)
+- [null_basics.md](./null_basics.md)

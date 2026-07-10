@@ -1,0 +1,87 @@
+# Path Filters
+
+_Github Actions · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Skip or select jobs based on which paths changed using `paths` / `paths-ignore` filters (and optional path-filter actions).
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `on.push.paths` | Only run when paths match |
+| `paths-ignore` | Skip doc-only changes |
+| Multiple jobs | Different filters per area |
+| Fork PRs | Filters still apply to PR files |
+
+## 💡 Examples
+
+**.github/workflows/path_filters.yml:**
+
+```yaml
+name: Path filters
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/path_filters.yml"
+
+jobs:
+  site:
+    if: github.event_name == 'pull_request' || contains(join(github.event.commits.*.modified, ','), 'site/') || true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run lint
+        working-directory: site
+
+  python:
+    runs-on: ubuntu-latest
+    # Alternative: dorny/paths-filter for multi-job path detection
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            python:
+              - 'Python/**'
+              - '**/requirements*.txt'
+      - if: steps.filter.outputs.python == 'true'
+        run: echo "Run Python checks here"
+```
+
+**Simple docs skip:**
+
+```yaml
+on:
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+```
+
+## ⚠️ Pitfalls
+
+- Workflow file changes should be included in `paths` or the workflow never updates.
+- `paths-ignore` on the whole workflow skips all jobs — use job-level filters for mixed repos.
+- Required checks that never run can block merges — configure branch protection carefully.
+
+## 🔗 Related
+
+- [Node CI](node_ci.md)

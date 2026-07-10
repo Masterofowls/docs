@@ -1,0 +1,100 @@
+---
+title: Glossary
+description: Playwright · Reference cheat sheet
+---
+
+# Glossary
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core Playwright terms for browser automation, locators, fixtures, and end-to-end testing.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Action | An interaction such as click, fill, or press performed on a locator. |
+| Assertion | A check that verifies page state, often auto-retrying with `expect`. |
+| Auto-waiting | Playwright’s habit of waiting for elements to be actionable before acting. |
+| Browser | A launched browser type instance such as Chromium, Firefox, or WebKit. |
+| BrowserContext | An isolated browser session with its own cookies, storage, and cache. |
+| Codegen | The recorder that generates Playwright scripts from manual interactions. |
+| Expect | Playwright’s assertion API that retries until timeout. |
+| Fixture | Reusable test setup/teardown provided by the test runner (e.g. `page`). |
+| Frame | A nested browsing context inside a page, such as an iframe. |
+| Headless | Running a browser without a visible UI window. |
+| Locator | A lazy, strict query describing how to find element(s) on a page. |
+| Network interception | Mocking or observing HTTP requests via route handlers. |
+| Page | A single tab/document you navigate and automate. |
+| Page Object | A class that encapsulates selectors and actions for a UI area. |
+| Parallelism | Running tests concurrently across workers for speed. |
+| Playwright Test | The built-in test runner (`@playwright/test`) with projects and reporters. |
+| Project | A named configuration slice (browser, device, or dependency set). |
+| Reporter | A plugin that formats and outputs test results. |
+| Screenshot | A captured image of a page or element for debugging or visual checks. |
+| Selector engine | The matching strategy behind locators (role, text, CSS, XPath, etc.). |
+| Storage state | Saved cookies/localStorage used to reuse authenticated sessions. |
+| Timeout | The maximum wait before an action or assertion fails. |
+| Trace | A detailed recording of actions, DOM snapshots, and network for debugging. |
+| Video | An optional recording of the test browser session. |
+| Worker | A parallel process that executes a subset of tests. |
+
+## 💡 Examples
+
+**Locator and assertion:**
+
+```ts
+import { test, expect } from "@playwright/test";
+
+test("login", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("a@b.com");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByText("Dashboard")).toBeVisible();
+});
+```
+
+**Network mock:**
+
+```ts
+await page.route("**/api/user", async (route) => {
+  await route.fulfill({
+    status: 200,
+    body: JSON.stringify({ name: "Ada" }),
+  });
+});
+```
+
+**Page object sketch:**
+
+```ts
+class LoginPage {
+  constructor(private page: Page) {}
+  async login(email: string, password: string) {
+    await this.page.getByLabel("Email").fill(email);
+    await this.page.getByLabel("Password").fill(password);
+    await this.page.getByRole("button", { name: "Sign in" }).click();
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **locator** (lazy, re-querying) with a one-shot **ElementHandle**.
+- Mixing **page** and **context** — auth/storage lives on the context.
+- Treating **CSS selectors** as first choice when **role/text** locators are more stable.
+- Equating a **trace** with a **screenshot** — traces capture the full timeline.
+- Assuming **auto-waiting** removes the need for good assertions and timeouts.
+
+## 🔗 Related
+
+- [locators](locators)
+- [assertions](assertions)
+- [fixtures](fixtures)
+- [page_object](page_object)
+- [network](network)
+- [tracing](tracing)

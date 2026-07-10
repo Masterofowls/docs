@@ -1,0 +1,104 @@
+---
+title: Dark Mode Toggle
+description: React Native · Example / how-to
+---
+
+# Dark Mode Toggle
+
+_React Native · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Toggle light/dark appearance with React context and `useColorScheme`, applying colors through a small theme object.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `useColorScheme` | System preference |
+| Context | Share resolved theme |
+| Manual override | User toggle beats system |
+| Style tokens | Background / text colors |
+
+## 💡 Examples
+
+**dark_mode_toggle.tsx:**
+
+```tsx
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  Button,
+  Text,
+  useColorScheme,
+  View,
+  StyleSheet,
+} from "react-native";
+
+type Mode = "system" | "light" | "dark";
+type Palette = { bg: string; fg: string };
+
+const palettes: Record<"light" | "dark", Palette> = {
+  light: { bg: "#ffffff", fg: "#111111" },
+  dark: { bg: "#111111", fg: "#f5f5f5" },
+};
+
+type ThemeCtx = {
+  mode: Mode;
+  setMode: (m: Mode) => void;
+  colors: Palette;
+};
+
+const ThemeContext = createContext<ThemeCtx | null>(null);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const system = useColorScheme();
+  const [mode, setMode] = useState<Mode>("system");
+  const resolved = mode === "system" ? (system === "dark" ? "dark" : "light") : mode;
+  const value = useMemo(
+    () => ({ mode, setMode, colors: palettes[resolved] }),
+    [mode, resolved],
+  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+export function useTheme() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme requires ThemeProvider");
+  return ctx;
+}
+
+export function DarkModeToggle() {
+  const { mode, setMode, colors } = useTheme();
+  return (
+    <View style={[styles.box, { backgroundColor: colors.bg }]}>
+      <Text style={{ color: colors.fg }}>Mode: {mode}</Text>
+      <Button title="System" onPress={() => setMode("system")} />
+      <Button title="Light" onPress={() => setMode("light")} />
+      <Button title="Dark" onPress={() => setMode("dark")} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  box: { flex: 1, gap: 8, padding: 16, justifyContent: "center" },
+});
+```
+
+## ⚠️ Pitfalls
+
+- System scheme can be `null` — default to light.
+- Hard-coded `#fff` in child components ignores the theme — pass `colors` or use context.
+- Persist `mode` if you want the choice to survive restarts.
+
+## 🔗 Related
+
+- [FlatList search](flatlist_search)
+- [Form keyboard](form_keyboard)

@@ -1,0 +1,77 @@
+# Variables: let and const
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Modern JavaScript declares variables with `let` and `const`. Avoid `var` in new code. `const` prevents reassignment of the binding; `let` allows reassignment. Both are block-scoped.
+
+## 🔧 Core concepts
+
+| Keyword | Reassign? | Scope | Typical use |
+| --- | --- | --- | --- |
+| `const` | No | Block `{}` | Default choice |
+| `let` | Yes | Block `{}` | Values that change |
+| `var` | Yes | Function | Legacy only |
+
+`const` objects/arrays can still have their *contents* mutated — the binding cannot point to a new object.
+
+## 💡 Examples
+
+**Basic declarations:**
+
+```js
+const name = "Sam";
+let score = 0;
+
+score = score + 10;
+// name = "Alex"; // TypeError
+console.log(name, score);
+```
+
+**Block scope:**
+
+```js
+let x = 1;
+{
+  let x = 2;
+  console.log(x); // 2
+}
+console.log(x); // 1
+```
+
+**const with objects:**
+
+```js
+const user = { id: 1, role: "guest" };
+user.role = "admin"; // OK — mutating property
+// user = {};       // TypeError — rebinding
+
+const nums = [1, 2];
+nums.push(3); // OK
+console.log(user, nums);
+```
+
+**Temporal dead zone (use before declare):**
+
+```js
+// console.log(a); // ReferenceError
+let a = 5;
+console.log(a);
+```
+
+## ⚠️ Pitfalls
+
+- Prefer `const` until you know a value must change.
+- `const` ≠ deeply immutable.
+- Redeclaring the same `let`/`const` in one scope is a SyntaxError.
+- Forgetting `let`/`const` creates an accidental global in non-strict sloppy mode.
+
+## 🔗 Related
+
+- [hello_world.md](./hello_world.md)
+- [typeof_basics.md](./typeof_basics.md)
+- [null_undefined.md](./null_undefined.md)
+- [template_basics.md](./template_basics.md)

@@ -1,0 +1,93 @@
+---
+title: Glossary
+description: Jest · Reference cheat sheet
+---
+
+# Glossary
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core Jest terms for matchers, mocks, lifecycle hooks, snapshots, and test configuration.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| AfterAll | A hook that runs once after all tests in a file or `describe` finish. |
+| AfterEach | A hook that runs after every test in the current scope. |
+| BeforeAll | A hook that runs once before any tests in a file or `describe` start. |
+| BeforeEach | A hook that runs before every test in the current scope. |
+| Coverage | A report of which statements/branches tests executed. |
+| Describe | A block that groups related tests under a shared name. |
+| Each | A helper (`test.each` / `describe.each`) that table-drives repeated cases. |
+| Expect | The assertion entry point that chains matchers onto a value. |
+| Fake timers | Mocked clock APIs that let tests advance time manually. |
+| Fn | `jest.fn()`, the factory for mock functions. |
+| Hoisting | Jest’s behavior of lifting `jest.mock` calls to the top of a module. |
+| It / test | A single test case function registered with Jest. |
+| Matcher | An assertion method such as `toBe`, `toEqual`, or `toHaveBeenCalled`. |
+| Mock | A stand-in function or module that records calls and controls returns. |
+| Module mock | Replacing an imported module with a mock via `jest.mock`. |
+| Only / skip | Focusing (`.only`) or excluding (`.skip`) specific suites or tests. |
+| Setup file | A file run before the test framework is installed in each environment. |
+| Snapshot | A serialized output stored on disk and compared on later runs. |
+| Spy | A wrapper around a real function that records calls while optionally calling through. |
+| Suite | A group of tests, typically created by a `describe` block. |
+| Test environment | The runtime context such as `node` or `jsdom` for each test file. |
+| Test runner | The component that discovers files and executes suites. |
+| Timeout | The maximum duration a test may run before Jest fails it. |
+| Transformer | A preprocessor (often Babel/ts-jest) that compiles files before tests. |
+| Watch mode | A continuous mode that re-runs affected tests on file changes. |
+
+## 💡 Examples
+
+**Describe, test, and matchers:**
+
+```js
+describe("sum", () => {
+  test("adds numbers", () => {
+    expect(1 + 2).toBe(3);
+    expect({ a: 1 }).toEqual({ a: 1 });
+  });
+});
+```
+
+**Mocks and spies:**
+
+```js
+const fetchUser = jest.fn().mockResolvedValue({ id: 1 });
+const log = jest.spyOn(console, "log").mockImplementation(() => {});
+
+await fetchUser(1);
+expect(fetchUser).toHaveBeenCalledWith(1);
+log.mockRestore();
+```
+
+**Lifecycle hooks:**
+
+```js
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **`toBe`** (reference/primitive identity) with **`toEqual`** (deep value equality).
+- Mixing **mock** (full replacement) with **spy** (wrap existing implementation).
+- Treating **snapshot** failures as always product bugs — snapshots need intentional updates.
+- Equating **fake timers** with real delays — you must advance timers explicitly.
+- Assuming **clearAllMocks** resets implementations the same way **resetAllMocks** does.
+
+## 🔗 Related
+
+- [matchers](matchers)
+- [mocks](mocks)
+- [spies](spies)
+- [setup_teardown](setup_teardown)
+- [snapshots](snapshots)
+- [watch_mode](watch_mode)

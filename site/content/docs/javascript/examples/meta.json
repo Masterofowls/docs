@@ -1,0 +1,11 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "array-pipeline",
+    "debounce-input",
+    "dom-todo",
+    "fetch-json",
+    "localstorage-prefs"
+  ]
+}

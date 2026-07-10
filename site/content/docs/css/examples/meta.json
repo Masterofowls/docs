@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "card-layout",
+    "dark-mode-toggle",
+    "responsive-nav"
+  ]
+}

@@ -1,0 +1,76 @@
+---
+title: Hello World
+description: Python · Reference cheat sheet
+---
+
+# Hello World
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A “Hello World” program is the smallest useful program: it prints a message so you know the language toolchain works. In Python that is usually one `print` call.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `print(...)` | Sends text to standard output (the terminal) |
+| String | Text in quotes: `"Hello"` or `'Hello'` |
+| Script entry | Top-level code runs when you execute the file |
+| `__name__` | Equals `"__main__"` when the file is run directly |
+
+You can run code in the REPL or save it in a `.py` file. Files are better for anything you want to keep.
+
+## 💡 Examples
+
+**One-liner in the REPL:**
+
+```python
+print("Hello, World!")
+```
+
+**Minimal script (`hello.py`):**
+
+```python
+print("Hello, World!")
+```
+
+```shellscript
+python hello.py
+```
+
+**With a main guard (good habit):**
+
+```python
+def main():
+    print("Hello, World!")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Slightly richer greeting:**
+
+```python
+name = "Ada"
+print(f"Hello, {name}!")
+print("Welcome to Python.")
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting quotes: `print(Hello)` looks for a variable named `Hello`.
+- Using smart/curly quotes from a word processor — use straight `"` or `'`.
+- Expecting `print` to return a value; it returns `None`.
+- On Windows, double-clicking a `.py` may flash a window and close; run from a terminal instead.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started)
+- [variables.md](./variables)
+- [input_output_basics.md](./input_output_basics)
+- [print_input.md](./print_input)

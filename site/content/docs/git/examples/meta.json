@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "fix-last-commit",
+    "sync-fork-branch",
+    "undo-local-changes"
+  ]
+}

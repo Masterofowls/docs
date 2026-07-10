@@ -1,0 +1,76 @@
+---
+title: Watch Folder
+description: Powershell · Example / how-to
+---
+
+# Watch Folder
+
+_Powershell · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Watch a directory for created/changed files using `FileSystemWatcher` and run a handler for each event.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `FileSystemWatcher` | OS file change events |
+| `Register-ObjectEvent` | Subscribe in PowerShell |
+| Filter | Limit to extensions |
+| Debounce mindset | Editors may fire many events |
+
+## 💡 Examples
+
+**watch_folder.ps1:**
+
+```powershell
+param(
+    [string]$Path = ".\inbox",
+    [string]$Filter = "*.*"
+)
+
+$ErrorActionPreference = "Stop"
+New-Item -ItemType Directory -Force -Path $Path | Out-Null
+
+$watcher = New-Object System.IO.FileSystemWatcher
+$watcher.Path = (Resolve-Path $Path)
+$watcher.Filter = $Filter
+$watcher.IncludeSubdirectories = $false
+$watcher.EnableRaisingEvents = $true
+
+$action = {
+    $name = $Event.SourceEventArgs.Name
+    $change = $Event.SourceEventArgs.ChangeType
+    $time = Get-Date -Format o
+    Write-Host "[$time] $change :: $name"
+}
+
+$handlers = @(
+    Register-ObjectEvent $watcher Created -Action $action
+    Register-ObjectEvent $watcher Changed -Action $action
+    Register-ObjectEvent $watcher Renamed -Action $action
+)
+
+Write-Host "Watching $($watcher.Path) (Ctrl+C to stop)"
+try {
+    while ($true) { Start-Sleep -Seconds 1 }
+} finally {
+    $handlers | ForEach-Object { Unregister-Event -SourceIdentifier $_.Name -ErrorAction SilentlyContinue }
+    $watcher.EnableRaisingEvents = $false
+    $watcher.Dispose()
+}
+```
+
+## ⚠️ Pitfalls
+
+- Some apps write via temp+rename — listen for `Renamed`/`Created`, not only `Changed`.
+- Event storms: debounce in the action if you kick off heavy work.
+- Always unregister events / dispose the watcher on exit.
+
+## 🔗 Related
+
+- [Export CSV report](export_csv_report)
+- [REST get JSON](rest_get_json)

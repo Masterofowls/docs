@@ -1,0 +1,70 @@
+---
+title: Find and Replace
+description: Bash · Example / how-to
+---
+
+# Find and Replace
+
+_Bash · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Recursively find text files and apply a safe in-place string replacement with `find` + `sed` (or `perl`).
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `find` | Select files by name/type |
+| `sed -i` | In-place edit |
+| Excludes | Skip `.git` / `node_modules` |
+| Dry run | Preview before write |
+
+## 💡 Examples
+
+**find_and_replace.sh:**
+
+```shellscript
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${1:-.}"
+OLD="${2:?usage: $0 ROOT OLD NEW}"
+NEW="${3:?usage: $0 ROOT OLD NEW}"
+
+echo "dry run matches:"
+grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.venv \
+  --include='*.md' --include='*.py' --include='*.ts' --include='*.tsx' \
+  -- "$OLD" "$ROOT" || true
+
+read -r -p "Apply replacement? [y/N] " ans
+[[ "${ans:-}" =~ ^[Yy]$ ]] || exit 0
+
+# portable-ish in-place with perl
+find "$ROOT" \
+  \( -path '*/.git/*' -o -path '*/node_modules/*' -o -path '*/.venv/*' \) -prune -o \
+  -type f \( -name '*.md' -o -name '*.py' -o -name '*.ts' -o -name '*.tsx' \) \
+  -print0 |
+  xargs -0 perl -pi -e "s/\Q$OLD\E/$NEW/g"
+
+echo "done"
+```
+
+**One-off GNU sed (Linux):**
+
+```shellscript
+find . -name '*.md' -print0 | xargs -0 sed -i 's/foo/bar/g'
+```
+
+## ⚠️ Pitfalls
+
+- macOS `sed -i` needs `sed -i ''` — prefer `perl -pi` for portability.
+- Binary files can be corrupted — limit by extension.
+- Always dry-run with `grep` before mass edits; commit first.
+
+## 🔗 Related
+
+- [Backup script](backup_script)
+- [Healthcheck loop](healthcheck_loop)

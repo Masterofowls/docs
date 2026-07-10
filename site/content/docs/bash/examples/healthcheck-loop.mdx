@@ -1,0 +1,75 @@
+---
+title: Healthcheck Loop
+description: Bash · Example / how-to
+---
+
+# Healthcheck Loop
+
+_Bash · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Poll an HTTP health endpoint until it succeeds or a timeout expires — useful for deploy wait scripts.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Loop + sleep | Retry with backoff gap |
+| `curl -fsS` | Fail on HTTP errors |
+| Deadline | Absolute timeout |
+| Exit codes | `0` healthy, `1` timed out |
+
+## 💡 Examples
+
+**healthcheck_loop.sh:**
+
+```shellscript
+#!/usr/bin/env bash
+set -euo pipefail
+
+URL="${1:-http://127.0.0.1:8000/health}"
+TIMEOUT_SEC="${TIMEOUT_SEC:-60}"
+INTERVAL_SEC="${INTERVAL_SEC:-2}"
+START="$(date +%s)"
+
+echo "waiting for $URL (timeout ${TIMEOUT_SEC}s)"
+
+while true; do
+  if curl -fsS --max-time 5 "$URL" >/dev/null; then
+    echo "healthy"
+    exit 0
+  fi
+
+  NOW="$(date +%s)"
+  ELAPSED="$((NOW - START))"
+  if ((ELAPSED >= TIMEOUT_SEC)); then
+    echo "error: timed out after ${TIMEOUT_SEC}s" >&2
+    exit 1
+  fi
+
+  echo "not ready (${ELAPSED}s)…"
+  sleep "$INTERVAL_SEC"
+done
+```
+
+**Usage:**
+
+```shellscript
+chmod +x healthcheck_loop.sh
+./healthcheck_loop.sh http://127.0.0.1:9000/healthz
+TIMEOUT_SEC=120 INTERVAL_SEC=3 ./healthcheck_loop.sh https://example.com/health
+```
+
+## ⚠️ Pitfalls
+
+- `curl` without `-f` treats 500 as success — always use `-f` or check status.
+- Infinite loops without a deadline hang CI jobs.
+- DNS/TLS failures need clear stderr; avoid swallowing curl errors silently.
+
+## 🔗 Related
+
+- [Backup script](backup_script)
+- [Find and replace](find_and_replace)

@@ -1,0 +1,58 @@
+# Sync Fork Branch
+
+_Git · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Update your fork’s branch from the upstream repository using remotes, fetch, and rebase or merge.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `upstream` remote | Original repo |
+| `origin` remote | Your fork |
+| `fetch` | Download without merge |
+| `rebase` / `merge` | Integrate upstream |
+
+## 💡 Examples
+
+**One-time remote setup:**
+
+```bash
+git remote add upstream https://github.com/ORG/REPO.git
+git remote -v
+```
+
+**Sync main, then update feature branch:**
+
+```bash
+git fetch upstream
+git checkout main
+git merge --ff-only upstream/main
+git push origin main
+
+git checkout feature/my-work
+git rebase main
+# or: git merge main
+git push origin feature/my-work
+```
+
+**If rebase rewrote commits already on the fork:**
+
+```bash
+git push --force-with-lease origin feature/my-work
+```
+
+## ⚠️ Pitfalls
+
+- Prefer `--force-with-lease` over `--force` to avoid clobbering others’ pushes.
+- Confusing `origin` and `upstream` pushes updates to the wrong place.
+- Long-lived forks: sync often to reduce conflict size.
+
+## 🔗 Related
+
+- [Fix last commit](fix_last_commit.md)
+- [Undo local changes](undo_local_changes.md)

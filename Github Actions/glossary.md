@@ -1,0 +1,94 @@
+# Glossary
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of core GitHub Actions terms for workflows, jobs, runners, secrets, and reusable automation.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Action | A reusable unit of work published for use as a step (`uses:`). |
+| Artifact | A file set uploaded from a job and downloadable later in the workflow. |
+| Cache | Stored dependencies keyed for faster restores across runs. |
+| Checkout | The common first step that clones the repository onto the runner. |
+| Composite action | An action defined as a sequence of steps in an `action.yml`. |
+| Concurrency | Controls that cancel or queue overlapping workflow runs. |
+| Context | Built-in objects such as `github`, `env`, `secrets`, and `steps` used in expressions. |
+| Environment | A named deployment target with protection rules and secrets. |
+| Event | A repository activity that can trigger a workflow, such as `push`. |
+| Expression | A `${{ }}` expression evaluated for conditions, inputs, and contexts. |
+| Job | A set of steps that runs on the same runner. |
+| Matrix | A strategy that expands one job into many variants of inputs. |
+| Needs | A job dependency declaring that another job must succeed first. |
+| OIDC | Federated auth letting workflows obtain cloud tokens without long-lived keys. |
+| Permission | Token scopes limiting what `GITHUB_TOKEN` may do. |
+| Reusable workflow | A callable workflow invoked by other workflows with `uses:`. |
+| Runner | The machine (GitHub-hosted or self-hosted) that executes a job. |
+| Secret | An encrypted value exposed to workflows as an environment variable. |
+| Service container | A Docker service (e.g. Postgres) attached to a job for tests. |
+| Step | A single command or action invocation inside a job. |
+| Trigger | The `on:` configuration that starts a workflow for matching events. |
+| Workflow | A YAML automation file under `.github/workflows/`. |
+| Workflow call | The event that allows one workflow to be invoked by another. |
+| Workflow dispatch | A manual trigger that can accept typed inputs. |
+| Workflow run | One execution instance of a workflow. |
+
+## 💡 Examples
+
+**Workflow trigger and job:**
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci && npm test
+```
+
+**Matrix strategy:**
+
+```yaml
+strategy:
+  matrix:
+    node: [20, 22]
+    os: [ubuntu-latest, windows-latest]
+runs-on: ${{ matrix.os }}
+```
+
+**Secrets and expressions:**
+
+```yaml
+env:
+  API_KEY: ${{ secrets.API_KEY }}
+if: ${{ github.ref == 'refs/heads/main' }}
+```
+
+## ⚠️ Pitfalls
+
+- Confusing **job** (runner-scoped) with **step** (sequential unit inside a job).
+- Mixing **secrets** (encrypted) with ordinary **env** vars committed in YAML.
+- Treating **cache** as an artifact store — caches are best-effort and can miss.
+- Equating **reusable workflows** with **composite actions** — different call sites and capabilities.
+- Assuming **matrix** failures always fail-fast the same way — `fail-fast` is configurable.
+
+## 🔗 Related
+
+- [workflow_syntax](workflow_syntax.md)
+- [jobs_steps](jobs_steps.md)
+- [events_triggers](events_triggers.md)
+- [matrix](matrix.md)
+- [secrets_env](secrets_env.md)
+- [caching](caching.md)
