@@ -1,0 +1,76 @@
+# Functions
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Functions encapsulate reusable logic. Advanced functions use `[CmdletBinding()]` to gain common parameters, pipeline binding, and `-WhatIf` support. Prefer Verb-Noun names and explicit `param()` blocks.
+
+## 🔧 Core concepts
+
+| Feature | Detail |
+| --- | --- |
+| Simple | `function Name { param(...) … }` |
+| Advanced | `[CmdletBinding()]` + `param` attributes |
+| Pipeline | `ValueFromPipeline`, `process {}` |
+| Output | Write objects; avoid `Write-Host` for data |
+| Scope | Functions see parent scope unless `local` |
+| Dynamic params | Advanced scenarios |
+| Comment-based help | `.SYNOPSIS` in comments |
+
+Blocks: `begin`, `process`, `end`, `clean` (PS 7.3+). Use `process` for pipeline streaming.
+
+## 💡 Examples
+
+**Advanced function:**
+
+```powershell
+function Get-FileSizeMb {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+    [Alias('FullName')]
+    [string]$Path
+  )
+  process {
+    $item = Get-Item -LiteralPath $Path
+    [pscustomobject]@{
+      Path = $item.FullName
+      SizeMB = [math]::Round($item.Length / 1MB, 2)
+    }
+  }
+}
+
+Get-ChildItem *.log | Get-FileSizeMb
+```
+
+**ShouldProcess:**
+
+```powershell
+function Remove-OldLog {
+  [CmdletBinding(SupportsShouldProcess)]
+  param([string]$Path)
+  if ($PSCmdlet.ShouldProcess($Path, 'Remove')) {
+    Remove-Item -LiteralPath $Path
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- `Write-Host` bypasses the pipeline—use `Write-Output` / implicit output for data.
+- Forgetting `process {}` breaks per-object pipeline behavior (only runs once).
+- `$args` is unstructured—prefer `param()`.
+- Name collisions with cmdlets: use a module prefix or approved verbs.
+- Returning arrays may get flattened—use `Write-Output -NoEnumerate` or unary comma when needed.
+- Don’t use `exit` inside library functions; throw or return instead.
+
+## 🔗 Related
+
+- [cmdlets.md](./cmdlets.md)
+- [pipeline.md](./pipeline.md)
+- [modules.md](./modules.md)
+- [error_handling.md](./error_handling.md)
+- [scripting.md](./scripting.md)

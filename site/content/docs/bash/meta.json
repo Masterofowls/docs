@@ -1,0 +1,27 @@
+{
+  "title": "Bash",
+  "description": "Shell scripting essentials",
+  "icon": "Terminal",
+  "root": true,
+  "pages": [
+    "index",
+    "arrays",
+    "conditionals",
+    "cron",
+    "debugging",
+    "exit-codes",
+    "functions",
+    "getopts",
+    "globbing",
+    "loops",
+    "pipes-redirection",
+    "process-substitution",
+    "quoting",
+    "scripts-best-practices",
+    "shebang",
+    "ssh",
+    "string-ops",
+    "subshells",
+    "variables"
+  ]
+}

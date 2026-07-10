@@ -1,0 +1,84 @@
+---
+title: Actions
+description: Playwright · Reference cheat sheet
+---
+
+# Actions
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Actions (`click`, `fill`, `press`, `check`, …) auto-wait for actionability: attached, visible, stable, enabled, and receiving events. Prefer locator actions over raw mouse coordinates.
+
+## 🔧 Core concepts
+
+| Action | Notes |
+| --- | --- |
+| `click` / `dblclick` | Scrolls into view, waits |
+| `fill` | Clears then types |
+| `type` / `pressSequentially` | Key-by-key (rare) |
+| `press` | Shortcuts (`Enter`, `Control+A`) |
+| `check` / `uncheck` | Checkboxes |
+| `selectOption` | `<select>` |
+| `hover` / `focus` | Pointer / focus |
+| `dragTo` | Drag and drop |
+| `setInputFiles` | File uploads |
+
+Force: `\{ force: true \}` skips checks — use sparingly.
+
+## 💡 Examples
+
+**Forms:**
+
+```ts
+await page.getByLabel('Email').fill('ada@example.com');
+await page.getByLabel('Password').fill('secret');
+await page.getByRole('checkbox', { name: 'Remember me' }).check();
+await page.getByLabel('Country').selectOption('GB');
+await page.getByRole('button', { name: 'Sign in' }).click();
+```
+
+**Keyboard & mouse:**
+
+```ts
+await page.getByRole('textbox').press('Control+A');
+await page.getByRole('textbox').press('Backspace');
+await page.getByText('Item').hover();
+await page.getByTestId('handle').dragTo(page.getByTestId('dropzone'));
+```
+
+**Files & dialogs:**
+
+```ts
+await page.getByLabel('Avatar').setInputFiles('fixtures/avatar.png');
+page.once('dialog', (d) => d.accept());
+await page.getByRole('button', { name: 'Delete' }).click();
+```
+
+**Position / modifiers:**
+
+```ts
+await page.getByRole('button').click({ button: 'right' });
+await page.getByRole('button').click({ modifiers: ['Shift'] });
+await page.getByTestId('canvas').click({ position: { x: 10, y: 20 } });
+```
+
+## ⚠️ Pitfalls
+
+- `page.click('css')` string API is legacy — use locators.
+- `fill` on contenteditable may need `pressSequentially`.
+- Clicking covered elements — fix overlay or use proper waits, not only `force`.
+- Race with animations — wait for stable state / assert visibility first.
+- Uploading absolute paths that don't exist on CI agents.
+
+## 🔗 Related
+
+- [Locators](locators)
+- [Assertions](assertions)
+- [Navigation](navigation)
+- [Page object](page_object)
+- [Network](network)
+- [Fixtures](fixtures)

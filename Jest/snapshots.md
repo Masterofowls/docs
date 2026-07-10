@@ -1,0 +1,84 @@
+# Snapshots
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Snapshots store serialized output and fail when it changes. Use for UI trees, large JSON, or error messages — keep them small and review diffs in PRs.
+
+## 🔧 Core concepts
+
+| API | Use |
+| --- | --- |
+| `toMatchSnapshot` | File under `__snapshots__` |
+| `toMatchInlineSnapshot` | Embedded in test file |
+| `toThrowErrorMatchingSnapshot` | Error text |
+| `-u` / `--updateSnapshot` | Refresh baselines |
+| Property matchers | Soften volatile fields |
+
+Prefer inline snapshots for tiny values; file snapshots for larger trees.
+
+## 💡 Examples
+
+**Basic:**
+
+```js
+test('renders', () => {
+  expect(renderHeader()).toMatchSnapshot();
+});
+```
+
+**Inline:**
+
+```js
+expect(user).toMatchInlineSnapshot(`
+{
+  "id": 1,
+  "name": "Ada",
+}
+`);
+```
+
+**Property matchers:**
+
+```js
+expect(article).toMatchSnapshot({
+  id: expect.any(Number),
+  createdAt: expect.any(Date),
+});
+```
+
+**Update:**
+
+```bash
+npx jest -u
+npx jest path/to/file.test.js -u
+```
+
+**Serializer (custom):**
+
+```js
+expect.addSnapshotSerializer({
+  test: (v) => v && v.__type === 'Money',
+  print: (v) => `Money(${v.cents})`,
+});
+```
+
+## ⚠️ Pitfalls
+
+- Giant DOM snapshots that churn on class-name noise.
+- Blindly updating with `-u` without reading diffs.
+- Timestamps/random IDs without property matchers.
+- Committing snapshots that differ by OS line endings.
+- Using snapshots instead of precise matchers for critical logic.
+
+## 🔗 Related
+
+- [Matchers](matchers.md)
+- [React Testing Library](react_testing_library.md)
+- [Custom matchers](custom_matchers.md)
+- [Watch mode](watch_mode.md)
+- [Config](config.md)
+- [Coverage](coverage.md)

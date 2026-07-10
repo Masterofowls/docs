@@ -1,0 +1,67 @@
+# Remoting
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PowerShell Remoting runs commands on remote machines over WinRM (classic) or SSH (PowerShell 7+). Use `Enter-PSSession` for interactive work and `Invoke-Command` for one-shot or fan-out automation. Always consider authentication, double-hop limits, and serialization.
+
+## 🔧 Core concepts
+
+| Cmdlet | Role |
+| --- | --- |
+| `Enable-PSRemoting` | Configure WinRM (Windows, admin) |
+| `Enter-PSSession` | Interactive remote shell |
+| `Exit-PSSession` | Leave |
+| `Invoke-Command` | Run scriptblock remotely |
+| `New-PSSession` | Persistent session |
+| `Copy-Item -ToSession` | File transfer via session |
+| SSH remoting | `New-PSSession -HostName` (PS 7+) |
+
+CredSSP / JEA / Just Enough Admin address delegation and least privilege. Objects returned are often deserialized (methods removed).
+
+## 💡 Examples
+
+**Invoke on many hosts:**
+
+```powershell
+$servers = 'web1', 'web2'
+Invoke-Command -ComputerName $servers -ScriptBlock {
+  Get-Service sshd -ErrorAction SilentlyContinue |
+    Select-Object Name, Status
+}
+```
+
+**Persistent session:**
+
+```powershell
+$s = New-PSSession -ComputerName web1 -Credential (Get-Credential)
+Invoke-Command -Session $s -ScriptBlock { $env:COMPUTERNAME }
+Copy-Item -Path .\app.zip -Destination C:\Temp\ -ToSession $s
+Remove-PSSession $s
+```
+
+**SSH (PS 7+):**
+
+```powershell
+Enter-PSSession -HostName ada@linux1 -SSHTransport
+```
+
+## ⚠️ Pitfalls
+
+- Second hop: remote session can’t use your creds for a third machine without CredSSP/Kerberos delegation.
+- Deserialized objects lack methods—rehydrate or rematerialize on the remote side.
+- Firewall / WinRM service must allow connections; HTTPS listeners for untrusted networks.
+- Large fan-out: throttle with sessions and error aggregation (`-ThrottleLimit`).
+- Don’t embed plain passwords; use `Get-Credential`, SecretManagement, or managed identities.
+- Linux remoting needs SSH configured; WinRM is Windows-centric.
+
+## 🔗 Related
+
+- [jobs.md](./jobs.md)
+- [objects.md](./objects.md)
+- [error_handling.md](./error_handling.md)
+- [scripting.md](./scripting.md)
+- [useful_commands.md](./useful_commands.md)

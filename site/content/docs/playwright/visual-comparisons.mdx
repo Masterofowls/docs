@@ -1,0 +1,87 @@
+---
+title: Visual Comparisons
+description: Playwright · Reference cheat sheet
+---
+
+# Visual Comparisons
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`toHaveScreenshot` and `toMatchSnapshot` compare pixels/text against committed baselines. Stabilize fonts, animations, and dynamic data before trusting diffs.
+
+## 🔧 Core concepts
+
+| API | Use |
+| --- | --- |
+| `expect(page).toHaveScreenshot()` | Full page / viewport |
+| `expect(locator).toHaveScreenshot()` | Element |
+| `maxDiffPixels` / `maxDiffPixelRatio` | Tolerance |
+| `stylePath` | Inject CSS for stability |
+| Update flag | `--update-snapshots` |
+
+Baselines are platform-specific (OS + browser). Generate on the same CI image you run.
+
+## 💡 Examples
+
+**Page screenshot assert:**
+
+```ts
+await expect(page).toHaveScreenshot('home.png', {
+  animations: 'disabled',
+  caret: 'hide',
+  maxDiffPixelRatio: 0.01,
+});
+```
+
+**Element + mask:**
+
+```ts
+await expect(page.getByTestId('hero')).toHaveScreenshot({
+  mask: [page.getByTestId('clock'), page.getByTestId('avatar')],
+});
+```
+
+**Config defaults:**
+
+```ts
+expect: {
+  toHaveScreenshot: {
+    maxDiffPixels: 50,
+    animations: 'disabled',
+  },
+},
+```
+
+**Update baselines:**
+
+```shellscript
+npx playwright test --update-snapshots
+npx playwright test --update-snapshots --project=chromium
+```
+
+**Text snapshot:**
+
+```ts
+expect(await page.locator('pre').textContent()).toMatchSnapshot('dump.txt');
+```
+
+## ⚠️ Pitfalls
+
+- Generating snapshots on Windows and comparing on Linux CI.
+- Unmasked timestamps, ads, or lazy-loaded images.
+- Fonts not installed in CI → different glyph metrics.
+- Animations/caret blinking causing 1-pixel flakes.
+- Committing huge full-site screenshots without masking.
+
+## 🔗 Related
+
+- [Screenshots & video](screenshots_video)
+- [Assertions](assertions)
+- [CI](ci)
+- [Config](config)
+- [Mobile emulation](mobile_emulation)
+- [Tracing](tracing)

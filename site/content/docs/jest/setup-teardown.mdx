@@ -1,0 +1,95 @@
+---
+title: "Setup & Teardown"
+description: Jest · Reference cheat sheet
+---
+
+# Setup & Teardown
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`beforeAll` / `beforeEach` / `afterEach` / `afterAll` manage lifecycle. Keep setup local to `describe` blocks; reset mocks and state so tests stay independent.
+
+## 🔧 Core concepts
+
+| Hook | When |
+| --- | --- |
+| `beforeAll` | Once before suite |
+| `beforeEach` | Before every test |
+| `afterEach` | After every test |
+| `afterAll` | Once after suite |
+| `describe` | Scope hooks & tests |
+
+Order: outer `beforeAll` → inner `beforeAll` → `beforeEach` → test → `afterEach` → …
+
+## 💡 Examples
+
+**Typical cleanup:**
+
+```js
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  cleanup(); // RTL
+});
+```
+
+**Scoped describe:**
+
+```js
+describe('db', () => {
+  let db;
+  beforeAll(async () => {
+    db = await connect();
+  });
+  afterAll(async () => {
+    await db.close();
+  });
+  test('query', async () => {
+    expect(await db.ping()).toBe(true);
+  });
+});
+```
+
+**Global setup files (config):**
+
+```js
+// jest.config.js
+setupFiles: ['<rootDir>/jest.polyfills.js'],
+setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+```
+
+```js
+// jest.setup.js
+import '@testing-library/jest-dom';
+```
+
+**Skip / only:**
+
+```js
+describe.skip('wip', () => {});
+test.only('focus', () => {});
+```
+
+## ⚠️ Pitfalls
+
+- Shared mutable state in `beforeAll` without reset.
+- Async hooks without `async`/`await` → races.
+- Leaving `test.only` in committed code.
+- Heavy `beforeEach` making suites slow — prefer lighter factories.
+- Global setup importing app modules before mocks are declared.
+
+## 🔗 Related
+
+- [Config](config)
+- [Mocks](mocks)
+- [Timers](timers)
+- [React Testing Library](react_testing_library)
+- [Module mocks](module_mocks)
+- [Watch mode](watch_mode)

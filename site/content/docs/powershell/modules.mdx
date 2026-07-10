@@ -1,0 +1,80 @@
+---
+title: Modules
+description: PowerShell · Reference cheat sheet
+---
+
+# Modules
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Modules package functions, cmdlets, and resources for reuse. Import with `Import-Module`; discover with `Get-Module -ListAvailable`. Prefer versioned modules from the PowerShell Gallery and explicit manifests (`.psd1`) for production.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `.psm1` | Script module |
+| `.psd1` | Manifest (exports, deps, version) |
+| `Import-Module` | Load |
+| `Remove-Module` | Unload |
+| `Get-Module` | Loaded / available |
+| `Install-Module` | From Gallery (PSGet) |
+| `$env:PSModulePath` | Search paths |
+| Autoloading | Commands trigger import |
+
+Export explicitly via `Export-ModuleMember` or manifest `FunctionsToExport`—avoid accidental exports.
+
+## 💡 Examples
+
+**Import and find:**
+
+```powershell
+Get-Module -ListAvailable | Select-Object Name, Version
+Import-Module ThreadJob -Force
+Get-Command -Module ThreadJob
+```
+
+**Install from Gallery:**
+
+```powershell
+Set-PSRepository PSGallery -InstallationPolicy Trusted
+Install-Module -Name PSScriptAnalyzer -Scope CurrentUser
+```
+
+**Minimal module:**
+
+```powershell
+# MyUtils.psm1
+function Get-Hello { 'hello' }
+Export-ModuleMember -Function Get-Hello
+```
+
+```powershell
+# MyUtils.psd1 (sketch)
+@{
+  RootModule = 'MyUtils.psm1'
+  ModuleVersion = '1.0.0'
+  FunctionsToExport = @('Get-Hello')
+}
+```
+
+## ⚠️ Pitfalls
+
+- Multiple versions on `PSModulePath`—pin with `-RequiredVersion` when needed.
+- CurrentUser vs AllUsers install scopes (admin rights).
+- Binary modules differ by edition (Windows PowerShell 5.1 vs PowerShell 7+).
+- Dot-sourcing `.ps1` is not a module—state and exports behave differently.
+- Gallery modules: review publishers; use `Install-Module -WhatIf` / checksums where required.
+- Circular imports and side effects at import time make debugging hard—keep imports thin.
+
+## 🔗 Related
+
+- [functions.md](./functions)
+- [cmdlets.md](./cmdlets)
+- [profiles.md](./profiles)
+- [scripting.md](./scripting)
+- [execution_policy.md](./execution_policy)

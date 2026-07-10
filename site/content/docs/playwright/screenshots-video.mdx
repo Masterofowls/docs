@@ -1,0 +1,85 @@
+---
+title: "Screenshots & Video"
+description: Playwright · Reference cheat sheet
+---
+
+# Screenshots & Video
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Capture screenshots and video for debugging and visual checks. Configure globally in `use`, or call APIs ad hoc in tests.
+
+## 🔧 Core concepts
+
+| Option | Values |
+| --- | --- |
+| `screenshot` | `off` \| `on` \| `only-on-failure` |
+| `video` | `off` \| `on` \| `retain-on-failure` \| `on-first-retry` |
+| `page.screenshot` | Full page / element / clip |
+| Trace | Separate — includes snapshots |
+
+Videos are WebM; screenshots PNG by default.
+
+## 💡 Examples
+
+**Config:**
+
+```ts
+use: {
+  screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
+},
+```
+
+**Manual screenshots:**
+
+```ts
+await page.screenshot({ path: 'artifacts/home.png', fullPage: true });
+await page.getByTestId('chart').screenshot({ path: 'artifacts/chart.png' });
+await page.screenshot({
+  path: 'clip.png',
+  clip: { x: 0, y: 0, width: 800, height: 600 },
+});
+```
+
+**Mask sensitive UI:**
+
+```ts
+await page.screenshot({
+  path: 'masked.png',
+  mask: [page.getByTestId('ssn'), page.getByLabel('Card number')],
+});
+```
+
+**Element + animations:**
+
+```ts
+await page.screenshot({
+  path: 'stable.png',
+  animations: 'disabled',
+  caret: 'hide',
+});
+```
+
+Artifacts land under `test-results/` with HTML report links when using the html reporter.
+
+## ⚠️ Pitfalls
+
+- `video: 'on'` for all tests fills disks quickly.
+- Full-page screenshots of infinite scroll pages are huge/slow.
+- Flaky pixels from fonts, DPI, and animations — prefer visual comparison APIs.
+- Paths outside `test-results` may not attach to the HTML report.
+- Recording video in headed debug sessions without cleanup.
+
+## 🔗 Related
+
+- [Visual comparisons](visual_comparisons)
+- [Tracing](tracing)
+- [Config](config)
+- [CI](ci)
+- [Assertions](assertions)
+- [Parallel](parallel)

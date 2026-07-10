@@ -1,0 +1,89 @@
+# Navigation
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`page.goto`, history APIs, and wait helpers synchronize tests with loads, SPA route changes, and downloads. Pair navigation with URL assertions.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `page.goto(url)` | Full navigation |
+| `page.reload()` | Refresh |
+| `page.goBack` / `goForward` | History |
+| `waitForURL` | SPA / redirect |
+| `waitForLoadState` | `load` / `domcontentloaded` / `networkidle` |
+| `baseURL` | Relative paths in config |
+
+`goto` waits for `load` by default (`waitUntil` option). Prefer `domcontentloaded` for SPAs that keep connections open.
+
+## 💡 Examples
+
+**Basic:**
+
+```ts
+await page.goto('/');
+await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+await expect(page).toHaveURL(/\/settings/);
+```
+
+**Click that navigates:**
+
+```ts
+await Promise.all([
+  page.waitForURL('**/dashboard'),
+  page.getByRole('link', { name: 'Dashboard' }).click(),
+]);
+// or simply:
+await page.getByRole('link', { name: 'Dashboard' }).click();
+await expect(page).toHaveURL(/dashboard/);
+```
+
+**Load states:**
+
+```ts
+await page.goto('/heavy');
+await page.waitForLoadState('networkidle'); // avoid if websockets/polling
+```
+
+**Popups / new tabs:**
+
+```ts
+const [popup] = await Promise.all([
+  page.waitForEvent('popup'),
+  page.getByRole('link', { name: 'Open report' }).click(),
+]);
+await popup.waitForLoadState();
+await expect(popup).toHaveTitle(/Report/);
+```
+
+**Downloads:**
+
+```ts
+const [download] = await Promise.all([
+  page.waitForEvent('download'),
+  page.getByRole('button', { name: 'Export' }).click(),
+]);
+await download.saveAs('out/report.csv');
+```
+
+## ⚠️ Pitfalls
+
+- `networkidle` flakes on apps with long-polling or analytics.
+- Missing `await` on `goto` — race with next assertion.
+- Absolute URLs ignoring `baseURL` in multi-env setups.
+- Not handling client-side redirects with `waitForURL` / `toHaveURL`.
+- Assuming same-tab navigation when target opens a popup.
+
+## 🔗 Related
+
+- [Actions](actions.md)
+- [Assertions](assertions.md)
+- [Network](network.md)
+- [Config](config.md)
+- [Authentication](authentication.md)
+- [Tracing](tracing.md)

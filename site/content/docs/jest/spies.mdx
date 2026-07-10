@@ -1,0 +1,88 @@
+---
+title: Spies
+description: Jest · Reference cheat sheet
+---
+
+# Spies
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`jest.spyOn(object, method)` wraps a real method to assert calls while optionally keeping the original implementation. Prefer spies when you need partial observation.
+
+## 🔧 Core concepts
+
+| API | Effect |
+| --- | --- |
+| `jest.spyOn(obj, 'm')` | Track calls |
+| `mockImplementation` | Replace body |
+| `mockRestore` | Put original back |
+| `mockClear` | Clear call history |
+| `mockReset` | Clear history + implementation |
+
+Spies are mocks; matchers like `toHaveBeenCalledWith` apply.
+
+## 💡 Examples
+
+**Observe without changing:**
+
+```js
+const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+doWork();
+expect(log).toHaveBeenCalledWith('done');
+log.mockRestore();
+```
+
+**Replace temporarily:**
+
+```js
+const spy = jest
+  .spyOn(Date, 'now')
+  .mockReturnValue(1_700_000_000_000);
+expect(Date.now()).toBe(1_700_000_000_000);
+spy.mockRestore();
+```
+
+**Class method:**
+
+```js
+const spy = jest.spyOn(User.prototype, 'save').mockResolvedValue(undefined);
+await user.save();
+expect(spy).toHaveBeenCalled();
+```
+
+**Cleanup in afterEach:**
+
+```js
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+```
+
+**Call order:**
+
+```js
+expect(fnA.mock.invocationCallOrder[0]).toBeLessThan(
+  fnB.mock.invocationCallOrder[0],
+);
+```
+
+## ⚠️ Pitfalls
+
+- Spying on non-configurable properties / some ESM bindings.
+- Leaving `console` spies mocked and hiding useful output.
+- `mockReset` vs `mockRestore` confusion — restore for spies.
+- Spying after the module cached a bound original function.
+- Asserting call order in parallel async code.
+
+## 🔗 Related
+
+- [Mocks](mocks)
+- [Module mocks](module_mocks)
+- [Matchers](matchers)
+- [Timers](timers)
+- [Setup & teardown](setup_teardown)
+- [Async](async)

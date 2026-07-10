@@ -1,0 +1,76 @@
+# Tracing
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Traces capture DOM snapshots, network, console, and actions for post-mortem debugging. Open with `npx playwright show-trace` or the HTML report.
+
+## 🔧 Core concepts
+
+| Mode | Behavior |
+| --- | --- |
+| `off` | No traces |
+| `on` | Every test |
+| `retain-on-failure` | Keep if failed |
+| `on-first-retry` | Recommended default |
+
+Trace viewer shows timeline, before/after snapshots, source, and network.
+
+## 💡 Examples
+
+**Config (recommended):**
+
+```ts
+use: {
+  trace: 'on-first-retry',
+},
+retries: process.env.CI ? 2 : 0,
+```
+
+**CLI:**
+
+```bash
+npx playwright test --trace on
+npx playwright show-trace test-results/.../trace.zip
+npx playwright show-report
+```
+
+**Programmatic:**
+
+```ts
+await browser.startTracing(page, { path: 'trace.json', screenshots: true });
+// ... actions
+await browser.stopTracing();
+```
+
+Prefer context tracing via config over low-level Chrome tracing.
+
+**Debug locally:**
+
+```bash
+PWDEBUG=1 npx playwright test
+npx playwright test --debug
+npx playwright test --ui
+```
+
+UI mode includes time-travel and locator picker; traces complement CI failures.
+
+## ⚠️ Pitfalls
+
+- `trace: 'on'` in large suites → huge artifacts and slow uploads.
+- Not downloading CI artifacts — traces stay on the runner.
+- Comparing traces across different browsers without noting engine differences.
+- Expecting traces without retries when using `on-first-retry`.
+- Zipping/custom paths that the HTML reporter cannot find.
+
+## 🔗 Related
+
+- [Config](config.md)
+- [Screenshots & video](screenshots_video.md)
+- [CI](ci.md)
+- [Parallel](parallel.md)
+- [Assertions](assertions.md)
+- [Network](network.md)

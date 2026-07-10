@@ -1,0 +1,81 @@
+# Reusable Workflows
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Reusable workflows let one workflow call another with `workflow_call` / `uses: org/repo/.github/workflows/file.yml@ref`. Share CI patterns across repos while keeping callers thin. Pass inputs, secrets, and read outputs from called jobs.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `on.workflow_call` | Define a callable workflow |
+| `inputs` / `secrets` | Contract for callers |
+| `uses: ./.github/workflows/x.yml` | Same-repo call |
+| `uses: org/repo/...@v1` | Cross-repo call |
+| `with:` / `secrets:` | Pass values |
+| `jobs.*.outputs` | Return data to caller |
+
+Called workflows run as jobs from the caller’s perspective (`needs` works). Nesting depth and some features (e.g. certain matrix cases) have limits.
+
+## 💡 Examples
+
+**Callee (`_ci.yml`):**
+
+```yaml
+name: Reusable CI
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: '22'
+    secrets:
+      NPM_TOKEN:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm test
+```
+
+**Caller:**
+
+```yaml
+jobs:
+  call-ci:
+    uses: ./.github/workflows/_ci.yml
+    with:
+      node-version: '20'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+## ⚠️ Pitfalls
+
+- Caller must explicitly pass secrets—`secrets: inherit` only when appropriate.
+- Version-pin `@ref` for cross-repo reuse; floating branches can break you.
+- Not everything is supported inside reusable workflows (check current limits).
+- Debugging spans two files—add clear job names.
+- Permissions are evaluated carefully across caller/callee—set both as needed.
+- Avoid deep nesting; prefer one reusable layer.
+
+## 🔗 Related
+
+- [composite_actions.md](./composite_actions.md)
+- [workflow_syntax.md](./workflow_syntax.md)
+- [jobs_steps.md](./jobs_steps.md)
+- [secrets_env.md](./secrets_env.md)
+- [expressions.md](./expressions.md)

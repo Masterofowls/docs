@@ -1,0 +1,83 @@
+# Config
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Configure Jest via `jest.config.js/ts` or `package.json#jest`. Key knobs: environment, transforms, roots, coverage, and setup files.
+
+## 🔧 Core concepts
+
+| Option | Purpose |
+| --- | --- |
+| `testEnvironment` | `node` \| `jsdom` |
+| `roots` / `testMatch` | Discovery |
+| `transform` | TS/JS compile |
+| `moduleNameMapper` | Aliases / CSS mocks |
+| `setupFilesAfterEnv` | Matchers, RTL |
+| `collectCoverageFrom` | Coverage scope |
+| `clearMocks` | Auto clear between tests |
+
+## 💡 Examples
+
+**jest.config.js:**
+
+```js
+/** @type {import('jest').Config} */
+module.exports = {
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.test.ts'],
+  clearMocks: true,
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less)$': 'identity-obj-proxy',
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+};
+```
+
+**React / jsdom:**
+
+```js
+testEnvironment: 'jsdom',
+```
+
+**package.json scripts:**
+
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:ci": "jest --ci --coverage --maxWorkers=2"
+  }
+}
+```
+
+**CLI overrides:**
+
+```bash
+npx jest --config=jest.config.js
+npx jest --env=jsdom
+npx jest --runInBand
+```
+
+## ⚠️ Pitfalls
+
+- Path aliases in TS not mirrored in `moduleNameMapper`.
+- Transforming `node_modules` accidentally (slow) or not transforming ESM deps.
+- Multiple configs in monorepos without projects/`--selectProjects`.
+- `jsdom` for pure Node libraries — unnecessary overhead.
+- Coverage thresholds failing CI without local awareness.
+
+## 🔗 Related
+
+- [Install](install.md)
+- [TypeScript](typescript.md)
+- [Coverage](coverage.md)
+- [Setup & teardown](setup_teardown.md)
+- [Module mocks](module_mocks.md)
+- [Watch mode](watch_mode.md)

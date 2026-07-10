@@ -1,0 +1,84 @@
+---
+title: CI
+description: Playwright · Reference cheat sheet
+---
+
+# CI
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Run Playwright headlessly in CI with browser deps, artifacts (report, trace, video), sharding, and a started app via `webServer` or job services.
+
+## 🔧 Core concepts
+
+| Concern | Practice |
+| --- | --- |
+| Browsers | `npx playwright install --with-deps` |
+| Retries | `retries: 2` on CI only |
+| Workers | Conservative (1–2) on small runners |
+| Artifacts | Upload `playwright-report/`, `test-results/` |
+| Sharding | `--shard=n/m` across jobs |
+| Containers | Official Playwright Docker image |
+
+## 💡 Examples
+
+**GitHub Actions (sketch):**
+
+```yaml
+- uses: actions/checkout@v4
+- uses: actions/setup-node@v4
+  with: { node-version: 22 }
+- run: npm ci
+- run: npx playwright install --with-deps
+- run: npx playwright test
+  env:
+    CI: true
+- uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: playwright-report
+    path: playwright-report/
+```
+
+**Config CI guards:**
+
+```ts
+forbidOnly: !!process.env.CI,
+retries: process.env.CI ? 2 : 0,
+workers: process.env.CI ? 2 : undefined,
+reporter: process.env.CI
+  ? [['github'], ['html'], ['list']]
+  : [['list'], ['html']],
+```
+
+**Docker:**
+
+```shellscript
+docker run --rm -v $PWD:/work -w /work mcr.microsoft.com/playwright:v1.49.0-jammy \
+  /bin/bash -c "npm ci && npx playwright test"
+```
+
+Pin image tag to the same Playwright version as `package.json`.
+
+**Shard matrix:** `strategy.matrix.shard: [1, 2, 3]` + `--shard=$\{\{ matrix.shard \}\}/3`.
+
+## ⚠️ Pitfalls
+
+- Missing `--with-deps` on Ubuntu → browser launch errors.
+- Not uploading artifacts on failure (`if: always()`).
+- Snapshot baselines from a different OS than CI.
+- Starting the app twice (`webServer` + manual job step).
+- Secrets in logs from `DEBUG=pw:api` in CI.
+
+## 🔗 Related
+
+- [Install](install)
+- [Config](config)
+- [Parallel](parallel)
+- [Tracing](tracing)
+- [Visual comparisons](visual_comparisons)
+- [Authentication](authentication)

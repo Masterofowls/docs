@@ -1,0 +1,82 @@
+# Cron
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Cron schedules recurring jobs via crontab entries. Each line is five time fields plus a command. Cron runs with a minimal environment—always set `PATH`, use absolute paths, and redirect logs. Prefer systemd timers on modern Linux when available.
+
+## 🔧 Core concepts
+
+| Field | Values |
+| --- | --- |
+| Minute | 0–59 |
+| Hour | 0–23 |
+| Dom | 1–31 |
+| Month | 1–12 |
+| Dow | 0–7 (0/7 = Sun) |
+| `*` | Any |
+| `*/n` | Every n |
+| `a,b` | List |
+| `a-b` | Range |
+
+| Command | Role |
+| --- | --- |
+| `crontab -e` | Edit user crontab |
+| `crontab -l` | List |
+| `crontab -r` | Remove (dangerous) |
+| `/etc/cron.d/` | System drop-in files |
+
+Special strings (Vixie): `@reboot`, `@daily`, `@hourly`, `@weekly`, `@monthly`.
+
+## 💡 Examples
+
+**User crontab entries:**
+
+```cron
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+MAILTO=""
+
+# Every day at 02:30
+30 2 * * * /home/ada/bin/backup.sh >>/home/ada/logs/backup.log 2>&1
+
+# Every 15 minutes
+*/15 * * * * /usr/bin/curl -fsS https://example.com/health >/dev/null
+
+@reboot /home/ada/bin/on-boot.sh
+```
+
+**Wrapper script:**
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$HOME/app"
+/usr/bin/flock -n /tmp/app-cron.lock ./job.sh
+```
+
+**Systemd alternative (sketch):**
+
+```ini
+# app.timer + app.service with OnCalendar=*-*-* 02:30:00
+```
+
+## ⚠️ Pitfalls
+
+- Cron’s `PATH` is short—commands that work interactively may “not be found”.
+- `%` in commands is special in crontab (newline)—escape as `\%`.
+- No TTY; don’t assume interactive prompts or ssh-agent unless configured.
+- Overlapping runs: use `flock` to prevent pile-ups.
+- Timezone is the system timezone unless you set `TZ=`.
+- `crontab -r` deletes without confirmation on some systems.
+
+## 🔗 Related
+
+- [scripts_best_practices.md](./scripts_best_practices.md)
+- [shebang.md](./shebang.md)
+- [exit_codes.md](./exit_codes.md)
+- [debugging.md](./debugging.md)
+- [ssh.md](./ssh.md)

@@ -1,0 +1,86 @@
+---
+title: "Pipes & Redirection"
+description: Bash · Reference cheat sheet
+---
+
+# Pipes & Redirection
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Redirection connects command stdin/stdout/stderr to files or other FDs. Pipes (`|`) connect stdout of one process to stdin of the next. Master these to build reliable pipelines and capture errors separately.
+
+## 🔧 Core concepts
+
+| Operator | Meaning |
+| --- | --- |
+| `>` | Truncate/write stdout |
+| `>>` | Append stdout |
+| `2>` / `2>>` | stderr |
+| `&>` / `&>>` | stdout+stderr (bash) |
+| `>` / `2>&1` | Merge stderr into stdout |
+| `&lt;` | stdin from file |
+| `&lt;<EOF` | Here-document |
+| `&lt;&lt;&lt;"$s"` | Here-string |
+| `\|` | Pipe stdout → next stdin |
+| `|&` | Pipe stdout+stderr |
+| `n>&m` | Dup FD n to m |
+| `/dev/null` | Discard |
+
+FD 0 stdin, 1 stdout, 2 stderr. Order matters: `cmd >out 2>&1` merges both into `out`; `cmd 2>&1 >out` leaves stderr on the terminal.
+
+## 💡 Examples
+
+**Capture and merge:**
+
+```shellscript
+make >build.log 2>&1
+make 2>&1 | tee build.log
+curl -fsS "$url" -o file || echo "failed" >&2
+```
+
+**Here-doc and here-string:**
+
+```shellscript
+ssh host bash <<'EOF'
+  hostname
+  uptime
+EOF
+
+grep -F <<<"$needle" file.txt
+```
+
+**Swap / silence:**
+
+```shellscript
+cmd 2>/dev/null
+cmd >/dev/null 2>&1
+cmd 3>&1 1>&2 2>&3 3>&-    # swap stdout/stderr (classic trick)
+```
+
+**Process with pipefail:**
+
+```shellscript
+set -o pipefail
+curl -fsS "$url" | jq '.id'
+```
+
+## ⚠️ Pitfalls
+
+- Without `pipefail`, pipeline status is the last command only—failures earlier are hidden.
+- `>` overwrites silently; prefer `set -o noclobber` (`>|` to force) for safety.
+- `cmd > file 2>&1` vs `cmd 2>&1 > file`—order changes which FD lands where.
+- Pipes introduce subshells; side effects (vars, `cd`) don’t affect the parent.
+- Here-docs without quotes expand variables; use `&lt;&lt;'EOF'` for literals.
+- Large pipes buffer; for huge data consider temp files or streaming tools.
+
+## 🔗 Related
+
+- [exit_codes.md](./exit_codes)
+- [process_substitution.md](./process_substitution)
+- [subshells.md](./subshells)
+- [debugging.md](./debugging)
+- [scripts_best_practices.md](./scripts_best_practices)

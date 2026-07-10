@@ -1,0 +1,27 @@
+{
+  "title": "PowerShell",
+  "description": "Windows shell & automation",
+  "icon": "Monitor",
+  "root": true,
+  "pages": [
+    "index",
+    "cmdlets",
+    "conditionals",
+    "error-handling",
+    "execution-policy",
+    "functions",
+    "jobs",
+    "json-csv",
+    "loops",
+    "modules",
+    "objects",
+    "pipeline",
+    "profiles",
+    "remoting",
+    "rest-api",
+    "scripting",
+    "useful-commands",
+    "variables",
+    "vs-bash"
+  ]
+}

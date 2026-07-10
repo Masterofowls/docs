@@ -1,0 +1,85 @@
+# Scripts Best Practices
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Reliable bash scripts start with a clear shebang, strict mode, quoted expansions, and explicit error handling. Treat bash as glue: keep logic simple, prefer well-tested tools, and fail fast with useful messages.
+
+## 🔧 Core concepts
+
+| Practice | Why |
+| --- | --- |
+| `#!/usr/bin/env bash` | Portable interpreter |
+| `set -euo pipefail` | Fail on error/unset/pipe |
+| `IFS=$'\n\t'` | Safer splitting (optional) |
+| Quote `"$var"` / `"$@"` | Avoid splitting/globbing |
+| `local` in functions | No global leaks |
+| Check deps | `command -v` |
+| Prefer arrays | Lists with spaces |
+| ShellCheck | Static analysis |
+
+Structure: constants → functions → `main "$@"` at the bottom. Log to stderr; keep stdout for data.
+
+## 💡 Examples
+
+**Skeleton:**
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() { printf '%s\n' "$*" >&2; }
+die() { log "$*"; exit 1; }
+
+need() { command -v "$1" >/dev/null || die "missing: $1"; }
+
+main() {
+  need jq
+  [[ $# -ge 1 ]] || die "usage: $0 <file>"
+  local file=$1
+  [[ -f "$file" ]] || die "not a file: $file"
+  jq . <"$file"
+}
+
+main "$@"
+```
+
+**Safe temp files:**
+
+```bash
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+```
+
+**Dry-run pattern:**
+
+```bash
+run() {
+  if [[ "${DRY_RUN:-}" == 1 ]]; then
+    log "DRY: $*"
+  else
+    "$@"
+  fi
+}
+```
+
+## ⚠️ Pitfalls
+
+- Blind `set -e` without understanding exceptions in `if` / `&&` chains.
+- Parsing `ls`, `ps`, or word-splitting filenames.
+- Hard-coding `/bin/bash` when `env` is more portable.
+- Silent failures: always surface errors with context.
+- Running as root by default—drop privileges when possible.
+- Skipping ShellCheck (`shellcheck script.sh`) in CI.
+
+## 🔗 Related
+
+- [shebang.md](./shebang.md)
+- [debugging.md](./debugging.md)
+- [exit_codes.md](./exit_codes.md)
+- [quoting.md](./quoting.md)
+- [functions.md](./functions.md)
+- [getopts.md](./getopts.md)

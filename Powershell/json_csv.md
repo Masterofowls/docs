@@ -1,0 +1,69 @@
+# JSON & CSV
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PowerShell converts between objects and text formats with `ConvertTo-Json` / `ConvertFrom-Json` and `Export-Csv` / `Import-Csv`. Prefer object pipelines over hand-rolled string parsing. Watch depth limits and type fidelity when round-tripping JSON.
+
+## 🔧 Core concepts
+
+| Cmdlet | Role |
+| --- | --- |
+| `ConvertTo-Json` | Objects → JSON string |
+| `ConvertFrom-Json` | JSON → objects |
+| `Get-Content -Raw` | Read whole file |
+| `Export-Csv` | Objects → CSV file |
+| `Import-Csv` | CSV → objects (all strings) |
+| `ConvertTo-Csv` | CSV as strings in pipeline |
+
+PowerShell 7+ improved JSON depth defaults and added `-AsHashtable`. CSV exports include type metadata comments unless `-NoTypeInformation` (default in PS 6+).
+
+## 💡 Examples
+
+**JSON:**
+
+```powershell
+$data = Get-Content -Raw .\config.json | ConvertFrom-Json
+$data.Port = 8080
+$data | ConvertTo-Json -Depth 6 | Set-Content -Path .\config.json -Encoding utf8
+
+# PS 7+
+$h = Get-Content -Raw .\config.json | ConvertFrom-Json -AsHashtable
+```
+
+**CSV:**
+
+```powershell
+Get-Process |
+  Select-Object Name, Id, CPU |
+  Export-Csv .\procs.csv -NoTypeInformation
+
+Import-Csv .\procs.csv |
+  Where-Object { [int]$_.Id -gt 1000 }
+```
+
+**REST body:**
+
+```powershell
+$body = @{ name = 'Ada'; roles = @('dev') } | ConvertTo-Json
+```
+
+## ⚠️ Pitfalls
+
+- `ConvertTo-Json` truncates nested objects when `-Depth` is too low (default historically 2).
+- `Import-Csv` properties are strings—cast numbers/dates explicitly.
+- `Export-Csv` of `Format-Table` output is wrong—select objects first.
+- Hashtable key order / `PSCustomObject` differences affect JSON shape.
+- Large JSON: streaming parsers may be better than loading entirely.
+- Encoding: prefer UTF-8 without unexpected BOM issues across tools.
+
+## 🔗 Related
+
+- [objects.md](./objects.md)
+- [rest_api.md](./rest_api.md)
+- [pipeline.md](./pipeline.md)
+- [useful_commands.md](./useful_commands.md)
+- [scripting.md](./scripting.md)

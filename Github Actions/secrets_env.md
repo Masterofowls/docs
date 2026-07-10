@@ -1,0 +1,71 @@
+# Secrets & Environment Variables
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Use repository/org/environment **secrets** for sensitive values and **variables** for non-sensitive config. Map them into `env` at workflow, job, or step scope. Secrets are masked in logs but not a full security boundary—avoid echoing them.
+
+## 🔧 Core concepts
+
+| Source | Access |
+| --- | --- |
+| Secrets | `${{ secrets.NAME }}` |
+| Vars | `${{ vars.NAME }}` |
+| `GITHUB_TOKEN` | Auto-provided job token |
+| `env:` | Static or expression-based env |
+| Environment secrets | Bound via `environment:` |
+| Org secrets | Shared with selected repos |
+
+Never commit `.env` with real credentials. Prefer OIDC/`token` exchange over long-lived cloud keys when possible.
+
+## 💡 Examples
+
+**Wire secrets to env:**
+
+```yaml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      APP_ENV: ${{ vars.APP_ENV }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./deploy.sh
+```
+
+**Step-level only:**
+
+```yaml
+- name: Publish
+  env:
+    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  run: npm publish
+```
+
+**Set env dynamically:**
+
+```yaml
+- run: echo "SHA_SHORT=${GITHUB_SHA::8}" >> "$GITHUB_ENV"
+```
+
+## ⚠️ Pitfalls
+
+- Fork PRs usually cannot read repo secrets.
+- Masking is best-effort—partial prints / base64 may leak.
+- `pull_request_target` can expose secrets to untrusted code if you check out PR SHA unsafely.
+- Empty secrets fail differently than missing vars—validate early.
+- Don’t store huge blobs in secrets; use OIDC or encrypted storage.
+- `GITHUB_TOKEN` permissions are limited by workflow `permissions:` and defaults.
+
+## 🔗 Related
+
+- [permissions.md](./permissions.md)
+- [environments.md](./environments.md)
+- [events_triggers.md](./events_triggers.md)
+- [expressions.md](./expressions.md)
+- [workflow_syntax.md](./workflow_syntax.md)

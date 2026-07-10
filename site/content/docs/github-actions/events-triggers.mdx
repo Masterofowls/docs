@@ -1,0 +1,81 @@
+---
+title: "Events & Triggers"
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Events & Triggers
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `on` map selects which GitHub events start a workflow. Filter by branches, paths, tags, activity types, and cron schedules. Choose the narrowest trigger to save minutes and reduce noise.
+
+## 🔧 Core concepts
+
+| Event | Typical use |
+| --- | --- |
+| `push` | CI on commits |
+| `pull_request` | PR checks |
+| `workflow_dispatch` | Manual run |
+| `schedule` | Cron (UTC) |
+| `release` | Publish on release |
+| `workflow_call` | Reusable callee |
+| `repository_dispatch` | External webhook |
+| `issues` / `issue_comment` | Issue automation |
+
+Filters: `branches`, `branches-ignore`, `paths`, `paths-ignore`, `tags`, `types`. For PRs, `pull_request` runs in the merge context; `pull_request_target` is privileged—use carefully.
+
+## 💡 Examples
+
+**Push / PR with path filters:**
+
+```yaml
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'package.json']
+  pull_request:
+    paths: ['src/**']
+```
+
+**Manual + inputs:**
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target
+        required: true
+        default: staging
+        type: choice
+        options: [staging, prod]
+```
+
+**Cron (every day 06:00 UTC):**
+
+```yaml
+on:
+  schedule:
+    - cron: '0 6 * * *'
+```
+
+## ⚠️ Pitfalls
+
+- Scheduled workflows only run if the default branch contains the file and the repo is active.
+- Cron is UTC; expect delays under load.
+- `paths` filters don’t apply the way you expect for some events—read docs per event.
+- `pull_request_target` + checkout of PR code is a security footgun.
+- Fork PRs get a read-only `GITHUB_TOKEN` with restricted secrets.
+- Duplicate runs: `push` + `pull_request` both fire for same change—use concurrency or conditionals.
+
+## 🔗 Related
+
+- [workflow_syntax.md](./workflow_syntax)
+- [jobs_steps.md](./jobs_steps)
+- [secrets_env.md](./secrets_env)
+- [permissions.md](./permissions)
+- [environments.md](./environments)

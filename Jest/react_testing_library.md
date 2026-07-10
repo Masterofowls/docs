@@ -1,0 +1,77 @@
+# React Testing Library
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Testing Library tests React the way users interact: roles, labels, text — not implementation details. Pair with Jest + `jsdom` and `@testing-library/jest-dom`.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `render` | Mount component |
+| `screen` | Queries on document |
+| `userEvent` | Realistic interactions |
+| `waitFor` / `findBy*` | Async UI |
+| `within` | Scope queries |
+
+Prefer `getByRole` → `getByLabelText` → `getByText` → `getByTestId`.
+
+## 💡 Examples
+
+**Install:**
+
+```bash
+npm i -D @testing-library/react @testing-library/jest-dom @testing-library/user-event jest-environment-jsdom
+```
+
+```js
+// jest.setup.js
+import '@testing-library/jest-dom';
+```
+
+**Component test:**
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Login } from './Login';
+
+test('submits email', async () => {
+  const user = userEvent.setup();
+  const onSubmit = jest.fn();
+  render(<Login onSubmit={onSubmit} />);
+
+  await user.type(screen.getByLabelText(/email/i), 'ada@ex.com');
+  await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+  expect(onSubmit).toHaveBeenCalledWith({ email: 'ada@ex.com' });
+});
+```
+
+**Async:**
+
+```tsx
+expect(await screen.findByText(/welcome/i)).toBeInTheDocument();
+await waitFor(() => expect(mock).toHaveBeenCalled());
+```
+
+## ⚠️ Pitfalls
+
+- Querying by className / enzyme-style selectors.
+- Forgetting `userEvent.setup()` with fake timers.
+- Not wrapping state updates that warn about act — usually fixed by `findBy`/`await user`.
+- Snapshotting entire `container.innerHTML` instead of behavior asserts.
+- Using `getBy*` for elements that appear asynchronously — use `findBy*`.
+
+## 🔗 Related
+
+- [Matchers](matchers.md)
+- [Async](async.md)
+- [Setup & teardown](setup_teardown.md)
+- [Config](config.md)
+- [Timers](timers.md)
+- [Snapshots](snapshots.md)

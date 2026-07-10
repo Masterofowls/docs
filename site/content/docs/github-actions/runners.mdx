@@ -1,0 +1,80 @@
+---
+title: Runners
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Runners
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Runners execute jobs. GitHub-hosted runners (`ubuntu-latest`, `windows-latest`, `macos-latest`) are ephemeral VMs. Self-hosted runners persist on your hardware—isolate them carefully. Labels select where a job lands.
+
+## 🔧 Core concepts
+
+| Label | Notes |
+| --- | --- |
+| `ubuntu-latest` | Default Linux; version floats |
+| `ubuntu-24.04` / `22.04` | Pin OS image |
+| `windows-latest` | PowerShell default shell |
+| `macos-latest` | Scarcer / costlier |
+| `[self-hosted, linux, x64]` | Custom labels |
+
+| Topic | Detail |
+| --- | --- |
+| Tool cache | Preinstalled SDKs on hosted images |
+| Specs | CPU/RAM vary by label (larger runners available) |
+| Networking | Outbound internet; inbound limited |
+| Ephemeral | Hosted disk resets each job |
+
+Image software lists live in `actions/runner-images`.
+
+## 💡 Examples
+
+**Hosted job:**
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: lsb_release -a
+      - run: node -v || true
+```
+
+**Self-hosted:**
+
+```yaml
+jobs:
+  build:
+    runs-on: [self-hosted, linux, gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./build.sh
+```
+
+**Larger runners (org feature):**
+
+```yaml
+runs-on: ubuntu-latest-4-cores
+```
+
+## ⚠️ Pitfalls
+
+- `*-latest` moves—pin versions for reproducibility when it matters.
+- Self-hosted runners can retain secrets/workspace—use ephemeral runners or strict cleanup.
+- Never attach self-hosted runners to public repos without hardening (fork PR risk).
+- macOS minutes cost more—use only when required.
+- Custom container jobs (`container:`) change the environment vs bare VM.
+- Software may be missing—use setup actions instead of assuming host tools.
+
+## 🔗 Related
+
+- [jobs_steps.md](./jobs_steps)
+- [docker.md](./docker)
+- [matrix.md](./matrix)
+- [setup_node.md](./setup_node)
+- [setup_python.md](./setup_python)

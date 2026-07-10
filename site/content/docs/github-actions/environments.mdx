@@ -1,0 +1,80 @@
+---
+title: Environments
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Environments
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Environments (`environment: production`) gate deployments with protection rules: required reviewers, wait timers, and branch restrictions. Each environment can hold dedicated secrets and variables. Use them to separate staging and production credentials.
+
+## 🔧 Core concepts
+
+| Feature | Role |
+| --- | --- |
+| `environment:` | Bind job to named env |
+| `environment.name` / `url` | Name + deployment URL |
+| Protection rules | Approvals, wait timer |
+| Deployment branches | Limit which refs can deploy |
+| Env secrets/vars | Scoped credentials |
+| Deployment history | Visible in repo UI |
+
+Environments are configured in repo **Settings → Environments**. Public repos have limitations on private env secrets for forks.
+
+## 💡 Examples
+
+**Simple environment:**
+
+```yaml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://example.com
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./deploy.sh
+        env:
+          TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+```
+
+**Dynamic name:**
+
+```yaml
+environment: ${{ inputs.target }}
+```
+
+**With concurrency:**
+
+```yaml
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    environment: production
+    …
+```
+
+## ⚠️ Pitfalls
+
+- Job waits indefinitely for approval—communicate SLAs to reviewers.
+- Environment secrets aren’t available until the job is approved (by design).
+- Misnamed environments create new empty envs silently—match Settings names.
+- Protection rules don’t replace proper authz in your deploy scripts.
+- `url` is informational for the UI; it doesn’t verify the deployment.
+- Combining matrix + environment can create many deployment records—name carefully.
+
+## 🔗 Related
+
+- [secrets_env.md](./secrets_env)
+- [permissions.md](./permissions)
+- [events_triggers.md](./events_triggers)
+- [jobs_steps.md](./jobs_steps)
+- [github_pages.md](./github_pages)

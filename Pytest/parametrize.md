@@ -1,0 +1,91 @@
+# Parametrize
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`@pytest.mark.parametrize` runs one test body with many inputs. Combine with fixture params and `pytest.param` for ids, marks, and expected exceptions.
+
+## 🔧 Core concepts
+
+| Form | Use |
+| --- | --- |
+| `@pytest.mark.parametrize` | Table-driven tests |
+| `ids=` | Readable node ids |
+| `pytest.param(..., marks=)` | Per-row marks |
+| Indirect parametrization | Feed fixtures |
+| Stacked parametrize | Cartesian product |
+
+## 💡 Examples
+
+**Simple table:**
+
+```python
+import pytest
+
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (1, 1, 2),
+        (2, 3, 5),
+        (-1, 1, 0),
+    ],
+)
+def test_add(a, b, expected):
+    assert a + b == expected
+```
+
+**Ids & marks:**
+
+```python
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(1, id="one"),
+        pytest.param(0, marks=pytest.mark.xfail(reason="zero")),
+        pytest.param(-1, marks=pytest.mark.skip(reason="neg")),
+    ],
+)
+def test_value(value):
+    assert value > 0
+```
+
+**Indirect:**
+
+```python
+@pytest.fixture
+def user(request):
+    return User(role=request.param)
+
+@pytest.mark.parametrize("user", ["admin", "guest"], indirect=True)
+def test_access(user):
+    assert user.role in {"admin", "guest"}
+```
+
+**Cartesian:**
+
+```python
+@pytest.mark.parametrize("x", [1, 2])
+@pytest.mark.parametrize("y", ["a", "b"])
+def test_grid(x, y):
+    assert f"{x}{y}"
+```
+
+## ⚠️ Pitfalls
+
+- Huge cartesian products exploding CI time.
+- Unhashable / huge objects as params — use factories/ids.
+- Duplicate ids causing confusion in reports.
+- Putting setup logic in params instead of fixtures.
+- Over-parametrizing when a property-based test fits better.
+
+## 🔗 Related
+
+- [Fixtures](fixtures.md)
+- [Markers](markers.md)
+- [Asserts](asserts.md)
+- [CLI](cli.md)
+- [conftest](conftest.md)
+- [xdist](xdist.md)

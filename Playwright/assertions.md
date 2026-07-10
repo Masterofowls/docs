@@ -1,0 +1,85 @@
+# Assertions
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Playwright's `expect` auto-retries until the condition passes or timeout. Prefer web-first assertions (`toBeVisible`, `toHaveURL`) over manual polling.
+
+## 🔧 Core concepts
+
+| Assertion | Checks |
+| --- | --- |
+| `toBeVisible` / `toBeHidden` | Visibility |
+| `toBeEnabled` / `toBeDisabled` | Interactability |
+| `toHaveText` / `toContainText` | Text content |
+| `toHaveValue` | Input value |
+| `toHaveAttribute` | Attribute |
+| `toHaveCount` | Locator match count |
+| `toHaveURL` / `toHaveTitle` | Navigation |
+| `toHaveScreenshot` | Visual baseline |
+
+Soft assertions: `expect.soft` continues after failure within the test.
+
+## 💡 Examples
+
+**Element state:**
+
+```ts
+import { test, expect } from '@playwright/test';
+
+await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+await expect(page.getByText('Saved')).toBeVisible();
+await expect(page.getByLabel('Name')).toHaveValue('Ada');
+await expect(page.getByRole('listitem')).toHaveCount(3);
+```
+
+**Page-level:**
+
+```ts
+await expect(page).toHaveURL(/\/dashboard/);
+await expect(page).toHaveTitle(/Dashboard/);
+await expect(page.getByRole('alert')).toContainText('success');
+```
+
+**Custom timeout / soft:**
+
+```ts
+await expect(page.getByText('Ready')).toBeVisible({ timeout: 15_000 });
+await expect.soft(page.getByTestId('a')).toBeVisible();
+await expect.soft(page.getByTestId('b')).toBeVisible();
+// test fails at end if any soft failed
+```
+
+**API response:**
+
+```ts
+const res = await request.get('/api/health');
+expect(res.ok()).toBeTruthy();
+expect(await res.json()).toMatchObject({ status: 'up' });
+```
+
+**Negation:**
+
+```ts
+await expect(page.getByText('Error')).not.toBeVisible();
+```
+
+## ⚠️ Pitfalls
+
+- Using Node `assert` or Jest `expect` without auto-wait.
+- Asserting immediately after click without waiting for navigation/network.
+- Overly strict full-string `toHaveText` when UI adds whitespace/icons.
+- Screenshot assertions without stable fonts/animations (see visual comparisons).
+- Swallowing failures with try/catch around `expect`.
+
+## 🔗 Related
+
+- [Locators](locators.md)
+- [Actions](actions.md)
+- [Visual comparisons](visual_comparisons.md)
+- [API testing](api_testing.md)
+- [Network](network.md)
+- [Tracing](tracing.md)

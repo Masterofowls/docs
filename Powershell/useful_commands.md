@@ -1,0 +1,74 @@
+# Useful Commands
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A compact toolkit of high-frequency PowerShell commands for files, processes, networking, and discovery. Prefer cmdlets in scripts; aliases are fine interactively. PowerShell 7+ (`pwsh`) is recommended for cross-platform work.
+
+## 🔧 Core concepts
+
+| Area | Go-to cmdlets |
+| --- | --- |
+| Files | `Get-ChildItem`, `Copy-Item`, `Move-Item`, `Remove-Item`, `Get-Content`, `Set-Content` |
+| Search | `Select-String`, `Where-Object` |
+| Process | `Get-Process`, `Stop-Process`, `Start-Process` |
+| Net | `Test-Connection`, `Test-NetConnection`, `Invoke-WebRequest` |
+| System | `Get-Service`, `Get-ComputerInfo` (Win) |
+| Help | `Get-Help`, `Get-Command`, `Get-Member` |
+| Path | `Join-Path`, `Resolve-Path`, `Split-Path`, `Test-Path` |
+
+Operators: `-replace`, `-split`, `-join`, redirection `>`, `>>`, `2>`, `*>`.
+
+## 💡 Examples
+
+**Files and search:**
+
+```powershell
+Get-ChildItem -Recurse -Filter *.md |
+  Select-String -Pattern 'TODO' |
+  Select-Object Path, LineNumber, Line
+
+Get-Content .\app.log -Tail 50 -Wait
+```
+
+**Processes and ports (Win):**
+
+```powershell
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 10
+Test-NetConnection example.com -Port 443
+Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess
+```
+
+**Quick JSON / clipboard (Win):**
+
+```powershell
+Invoke-RestMethod https://api.github.com/zen
+Set-Clipboard (Get-Location).Path
+```
+
+**Discovery:**
+
+```powershell
+Get-Command *Item*
+Get-Help about_Operators
+```
+
+## ⚠️ Pitfalls
+
+- `rm`, `ls`, `cat` are aliases—behavior differs from GNU tools.
+- `Remove-Item -Recurse` without `-Force` may prompt; in PS 5.1 `-Recurse` quirks exist—test first.
+- `curl` alias confusion on Windows PowerShell 5.1.
+- Prefer `-LiteralPath` when names contain `[` wildcards.
+- Admin-required cmdlets fail silently or access-denied—check elevation.
+- Don’t use `Write-Host` when you need pipeline data.
+
+## 🔗 Related
+
+- [cmdlets.md](./cmdlets.md)
+- [pipeline.md](./pipeline.md)
+- [json_csv.md](./json_csv.md)
+- [rest_api.md](./rest_api.md)
+- [vs_bash.md](./vs_bash.md)

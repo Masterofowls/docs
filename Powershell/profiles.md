@@ -1,0 +1,69 @@
+# Profiles
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A profile is a script that runs when a host starts. Use it for aliases, prompt customization, and module imports—keep it fast and idempotent. Different hosts (Console, VS Code, ISE) have separate profile paths.
+
+## 🔧 Core concepts
+
+| Variable / cmdlet | Role |
+| --- | --- |
+| `$PROFILE` | Current host current user path |
+| `$PROFILE.AllUsersAllHosts` | All users, all hosts |
+| `$PROFILE.CurrentUserAllHosts` | Your user, all hosts |
+| `Test-Path $PROFILE` | Exists? |
+| `New-Item $PROFILE -Force` | Create |
+| `notepad $PROFILE` / `code $PROFILE` | Edit |
+
+Hosts: Windows PowerShell vs PowerShell 7 have different profile locations. Prefer `CurrentUserAllHosts` for shared settings across VS Code and terminal.
+
+## 💡 Examples
+
+**Create and open:**
+
+```powershell
+if (-not (Test-Path -Path $PROFILE)) {
+  New-Item -Path $PROFILE -ItemType File -Force
+}
+ise $PROFILE   # or: code $PROFILE
+```
+
+**Lean profile sketch:**
+
+```powershell
+# $PROFILE.CurrentUserAllHosts
+$ErrorActionPreference = 'Continue'
+Set-PSReadLineOption -EditMode Windows
+function prompt {
+  "PS $($executionContext.SessionState.Path.CurrentLocation)> "
+}
+Import-Module posh-git -ErrorAction SilentlyContinue
+```
+
+**Measure startup cost:**
+
+```powershell
+Measure-Command { pwsh -NoLogo -Command exit }
+Measure-Command { . $PROFILE }
+```
+
+## ⚠️ Pitfalls
+
+- Heavy imports in the profile slow every shell—lazy-load or use modules on demand.
+- Don’t put secrets in profiles; use SecretManagement / env vars.
+- Editing the wrong `$PROFILE` host path leads to “changes not applying”.
+- `-NoProfile` in automation skips profiles—scripts should not rely on them.
+- Syntax errors in a profile can break interactive sessions—keep a backup.
+- Avoid changing global machine state from a user profile.
+
+## 🔗 Related
+
+- [modules.md](./modules.md)
+- [execution_policy.md](./execution_policy.md)
+- [scripting.md](./scripting.md)
+- [useful_commands.md](./useful_commands.md)
+- [variables.md](./variables.md)

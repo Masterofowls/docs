@@ -1,0 +1,83 @@
+---
+title: Setup Node
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Setup Node
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`actions/setup-node` installs a Node.js version, optionally adds registry auth, and can cache npm/yarn/pnpm dependencies. Pair with `npm ci` for reproducible CI installs.
+
+## 🔧 Core concepts
+
+| Input | Role |
+| --- | --- |
+| `node-version` | e.g. `22`, `22.11.0`, `lts/*` |
+| `node-version-file` | `.nvmrc` / `.node-version` / `package.json` |
+| `cache` | `npm` / `yarn` / `pnpm` |
+| `cache-dependency-path` | Lockfile path(s) |
+| `registry-url` | Scoped registry |
+| `scope` | npm scope for auth |
+
+Matrix Node versions to catch compatibility issues. Prefer lockfiles committed to the repo.
+
+## 💡 Examples
+
+**npm CI:**
+
+```yaml
+- uses: actions/checkout@v4
+- uses: actions/setup-node@v4
+  with:
+    node-version-file: '.nvmrc'
+    cache: npm
+- run: npm ci
+- run: npm test
+```
+
+**Matrix:**
+
+```yaml
+strategy:
+  matrix:
+    node: [20, 22]
+steps:
+  - uses: actions/setup-node@v4
+    with:
+      node-version: ${{ matrix.node }}
+      cache: npm
+```
+
+**Publish with auth:**
+
+```yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version: 22
+    registry-url: 'https://registry.npmjs.org'
+- run: npm publish
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+## ⚠️ Pitfalls
+
+- `npm install` mutates lockfiles—use `npm ci` in CI.
+- Cache key misses when lockfile path is wrong (monorepos need `cache-dependency-path`).
+- pnpm/yarn need their own install steps and often `packageManager` / corepack.
+- Global tools installed in one job aren’t in another—reinstall or use artifacts.
+- Windows path lengths / script shells differ—test matrix cells.
+- Don’t commit `.npmrc` with tokens; inject via env/secrets.
+
+## 🔗 Related
+
+- [setup_python.md](./setup_python)
+- [caching.md](./caching)
+- [matrix.md](./matrix)
+- [checkout.md](./checkout)
+- [secrets_env.md](./secrets_env)

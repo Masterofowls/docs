@@ -1,0 +1,99 @@
+---
+title: Page Object
+description: Playwright · Reference cheat sheet
+---
+
+# Page Object
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Page Object Model (POM) wraps locators and flows in classes/modules so specs stay readable. Prefer composition and fixtures over deep inheritance.
+
+## 🔧 Core concepts
+
+| Piece | Responsibility |
+| --- | --- |
+| Page class | Locators + actions for one screen |
+| Component | Reusable widget (nav, dialog) |
+| Fixture | Construct POM with `page` |
+| Spec | Arrange / act / assert only |
+
+Keep assertions in tests (or thin expect helpers), not buried only inside pages.
+
+## 💡 Examples
+
+**Page class:**
+
+```ts
+import { type Page, type Locator } from '@playwright/test';
+
+export class LoginPage {
+  readonly email: Locator;
+  readonly password: Locator;
+  readonly submit: Locator;
+
+  constructor(private readonly page: Page) {
+    this.email = page.getByLabel('Email');
+    this.password = page.getByLabel('Password');
+    this.submit = page.getByRole('button', { name: 'Sign in' });
+  }
+
+  async goto() {
+    await this.page.goto('/login');
+  }
+
+  async login(email: string, password: string) {
+    await this.email.fill(email);
+    await this.password.fill(password);
+    await this.submit.click();
+  }
+}
+```
+
+**Fixture wiring:**
+
+```ts
+export const test = base.extend<{ loginPage: LoginPage }>({
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
+});
+
+test('signs in', async ({ loginPage, page }) => {
+  await loginPage.goto();
+  await loginPage.login('ada@ex.com', 'secret');
+  await expect(page).toHaveURL(/home/);
+});
+```
+
+**Component example:**
+
+```ts
+export class Nav {
+  constructor(private page: Page) {}
+  link(name: string) {
+    return this.page.getByRole('navigation').getByRole('link', { name });
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- God-objects with every selector in the app.
+- Returning raw CSS strings instead of Locators.
+- Duplicating waits inside every method — trust locator auto-wait.
+- Assertions-only pages that hide failures from the report title.
+- Over-abstracting one-off screens used by a single test.
+
+## 🔗 Related
+
+- [Fixtures](fixtures)
+- [Locators](locators)
+- [Actions](actions)
+- [Authentication](authentication)
+- [Assertions](assertions)
+- [Codegen](codegen)

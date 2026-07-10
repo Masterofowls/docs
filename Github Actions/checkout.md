@@ -1,0 +1,79 @@
+# Checkout
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`actions/checkout` clones your repository into the runner workspace. It is usually the first step. Configure depth, ref, submodules, and credentials for push or private dependencies.
+
+## 🔧 Core concepts
+
+| Input | Role |
+| --- | --- |
+| `ref` | Branch, tag, or SHA |
+| `fetch-depth` | `0` = full history; `1` default shallow |
+| `submodules` | `true` / `recursive` |
+| `token` | PAT or `GITHUB_TOKEN` |
+| `persist-credentials` | Leave creds for later git ops |
+| `path` | Clone into subdirectory |
+| `lfs` | Fetch Git LFS files |
+
+Default checkout uses the triggering commit SHA for most events. For PRs, it checks out the merge commit unless configured otherwise.
+
+## 💡 Examples
+
+**Standard:**
+
+```yaml
+- uses: actions/checkout@v4
+```
+
+**Full history + tags (changelogs):**
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+    fetch-tags: true
+```
+
+**Push commits back:**
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    token: ${{ secrets.GH_PAT }}
+    persist-credentials: true
+- run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    # … commit …
+    git push
+```
+
+**Subdirectory:**
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    path: app
+```
+
+## ⚠️ Pitfalls
+
+- Shallow clones break `git describe` / some version tools—raise `fetch-depth`.
+- `persist-credentials: true` + write token can allow unexpected pushes.
+- Private submodules need a token with access.
+- `pull_request_target` + checkout of PR head is a classic secret-exfiltration risk.
+- LFS failures are silent if not enabled—set `lfs: true` when needed.
+- Multiple checkouts need distinct `path` values.
+
+## 🔗 Related
+
+- [permissions.md](./permissions.md)
+- [jobs_steps.md](./jobs_steps.md)
+- [secrets_env.md](./secrets_env.md)
+- [composite_actions.md](./composite_actions.md)
+- [events_triggers.md](./events_triggers.md)

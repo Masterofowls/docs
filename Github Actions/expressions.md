@@ -1,0 +1,71 @@
+# Expressions
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Expressions (`${{ }}`) evaluate values for `if`, `env`, `with`, and names. Contexts expose github metadata, secrets, vars, matrix, needs, and steps outputs. Functions like `contains`, `hashFiles`, and `success()` power conditionals.
+
+## 🔧 Core concepts
+
+| Context | Contents |
+| --- | --- |
+| `github` | Event, ref, sha, actor, repository |
+| `env` | Environment variables |
+| `secrets` / `vars` | Config |
+| `matrix` | Strategy values |
+| `needs` | Upstream job results/outputs |
+| `steps` | Step outputs |
+| `runner` | OS, arch, temp |
+| `inputs` | `workflow_dispatch` / `workflow_call` |
+
+Common functions: `success()`, `failure()`, `cancelled()`, `always()`, `contains()`, `startsWith()`, `format()`, `toJSON()`, `hashFiles()`, `fromJSON()`.
+
+## 💡 Examples
+
+**Conditionals:**
+
+```yaml
+if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+if: failure()
+if: always() && needs.build.result == 'success'
+```
+
+**hashFiles + format:**
+
+```yaml
+key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+name: Build ${{ format('{0} ({1})', matrix.os, matrix.node) }}
+```
+
+**FromJSON for dynamic matrices:**
+
+```yaml
+strategy:
+  matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+```
+
+**Step output consumption:**
+
+```yaml
+if: steps.changes.outputs.app == 'true'
+```
+
+## ⚠️ Pitfalls
+
+- Inside `if:`, the `${{ }}` wrapper is optional but mixing quotes is error-prone.
+- Secrets are not available in some contexts (e.g. `hashFiles` inputs)—don’t try to hash secrets.
+- `github.head_ref` is empty outside PRs—guard with event checks.
+- Boolean strings: `'false'` is truthy as a non-empty string—compare carefully.
+- `hashFiles` returns empty if no match—keys may collide unexpectedly.
+- Multi-line expressions and YAML parsing—prefer single-line `if` when possible.
+
+## 🔗 Related
+
+- [jobs_steps.md](./jobs_steps.md)
+- [matrix.md](./matrix.md)
+- [secrets_env.md](./secrets_env.md)
+- [workflow_syntax.md](./workflow_syntax.md)
+- [events_triggers.md](./events_triggers.md)

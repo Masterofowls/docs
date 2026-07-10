@@ -1,0 +1,89 @@
+---
+title: CLI
+description: Pytest · Reference cheat sheet
+---
+
+# CLI
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The pytest CLI selects tests, controls verbosity, stops on failure, and passes plugin options. Learn a small set of flags for daily use and CI.
+
+## 🔧 Core concepts
+
+| Flag | Purpose |
+| --- | --- |
+| `-q` / `-v` | Quiet / verbose |
+| `-x` | Stop on first failure |
+| `--lf` / `--ff` | Last failed / failed first |
+| `-k EXPR` | Name expression |
+| `-m EXPR` | Mark expression |
+| `-s` | No capture (show print) |
+| `--pdb` | Drop into debugger |
+| `--maxfail=N` | Stop after N failures |
+| `-n` | xdist workers |
+
+Node id: `path/test_file.py::TestClass::test_name`.
+
+## 💡 Examples
+
+**Selection:**
+
+```shellscript
+pytest tests/test_api.py
+pytest tests/test_api.py::test_health
+pytest -k "user and not slow"
+pytest -m "not integration"
+```
+
+**Debugging:**
+
+```shellscript
+pytest -x --pdb
+pytest --lf
+pytest -vv -s
+pytest --trace   # break at start of each test
+```
+
+**Output & reports:**
+
+```shellscript
+pytest -ra
+pytest --tb=short
+pytest --junitxml=report.xml
+```
+
+**Useful combos:**
+
+```shellscript
+pytest -q --cov=myapp --cov-report=term-missing
+pytest -n auto -m "not slow"
+pytest --durations=10
+```
+
+**Collect only:**
+
+```shellscript
+pytest --collect-only -q
+```
+
+## ⚠️ Pitfalls
+
+- `-s` flooding CI logs.
+- Overusing `-k` strings that silently match nothing useful.
+- Forgetting quotes around mark expressions in shells.
+- Running from the wrong cwd so `testpaths` miss files.
+- Passing pytest args after `--` incorrectly in some wrappers.
+
+## 🔗 Related
+
+- [Configuration](configuration)
+- [Markers](markers)
+- [Coverage](coverage)
+- [xdist](xdist)
+- [Install](install)
+- [Asserts](asserts)

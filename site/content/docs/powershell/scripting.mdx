@@ -1,0 +1,85 @@
+---
+title: Scripting
+description: PowerShell · Reference cheat sheet
+---
+
+# Scripting
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Scripts are `.ps1` files with parameters, comment-based help, and controlled exit codes. Write them like advanced functions: explicit params, `$ErrorActionPreference = 'Stop'` when appropriate, and no dependency on an interactive profile.
+
+## 🔧 Core concepts
+
+| Topic | Practice |
+| --- | --- |
+| Shebang (Unix) | `#!/usr/bin/env pwsh` |
+| Params | `param(...)` at top |
+| `$PSScriptRoot` | Script directory |
+| `$PSCommandPath` | Full script path |
+| Exit | `exit $code` for process status |
+| Requires | `#Requires -Version 7` / `-Modules` |
+| Dot-source | `. .\lib.ps1` imports into current scope |
+| Call operator | `& .\script.ps1` |
+
+Use approved verbs for exported functions; keep scripts focused and testable.
+
+## 💡 Examples
+
+**Parameterized script:**
+
+```powershell
+<#
+.SYNOPSIS
+  Compress a folder.
+#>
+#Requires -Version 7
+param(
+  [Parameter(Mandatory)]
+  [string]$Path,
+  [string]$OutFile = "$PSScriptRoot\out.zip"
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+if (-not (Test-Path -LiteralPath $Path)) {
+  throw "Path not found: $Path"
+}
+Compress-Archive -Path $Path -DestinationPath $OutFile -Force
+Write-Output $OutFile
+```
+
+**Run:**
+
+```powershell
+pwsh -File .\backup.ps1 -Path .\data
+pwsh -NoProfile -File .\backup.ps1 -Path .\data
+```
+
+**Shared library:**
+
+```powershell
+. "$PSScriptRoot\lib\helpers.ps1"
+```
+
+## ⚠️ Pitfalls
+
+- Execution policy may block scripts—see [execution_policy.md](./execution_policy).
+- Dot-sourcing mutates caller scope; prefer modules for libraries.
+- Relative paths depend on the **caller's** location unless you use `$PSScriptRoot`.
+- Mixing Windows PowerShell 5.1 and PS 7 syntax breaks portability—declare `#Requires`.
+- Interactive prompts (`Read-Host`) fail in CI—require parameters instead.
+- Don’t assume aliases from your profile exist in automation.
+
+## 🔗 Related
+
+- [functions.md](./functions)
+- [error_handling.md](./error_handling)
+- [execution_policy.md](./execution_policy)
+- [modules.md](./modules)
+- [profiles.md](./profiles)

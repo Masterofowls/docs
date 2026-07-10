@@ -1,0 +1,25 @@
+{
+  "title": "Pytest",
+  "description": "Python testing framework",
+  "icon": "Beaker",
+  "root": true,
+  "pages": [
+    "index",
+    "asserts",
+    "asyncio-pytest",
+    "capsys-caplog",
+    "cli",
+    "configuration",
+    "conftest",
+    "coverage",
+    "django-pytest",
+    "fixtures",
+    "install",
+    "markers",
+    "mocking",
+    "parametrize",
+    "plugins",
+    "tmp-path",
+    "xdist"
+  ]
+}

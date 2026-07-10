@@ -1,0 +1,76 @@
+# Coverage
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Jest ships coverage via Istanbul/V8 providers. Collect with `--coverage`, set thresholds, and emit HTML/LCOV for CI.
+
+## 🔧 Core concepts
+
+| Option | Role |
+| --- | --- |
+| `--coverage` | Enable |
+| `collectCoverageFrom` | Include globs |
+| `coverageThreshold` | Fail under % |
+| `coverageProvider` | `babel` \| `v8` |
+| `coverageReporters` | html, text, lcov |
+
+Ignore generated files and stories in `coveragePathIgnorePatterns`.
+
+## 💡 Examples
+
+**CLI:**
+
+```bash
+npx jest --coverage
+npx jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'
+```
+
+**Config thresholds:**
+
+```js
+module.exports = {
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.stories.*',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+  coverageReporters: ['text', 'lcov', 'html'],
+};
+```
+
+**CI:**
+
+```bash
+npx jest --ci --coverage --maxWorkers=2
+```
+
+Open `coverage/lcov-report/index.html` locally.
+
+## ⚠️ Pitfalls
+
+- Inflated coverage from trivial barrel files.
+- V8 vs babel provider differences on ignored lines.
+- Thresholds on empty suites passing vacuously.
+- Not gitignoring `coverage/`.
+- Collecting from `dist/` instead of `src/`.
+
+## 🔗 Related
+
+- [Config](config.md)
+- [Watch mode](watch_mode.md)
+- [Install](install.md)
+- [TypeScript](typescript.md)
+- [Setup & teardown](setup_teardown.md)
+- [Migration to Vitest](migration_vitest.md)

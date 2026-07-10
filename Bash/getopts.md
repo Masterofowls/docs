@@ -1,0 +1,78 @@
+# getopts
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`getopts` parses single-letter command-line options in a portable way. It handles clustered flags (`-abc`), optional/required arguments, and error reporting. For long options (`--verbose`), use a manual loop or external tools—not plain `getopts`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `getopts optstring name` | Parse next option into `name` |
+| `optstring` | Letters; append `:` if option requires an argument |
+| Leading `:` in optstring | Silent error mode (`?` / `:` in name) |
+| `$OPTARG` | Argument value or bad option letter |
+| `$OPTIND` | Next argv index to process |
+| `--` | End of options (caller convention) |
+
+After the loop, remaining operands are `"$@"` shifted with `shift $((OPTIND - 1))`.
+
+## 💡 Examples
+
+**Classic flags:**
+
+```bash
+#!/usr/bin/env bash
+verbose=0
+file=""
+
+while getopts ':vf:' opt; do
+  case "$opt" in
+    v) verbose=1 ;;
+    f) file="$OPTARG" ;;
+    :) echo "option -$OPTARG requires an argument" >&2; exit 2 ;;
+    ?) echo "unknown option -$OPTARG" >&2; exit 2 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+echo "verbose=$verbose file=$file args: $*"
+```
+
+**Usage pattern:**
+
+```bash
+usage() {
+  cat <<'EOF' >&2
+usage: tool [-v] [-f file] [args...]
+EOF
+  exit 2
+}
+```
+
+**Reset for reuse (functions):**
+
+```bash
+OPTIND=1
+```
+
+## ⚠️ Pitfalls
+
+- `getopts` does not parse `--long` options.
+- Missing required args: with silent mode, `opt` is `:` and `OPTARG` is the option letter.
+- Forgetting `shift $((OPTIND - 1))` leaves flags in `"$@"`.
+- `OPTIND` is global—reset when calling `getopts` multiple times.
+- Option arguments starting with `-` are still accepted as `OPTARG`.
+- Prefer `getopts` over hand-rolled `$#` loops for short options.
+
+## 🔗 Related
+
+- [functions.md](./functions.md)
+- [variables.md](./variables.md)
+- [scripts_best_practices.md](./scripts_best_practices.md)
+- [conditionals.md](./conditionals.md)
+- [exit_codes.md](./exit_codes.md)

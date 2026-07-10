@@ -1,0 +1,80 @@
+---
+title: REST API
+description: PowerShell · Reference cheat sheet
+---
+
+# REST API
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Call HTTP APIs with `Invoke-RestMethod` (JSON → objects) or `Invoke-WebRequest` (full response). PowerShell 7 aligns more closely with modern TLS and HTTP defaults. Pass headers, bodies, and auth securely—never hard-code secrets.
+
+## 🔧 Core concepts
+
+| Cmdlet | Best for |
+| --- | --- |
+| `Invoke-RestMethod` | JSON/XML APIs → objects |
+| `Invoke-WebRequest` | Status, headers, raw content |
+| `-Method` | GET, POST, PUT, PATCH, DELETE |
+| `-Headers` | Auth and content negotiation |
+| `-Body` | String or byte body |
+| `-ContentType` | e.g. `application/json` |
+| `-Authentication` / `-Token` | PS 7+ auth helpers |
+| `-SkipCertificateCheck` | Dev only (PS 7+) |
+
+Use `ConvertTo-Json` for bodies and splatting for readable calls.
+
+## 💡 Examples
+
+**GET / POST JSON:**
+
+```powershell
+$base = 'https://api.example.com'
+$headers = @{ Authorization = "Bearer $env:API_TOKEN" }
+
+Invoke-RestMethod -Uri "$base/v1/users/me" -Headers $headers
+
+$body = @{ name = 'Ada'; active = $true } | ConvertTo-Json
+Invoke-RestMethod -Uri "$base/v1/users" -Method Post `
+  -Headers $headers -ContentType 'application/json' -Body $body
+```
+
+**Splatting + status check:**
+
+```powershell
+$params = @{
+  Uri = "$base/health"
+  Method = 'Get'
+  TimeoutSec = 30
+}
+$r = Invoke-WebRequest @params
+$r.StatusCode
+```
+
+**PS 7 token auth:**
+
+```powershell
+$token = ConvertTo-SecureString $env:API_TOKEN -AsPlainText -Force
+Invoke-RestMethod -Uri $uri -Authentication Bearer -Token $token
+```
+
+## ⚠️ Pitfalls
+
+- Windows PowerShell 5.1 defaults to older TLS—enable TLS 1.2 if needed.
+- `Invoke-RestMethod` throws on many error statuses; catch and read response bodies carefully.
+- Secrets in history/transcripts—prefer env vars or SecretManagement.
+- Proxy and corporate MITM certs break calls—configure correctly, don’t disable validation in prod.
+- Rate limits: respect `Retry-After`; add backoff.
+- Large downloads: prefer `Invoke-WebRequest -OutFile` or `curl`.
+
+## 🔗 Related
+
+- [json_csv.md](./json_csv)
+- [error_handling.md](./error_handling)
+- [variables.md](./variables)
+- [scripting.md](./scripting)
+- [useful_commands.md](./useful_commands)

@@ -1,0 +1,97 @@
+---
+title: Fixtures
+description: Pytest · Reference cheat sheet
+---
+
+# Fixtures
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Fixtures provide setup/teardown via dependency injection. Tests request fixtures by parameter name; scopes control lifetime (`function`, `class`, `module`, `package`, `session`).
+
+## 🔧 Core concepts
+
+| Concept | Meaning |
+| --- | --- |
+| `@pytest.fixture` | Define reusable resource |
+| `yield` | Setup before, teardown after |
+| `scope` | How often to recreate |
+| `autouse` | Apply without requesting |
+| `params` | Parametrized fixture |
+| Fixture factory | Return a creator callable |
+
+Prefer fixtures over setup/teardown methods for composability.
+
+## 💡 Examples
+
+**Basic yield fixture:**
+
+```python
+import pytest
+
+@pytest.fixture
+def db():
+    conn = connect()
+    yield conn
+    conn.close()
+
+def test_query(db):
+    assert db.execute("SELECT 1").fetchone()[0] == 1
+```
+
+**Scopes:**
+
+```python
+@pytest.fixture(scope="session")
+def app():
+    return create_app()
+
+@pytest.fixture(scope="module")
+def client(app):
+    return app.test_client()
+```
+
+**Factory:**
+
+```python
+@pytest.fixture
+def make_user(db):
+    created = []
+    def _make(**kwargs):
+        u = User(**kwargs)
+        db.add(u)
+        created.append(u)
+        return u
+    yield _make
+    for u in created:
+        db.delete(u)
+```
+
+**Autouse:**
+
+```python
+@pytest.fixture(autouse=True)
+def _fast_cache(monkeypatch):
+    monkeypatch.setenv("CACHE_URL", "memory://")
+```
+
+## ⚠️ Pitfalls
+
+- Session-scoped mutable state leaking between tests.
+- Requesting heavy fixtures unnecessarily — keep scopes tight.
+- Using `return` when teardown is needed — use `yield`.
+- Circular fixture dependencies.
+- Overusing `autouse` — hard to see what a test depends on.
+
+## 🔗 Related
+
+- [conftest](conftest)
+- [Parametrize](parametrize)
+- [tmp_path](tmp_path)
+- [capsys & caplog](capsys_caplog)
+- [Mocking](mocking)
+- [Markers](markers)

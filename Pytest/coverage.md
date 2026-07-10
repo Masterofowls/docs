@@ -1,0 +1,69 @@
+# Coverage
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`pytest-cov` integrates coverage.py: measure line/branch coverage, fail under thresholds, and emit terminal/HTML/XML reports for CI.
+
+## 🔧 Core concepts
+
+| Flag | Meaning |
+| --- | --- |
+| `--cov=pkg` | Measure package |
+| `--cov-report=` | term, html, xml |
+| `--cov-fail-under=N` | Exit non-zero if below |
+| `--cov-branch` | Branch coverage |
+| `omit` / `include` | Scope in `.coveragerc` |
+
+Run from project root so paths resolve correctly.
+
+## 💡 Examples
+
+**CLI:**
+
+```bash
+pytest --cov=myapp --cov-report=term-missing
+pytest --cov=myapp --cov-report=html --cov-report=xml
+pytest --cov=myapp --cov-fail-under=85 --cov-branch
+```
+
+**pyproject.toml:**
+
+```toml
+[tool.coverage.run]
+source = ["myapp"]
+branch = true
+omit = ["*/tests/*", "*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 85
+
+[tool.pytest.ini_options]
+addopts = "--cov=myapp --cov-report=term-missing"
+```
+
+**HTML:** open `htmlcov/index.html`.
+
+**CI:** publish `coverage.xml` to Codecov/Sonar; keep thresholds realistic for new projects.
+
+## ⚠️ Pitfalls
+
+- Measuring tests or virtualenv paths — set `source`/`omit`.
+- 100% line coverage with zero meaningful assertions.
+- Combining xdist without `pytest-cov` concurrency support configured.
+- Dynamic imports / `# pragma: no cover` abused to hide gaps.
+- Different coverage between local and CI due to optional extras.
+
+## 🔗 Related
+
+- [Install](install.md)
+- [CLI](cli.md)
+- [Configuration](configuration.md)
+- [xdist](xdist.md)
+- [Plugins](plugins.md)
+- [Asserts](asserts.md)

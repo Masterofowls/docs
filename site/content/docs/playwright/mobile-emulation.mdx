@@ -1,0 +1,88 @@
+---
+title: Mobile Emulation
+description: Playwright · Reference cheat sheet
+---
+
+# Mobile Emulation
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Emulate mobile viewports, touch, user agents, and device scale via `devices` presets or custom `use` options. Real device clouds are separate — this is browser emulation.
+
+## 🔧 Core concepts
+
+| Option | Controls |
+| --- | --- |
+| `devices['iPhone 13']` | Viewport, UA, touch, scale |
+| `viewport` | Width / height |
+| `isMobile` / `hasTouch` | Mobile heuristics / touch |
+| `deviceScaleFactor` | DPR |
+| `geolocation` / `permissions` | Location APIs |
+| `colorScheme` | light / dark |
+
+WebKit project ≈ Safari-like; Chromium ≈ Chrome Android-ish with device UA.
+
+## 💡 Examples
+
+**Project matrix:**
+
+```ts
+import { defineConfig, devices } from '@playwright/test';
+
+projects: [
+  { name: 'Pixel 7', use: { ...devices['Pixel 7'] } },
+  { name: 'iPhone 13', use: { ...devices['iPhone 13'] } },
+  {
+    name: 'iPhone landscape',
+    use: {
+      ...devices['iPhone 13 landscape'],
+    },
+  },
+],
+```
+
+**Custom phone:**
+
+```ts
+use: {
+  viewport: { width: 390, height: 844 },
+  userAgent: 'Mozilla/5.0 ...',
+  isMobile: true,
+  hasTouch: true,
+  deviceScaleFactor: 3,
+},
+```
+
+**Geolocation:**
+
+```ts
+await context.grantPermissions(['geolocation']);
+await context.setGeolocation({ latitude: 51.5, longitude: -0.12 });
+```
+
+**Codegen on device:**
+
+```shellscript
+npx playwright codegen --device="iPhone 13" https://example.com
+```
+
+## ⚠️ Pitfalls
+
+- Emulation ≠ real iOS/Android WebView quirks.
+- Touch gestures differ — use `tap` where needed; hover is desktop-only.
+- Fixed desktop locators failing on collapsed mobile nav.
+- Ignoring safe-area / soft keyboard overlap in screenshots.
+- Running all devices on every PR without sharding — slow CI.
+
+## 🔗 Related
+
+- [Config](config)
+- [Locators](locators)
+- [Screenshots & video](screenshots_video)
+- [Visual comparisons](visual_comparisons)
+- [Codegen](codegen)
+- [Parallel](parallel)

@@ -1,0 +1,87 @@
+---
+title: Docker
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Docker
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+GitHub Actions can build/push images, run jobs inside containers, and use service containers (Postgres, Redis). Authenticate to GHCR or Docker Hub with secrets or `GITHUB_TOKEN`. Keep tags immutable for releases.
+
+## 🔧 Core concepts
+
+| Pattern | Use |
+| --- | --- |
+| `container:` on job | Run all steps in an image |
+| `services:` | Sidecar containers with ports |
+| `docker build` / buildx | Image builds |
+| `docker/login-action` | Registry auth |
+| `docker/build-push-action` | Build + push |
+| GHCR | `ghcr.io/owner/name` |
+
+Job containers still need checkout and careful volume/workspace handling. Services are reachable by hostname = service id.
+
+## 💡 Examples
+
+**Service container:**
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm test
+```
+
+**Build and push GHCR:**
+
+```yaml
+permissions:
+  contents: read
+  packages: write
+steps:
+  - uses: actions/checkout@v4
+  - uses: docker/login-action@v3
+    with:
+      registry: ghcr.io
+      username: ${{ github.actor }}
+      password: ${{ secrets.GITHUB_TOKEN }}
+  - uses: docker/build-push-action@v6
+    with:
+      push: true
+      tags: ghcr.io/${{ github.repository }}:latest
+```
+
+## ⚠️ Pitfalls
+
+- `localhost` from a **job container** to a service may need the service name, not localhost—topology differs.
+- Layer caching needs explicit buildx cache config.
+- Publishing `:latest` only is fragile—also tag SHAs/versions.
+- Rootless / permission issues writing workspace files from containers.
+- Don’t bake secrets into images; use runtime env.
+- Windows containers are a separate ecosystem from Linux images.
+
+## 🔗 Related
+
+- [runners.md](./runners)
+- [jobs_steps.md](./jobs_steps)
+- [secrets_env.md](./secrets_env)
+- [permissions.md](./permissions)
+- [artifacts.md](./artifacts)

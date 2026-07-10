@@ -1,0 +1,80 @@
+# Plugins
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Plugins extend pytest via entry points or local modules. Popular ones cover coverage, Django, asyncio, timeouts, random order, and HTML reports.
+
+## 🔧 Core concepts
+
+| Plugin | Purpose |
+| --- | --- |
+| `pytest-cov` | Coverage |
+| `pytest-xdist` | Parallel |
+| `pytest-asyncio` | Async |
+| `pytest-django` | Django |
+| `pytest-timeout` | Hang protection |
+| `pytest-mock` | `mocker` fixture |
+| `pytest-html` | HTML report |
+
+Local plugins: modules with hooks, loaded via `pytest_plugins` or `-p`.
+
+## 💡 Examples
+
+**Install common set:**
+
+```bash
+python -m pip install pytest-cov pytest-xdist pytest-asyncio pytest-mock
+```
+
+**Minimal local plugin:**
+
+```python
+# tests/plugins/env.py
+def pytest_addoption(parser):
+    parser.addoption("--runslow", action="store_true")
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "slow: slow tests")
+```
+
+```python
+# conftest.py
+pytest_plugins = ["tests.plugins.env"]
+```
+
+**List plugins:**
+
+```bash
+pytest --trace-config
+pytest -p no:cacheprovider
+```
+
+**Entry-point plugin sketch:**
+
+```python
+# myplugin.py
+def pytest_runtest_setup(item):
+    if "network" in item.keywords and not item.config.getoption("--network"):
+        pytest.skip("needs --network")
+```
+
+## ⚠️ Pitfalls
+
+- Plugin version skew with pytest major upgrades.
+- Loading the same plugin twice (entry point + pytest_plugins).
+- Order-dependent plugins mutating collection unexpectedly.
+- Disabling builtin plugins accidentally with `-p no:...`.
+- Heavy plugins imported at collection time slowing startup.
+
+## 🔗 Related
+
+- [Install](install.md)
+- [conftest](conftest.md)
+- [Coverage](coverage.md)
+- [xdist](xdist.md)
+- [asyncio](asyncio_pytest.md)
+- [Mocking](mocking.md)

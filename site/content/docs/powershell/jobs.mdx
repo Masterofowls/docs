@@ -1,0 +1,79 @@
+---
+title: Jobs
+description: PowerShell · Reference cheat sheet
+---
+
+# Jobs
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Jobs run work in the background. Classic jobs (`Start-Job`) use separate processes; thread jobs (`Start-ThreadJob`) are lighter. PowerShell 7 also offers `ForEach-Object -Parallel`. Use jobs for fan-out, long tasks, and remoting aggregation.
+
+## 🔧 Core concepts
+
+| Cmdlet | Role |
+| --- | --- |
+| `Start-Job` | Background process job |
+| `Start-ThreadJob` | Same-process thread (module) |
+| `Get-Job` | List |
+| `Wait-Job` | Block until done |
+| `Receive-Job` | Collect output |
+| `Remove-Job` | Cleanup |
+| `Stop-Job` | Cancel |
+| `Invoke-Command -AsJob` | Remote as job |
+
+Child jobs appear under parent job objects for remoting fan-out. Always `Receive-Job` + `Remove-Job` to avoid leaks.
+
+## 💡 Examples
+
+**Local jobs:**
+
+```powershell
+$j = Start-Job -ScriptBlock {
+  Start-Sleep -Seconds 2
+  Get-Date
+}
+Wait-Job $j | Out-Null
+Receive-Job $j
+Remove-Job $j
+```
+
+**ThreadJob:**
+
+```powershell
+Install-Module ThreadJob -Scope CurrentUser
+$jobs = 1..5 | ForEach-Object {
+  Start-ThreadJob { param($n) Start-Sleep 1; $n * 2 } -ArgumentList $_
+}
+$jobs | Wait-Job | Receive-Job
+$jobs | Remove-Job
+```
+
+**Parallel foreach (PS 7+):**
+
+```powershell
+1..10 | ForEach-Object -Parallel {
+  Invoke-RestMethod "https://httpbin.org/get?n=$_"
+} -ThrottleLimit 4
+```
+
+## ⚠️ Pitfalls
+
+- Jobs don’t share live variables with the parent—pass `-ArgumentList` or `$using:` (remote/parallel).
+- Forgetting `Receive-Job` leaves output buffered and jobs in Completed state forever.
+- `Start-Job` is heavy (new runspace/process)—prefer ThreadJob/parallel for many small tasks.
+- Errors surface when receiving—check job `State` and `ChildJobs`.
+- UI/host-interactive cmdlets fail inside jobs.
+- Remoting jobs need sessions cleaned up (`Remove-PSSession`).
+
+## 🔗 Related
+
+- [remoting.md](./remoting)
+- [loops.md](./loops)
+- [error_handling.md](./error_handling)
+- [scripting.md](./scripting)
+- [pipeline.md](./pipeline)

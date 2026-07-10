@@ -1,0 +1,91 @@
+---
+title: Matchers
+description: Jest · Reference cheat sheet
+---
+
+# Matchers
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`expect(value)` matchers assert equality, truthiness, numbers, strings, collections, and errors. Prefer asymmetric matchers for partial object checks.
+
+## 🔧 Core concepts
+
+| Matcher | Use |
+| --- | --- |
+| `toBe` | Referential / primitives (`Object.is`) |
+| `toEqual` | Deep equality |
+| `toStrictEqual` | Deep + undefined keys |
+| `toMatch` / `toContain` | String / array |
+| `toThrow` | Sync exceptions |
+| `toBeCloseTo` | Floats |
+| `toHaveBeenCalled` | Mocks |
+
+Chain `.not`, `.resolves`, `.rejects`.
+
+## 💡 Examples
+
+**Equality:**
+
+```js
+expect(1 + 1).toBe(2);
+expect({ a: 1 }).toEqual({ a: 1 });
+expect({ a: 1 }).toStrictEqual({ a: 1 });
+```
+
+**Truthiness & numbers:**
+
+```js
+expect(x).toBeTruthy();
+expect(x).toBeNull();
+expect(x).toBeUndefined();
+expect(0.1 + 0.2).toBeCloseTo(0.3);
+expect(score).toBeGreaterThan(10);
+```
+
+**Collections & strings:**
+
+```js
+expect(['a', 'b']).toContain('a');
+expect('hello').toMatch(/ell/);
+expect({ a: 1, b: 2 }).toMatchObject({ a: 1 });
+expect([{ id: 1 }]).toContainEqual({ id: 1 });
+```
+
+**Asymmetric:**
+
+```js
+expect(user).toEqual({
+  id: expect.any(Number),
+  email: expect.stringMatching(/@/),
+  meta: expect.objectContaining({ role: 'admin' }),
+});
+```
+
+**Errors:**
+
+```js
+expect(() => parse('')).toThrow(Error);
+expect(() => parse('')).toThrow(/empty/);
+```
+
+## ⚠️ Pitfalls
+
+- `toBe` on objects compares references — use `toEqual`.
+- Floating point with `toBe` — use `toBeCloseTo`.
+- `toThrow` needs a wrapped function, not a thrown call.
+- Over-specific snapshots instead of focused matchers.
+- Forgetting `await expect(...).resolves` for promises.
+
+## 🔗 Related
+
+- [Async](async)
+- [Mocks](mocks)
+- [Custom matchers](custom_matchers)
+- [Snapshots](snapshots)
+- [Spies](spies)
+- [Install](install)

@@ -1,0 +1,83 @@
+---
+title: Install
+description: Pytest · Reference cheat sheet
+---
+
+# Install
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+pytest is the standard Python test runner: discovery, fixtures, asserts, plugins. Install into a venv; optional extras cover coverage, Django, asyncio, and xdist.
+
+## 🔧 Core concepts
+
+| Package | Role |
+| --- | --- |
+| `pytest` | Core runner |
+| `pytest-cov` | Coverage |
+| `pytest-xdist` | Parallel |
+| `pytest-asyncio` | Async tests |
+| `pytest-django` | Django integration |
+
+Discovery: `test_*.py`, `*_test.py`, `Test*` classes, `test_*` functions.
+
+## 💡 Examples
+
+**Install:**
+
+```shellscript
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -U pip
+python -m pip install pytest pytest-cov
+```
+
+**Minimal test:**
+
+```python
+# tests/test_math.py
+def test_add():
+    assert 1 + 1 == 2
+```
+
+**Run:**
+
+```shellscript
+pytest
+pytest -q
+pytest tests/test_math.py::test_add
+pytest -k "add and not slow"
+```
+
+**pyproject.toml:**
+
+```toml
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov>=5.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+```
+
+## ⚠️ Pitfalls
+
+- Running system `pytest` outside the venv → wrong packages.
+- Putting tests next to app without `pythonpath` / src layout.
+- Naming files `test.py` only — discovery still works but prefer packages.
+- Mixing unittest discovery expectations with pytest layout.
+- Forgetting `__init__.py` when import paths need packages (often optional).
+
+## 🔗 Related
+
+- [Configuration](configuration)
+- [CLI](cli)
+- [Fixtures](fixtures)
+- [Plugins](plugins)
+- [Coverage](coverage)
+- [xdist](xdist)

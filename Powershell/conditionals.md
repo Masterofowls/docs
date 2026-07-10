@@ -1,0 +1,79 @@
+# Conditionals
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Branch with `if` / `elseif` / `else`, `switch`, and ternary (`? :` in PowerShell 7+). Comparison operators are letter-based (`-eq`, `-lt`, …) and case-insensitive by default for strings. Use `-match` for regex and `-in` / `-contains` for membership.
+
+## 🔧 Core concepts
+
+| Operator | Meaning |
+| --- | --- |
+| `-eq -ne` | Equal / not equal |
+| `-lt -le -gt -ge` | Ordering |
+| `-like -notlike` | Wildcard |
+| `-match -notmatch` | Regex (`$matches`) |
+| `-in -notin` | Item in collection |
+| `-contains -notcontains` | Collection contains item |
+| `-and -or -not` / `!` | Logic |
+| `switch` | Multi-branch / regex / file |
+
+Null-conditional: `$x?.Prop`. Null-coalescing: `$x ?? 'default'` (PS 7+).
+
+## 💡 Examples
+
+**If / elseif:**
+
+```powershell
+if ($null -eq $path) {
+  throw 'path required'
+} elseif (Test-Path $path -PathType Leaf) {
+  'file'
+} else {
+  'missing or directory'
+}
+```
+
+**Switch:**
+
+```powershell
+switch -Regex ($name) {
+  '^ERROR'   { 'err'; break }
+  '^WARN'    { 'warn'; break }
+  default    { 'info' }
+}
+```
+
+**Ternary and null coalesce (PS 7+):**
+
+```powershell
+$mode = $IsWindows ? 'win' : 'unix'
+$port = $env:PORT ?? '8080'
+```
+
+**Membership:**
+
+```powershell
+if ($ext -in @('.jpg', '.png')) { 'image' }
+if (@(1,2,3) -contains 2) { 'yes' }
+```
+
+## ⚠️ Pitfalls
+
+- Put `$null` on the left: `$null -eq $x` avoids array comparison surprises.
+- `-contains` is for collections on the **left**; `-in` reads more naturally for scalars.
+- String compares are case-insensitive unless you use `-ceq` / `-clike` / `-cmatch`.
+- `if (@())` is false; `if @(0)` is true (non-empty array)—don’t confuse with truthiness of elements.
+- Assignment inside conditions is uncommon; `=` is not comparison—use `-eq`.
+- `switch` falls through without `break` in some modes—be explicit.
+
+## 🔗 Related
+
+- [variables.md](./variables.md)
+- [loops.md](./loops.md)
+- [error_handling.md](./error_handling.md)
+- [pipeline.md](./pipeline.md)
+- [vs_bash.md](./vs_bash.md)

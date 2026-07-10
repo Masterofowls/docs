@@ -1,0 +1,76 @@
+# Mocking
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Isolate units with `monkeypatch`, `unittest.mock`, or `pytest-mock`'s `mocker`. Patch where the name is looked up, not where it is defined.
+
+## 🔧 Core concepts
+
+| Tool | Strength |
+| --- | --- |
+| `monkeypatch` | Built-in, env/attrs/dicts |
+| `mocker` | Convenient MagickMock helpers |
+| `unittest.mock` | patch, Mock, AsyncMock |
+| `respx` / `responses` | HTTP mocking |
+| `freezegun` | Time |
+
+Prefer fakes/fakes over mocks when behavior matters.
+
+## 💡 Examples
+
+**monkeypatch:**
+
+```python
+def test_home(monkeypatch, tmp_path):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setattr("app.service.fetch", lambda: {"ok": True})
+    monkeypatch.delenv("SECRET", raising=False)
+```
+
+**pytest-mock:**
+
+```python
+def test_send(mocker):
+    send = mocker.patch("app.mail.send_email", return_value=True)
+    assert do_invite("a@b.com") is True
+    send.assert_called_once_with("a@b.com")
+```
+
+**unittest.mock:**
+
+```python
+from unittest.mock import patch, MagicMock
+
+@patch("app.db.Session")
+def test_query(Session):
+    Session.return_value.query.return_value = []
+    assert list_users() == []
+```
+
+**Async:**
+
+```python
+async def test_async(mocker):
+    mocker.patch("app.api.fetch", new_callable=mocker.AsyncMock, return_value=1)
+```
+
+## ⚠️ Pitfalls
+
+- Patching the definition site instead of the import site.
+- Over-mocking until the test asserts only the mock.
+- Leaving patches active without context managers / fixtures.
+- Mocking timestamps without also freezing related clocks.
+- Asserting call order when concurrency makes it nondeterministic.
+
+## 🔗 Related
+
+- [Fixtures](fixtures.md)
+- [Asserts](asserts.md)
+- [asyncio](asyncio_pytest.md)
+- [Plugins](plugins.md)
+- [tmp_path](tmp_path.md)
+- [capsys & caplog](capsys_caplog.md)

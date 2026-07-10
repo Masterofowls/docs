@@ -1,0 +1,80 @@
+---
+title: Error Handling
+description: PowerShell · Reference cheat sheet
+---
+
+# Error Handling
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PowerShell has terminating and non-terminating errors. Use `-ErrorAction`, `try/catch/finally`, and `$Error` to control behavior. Prefer terminating errors for scripts that must stop; use `-ErrorVariable` to capture without stopping.
+
+## 🔧 Core concepts
+
+| Mechanism | Role |
+| --- | --- |
+| Non-terminating | Writes to error stream; continues |
+| Terminating | Stops statement / enters `catch` |
+| `-ErrorAction` | `Stop`, `Continue`, `SilentlyContinue`, `Inquire`, `Ignore` |
+| `$ErrorActionPreference` | Default for non-terminating |
+| `try / catch / finally` | Structured handling |
+| `throw` / `Write-Error` | Raise errors |
+| `$Error` | Automatic error list |
+| `$LASTEXITCODE` | Native command exit code |
+
+`catch [System.IO.IOException]` filters by type. `$PSItem` / `$_` in `catch` is the error record.
+
+## 💡 Examples
+
+**Try/catch:**
+
+```powershell
+try {
+  Get-Content -LiteralPath .\missing.txt -ErrorAction Stop
+} catch {
+  Write-Error "Failed: $($_.Exception.Message)"
+} finally {
+  'cleanup'
+}
+```
+
+**Capture without stop:**
+
+```powershell
+Get-ChildItem .\nope -ErrorAction SilentlyContinue -ErrorVariable e
+if ($e) { $e | ForEach-Object Message }
+```
+
+**Native commands:**
+
+```powershell
+git rev-parse HEAD
+if ($LASTEXITCODE -ne 0) { throw "git failed: $LASTEXITCODE" }
+```
+
+**Preference scope:**
+
+```powershell
+$ErrorActionPreference = 'Stop'
+```
+
+## ⚠️ Pitfalls
+
+- Default `-ErrorAction Continue` means scripts keep going after many failures.
+- `try/catch` only catches terminating errors—add `-ErrorAction Stop` to cmdlets.
+- Swallowing errors with `SilentlyContinue` hides root causes.
+- `$Error[0]` is the newest; clear carefully (`$Error.Clear()`).
+- Mixing `throw` strings vs `ErrorRecord` changes catch behavior slightly.
+- Pipeline errors may not abort the whole pipeline unless preference is `Stop`.
+
+## 🔗 Related
+
+- [cmdlets.md](./cmdlets)
+- [scripting.md](./scripting)
+- [functions.md](./functions)
+- [jobs.md](./jobs)
+- [conditionals.md](./conditionals)

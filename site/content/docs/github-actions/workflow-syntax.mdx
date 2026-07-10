@@ -1,0 +1,82 @@
+---
+title: Workflow Syntax
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Workflow Syntax
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Workflows live in `.github/workflows/*.yml` and define when automation runs (`on`), what it does (`jobs`), and how steps execute. YAML indentation matters. Start from a minimal workflow, then add permissions, concurrency, and reuse.
+
+## 🔧 Core concepts
+
+| Key | Role |
+| --- | --- |
+| `name` | UI label |
+| `on` | Events / schedules |
+| `permissions` | Token scopes |
+| `env` | Workflow-level env |
+| `defaults` | Default `run` shell/working-directory |
+| `concurrency` | Cancel/queue overlapping runs |
+| `jobs` | Map of job IDs |
+| `run-name` | Dynamic run title |
+
+Top-level `jobs.<id>` contains `runs-on`, `steps`, `needs`, `strategy`, `environment`, etc. Comments use `#`.
+
+## 💡 Examples
+
+**Minimal CI:**
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: npm test
+```
+
+**Defaults:**
+
+```yaml
+defaults:
+  run:
+    shell: bash
+    working-directory: ./app
+```
+
+## ⚠️ Pitfalls
+
+- Tabs break YAML—use spaces only.
+- Unquoted `on: on` / special values may parse oddly; quote strings when unsure.
+- Workflow must be on the default branch to run `pull_request` from forks with some constraints—know fork PR token limits.
+- `actions/checkout` and other actions should be pinned to versions/SHAs for supply-chain safety.
+- Invalid expressions fail at runtime—validate with act or a dry PR.
+- Large monolithic workflows are hard to debug—split jobs.
+
+## 🔗 Related
+
+- [events_triggers.md](./events_triggers)
+- [jobs_steps.md](./jobs_steps)
+- [permissions.md](./permissions)
+- [expressions.md](./expressions)
+- [reusable_workflows.md](./reusable_workflows)

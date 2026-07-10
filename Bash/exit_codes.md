@@ -1,0 +1,81 @@
+# Exit Codes
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Every command returns an 8-bit exit status: `0` success, `1–255` failure. Scripts should exit with meaningful codes. `$?` holds the last foreground status; with `pipefail`, pipelines report the rightmost non-zero (or zero if all succeed).
+
+## 🔧 Core concepts
+
+| Code | Convention |
+| --- | --- |
+| `0` | Success |
+| `1` | General error |
+| `2` | Misuse of shell builtins / bad usage (common) |
+| `126` | Found but not executable |
+| `127` | Command not found |
+| `128+N` | Fatal signal N (e.g. 130 = SIGINT) |
+| `255` | Out-of-range `exit` (wrapped) |
+
+| Tool | Role |
+| --- | --- |
+| `exit N` | End shell/script with status N |
+| `return N` | End function with status N |
+| `$?` | Last status |
+| `set -e` | Exit on failure (with caveats) |
+| `set -o pipefail` | Pipeline status |
+
+sysexits.h codes (`EX_USAGE=64`, etc.) appear in some tools but are optional for scripts.
+
+## 💡 Examples
+
+**Check and propagate:**
+
+```bash
+if ! git pull; then
+  echo "pull failed: $?" >&2
+  exit 1
+fi
+```
+
+**Meaningful script exits:**
+
+```bash
+usage() { echo "usage: $0 <file>" >&2; exit 2; }
+[[ $# -eq 1 ]] || usage
+[[ -f "$1" ]] || { echo "missing file" >&2; exit 1; }
+```
+
+**Capture without losing status:**
+
+```bash
+output="$(cmd)" || status=$?
+status=${status:-0}
+```
+
+**Pipeline:**
+
+```bash
+set -o pipefail
+false | true     # status 1 with pipefail; 0 without
+```
+
+## ⚠️ Pitfalls
+
+- `exit` with values outside 0–255 are truncated modulo 256.
+- `cmd || true` swallows failures—use only when intentional.
+- `set -e` is disabled in some contexts (`if`, `&&`, `||`, `!`)—know the rules.
+- Assignments: `local x=$(false)` may not trigger `set -e` as expected.
+- Background jobs: `wait $pid` yields that job’s status.
+- Don’t parse `$?` after another command overwrote it—save immediately.
+
+## 🔗 Related
+
+- [conditionals.md](./conditionals.md)
+- [pipes_redirection.md](./pipes_redirection.md)
+- [debugging.md](./debugging.md)
+- [scripts_best_practices.md](./scripts_best_practices.md)
+- [functions.md](./functions.md)

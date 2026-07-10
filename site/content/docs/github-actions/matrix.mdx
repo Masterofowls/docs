@@ -1,0 +1,79 @@
+---
+title: Matrix
+description: GitHub Actions · Reference cheat sheet
+---
+
+# Matrix
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A strategy matrix expands one job into many combinations (OS, language version, flags). Use `include` / `exclude` to refine, `fail-fast` to control cancellation, and `max-parallel` to limit concurrency.
+
+## 🔧 Core concepts
+
+| Key | Role |
+| --- | --- |
+| `strategy.matrix` | Axes of values |
+| `$\{\{ matrix.os \}\}` | Reference a cell |
+| `include` | Add/override combos |
+| `exclude` | Remove combos |
+| `fail-fast` | Cancel siblings on failure (default true) |
+| `max-parallel` | Cap simultaneous matrix jobs |
+
+Matrix context is available in `runs-on`, `env`, step `name`, and `if`. Nested objects in matrix are allowed.
+
+## 💡 Examples
+
+**OS × Node:**
+
+```yaml
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+        exclude:
+          - os: windows-latest
+            node: 20
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+```
+
+**Include extra job:**
+
+```yaml
+strategy:
+  matrix:
+    shard: [1, 2, 3]
+    include:
+      - shard: 1
+        extra_flag: '--coverage'
+```
+
+## ⚠️ Pitfalls
+
+- Combinatorial explosion burns minutes—keep axes small.
+- `fail-fast: true` can hide sibling failures when debugging flakes.
+- Expression errors in matrix values fail the whole job graph.
+- Windows vs bash shell differences across OS matrix cells.
+- Job names collide in UI—set dynamic `name:` including matrix values.
+- Reusable workflows have limits on matrix passthrough—check docs.
+
+## 🔗 Related
+
+- [jobs_steps.md](./jobs_steps)
+- [runners.md](./runners)
+- [setup_node.md](./setup_node)
+- [setup_python.md](./setup_python)
+- [expressions.md](./expressions)

@@ -1,0 +1,80 @@
+# Asserts
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+pytest rewrites `assert` for rich introspection — no special assert API required. Use `pytest.raises`, `approx`, and helper matchers for exceptions and floats.
+
+## 🔧 Core concepts
+
+| Tool | Use |
+| --- | --- |
+| `assert` | Equality, membership, truthiness |
+| `pytest.raises` | Expect exceptions |
+| `pytest.approx` | Float tolerance |
+| `pytest.warns` | Expect warnings |
+| `unittest` asserts | Still work if preferred |
+
+Assertion rewriting applies to test modules; helper modules may need `pytest.register_assert_rewrite`.
+
+## 💡 Examples
+
+**Basics:**
+
+```python
+def test_list():
+    data = [1, 2, 3]
+    assert data == [1, 2, 3]
+    assert 2 in data
+    assert len(data) == 3
+```
+
+**Exceptions:**
+
+```python
+import pytest
+
+def test_raises():
+    with pytest.raises(ZeroDivisionError):
+        1 / 0
+
+def test_message():
+    with pytest.raises(ValueError, match="invalid"):
+        raise ValueError("invalid id")
+```
+
+**Approx & warnings:**
+
+```python
+assert 0.1 + 0.2 == pytest.approx(0.3)
+assert [0.1, 0.2] == pytest.approx([0.1, 0.2])
+
+with pytest.warns(UserWarning, match="deprecated"):
+    warn_user()
+```
+
+**Failure messages:**
+
+```python
+assert result.ok, f"expected ok, got {result!r}"
+```
+
+## ⚠️ Pitfalls
+
+- Writing `assertEqual` from unittest without need — plain assert is fine.
+- Comparing floats with `==` without `approx`.
+- Catching exceptions with try/except instead of `pytest.raises`.
+- Huge diffs from comparing large dicts — use focused keys.
+- Assert rewriting disabled in some imported helpers.
+
+## 🔗 Related
+
+- [Fixtures](fixtures.md)
+- [Parametrize](parametrize.md)
+- [Mocking](mocking.md)
+- [capsys & caplog](capsys_caplog.md)
+- [CLI](cli.md)
+- [Coverage](coverage.md)

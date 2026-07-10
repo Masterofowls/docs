@@ -1,0 +1,84 @@
+# Module Mocks
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Automock modules with `jest.mock`, manual `__mocks__` folders, and virtual mocks. Control Node built-ins and CSS/assets via mappers.
+
+## 🔧 Core concepts
+
+| Technique | When |
+| --- | --- |
+| `jest.mock('./mod')` | Auto mock or factory |
+| `__mocks__/mod.js` | Shared manual mock |
+| `jest.requireActual` | Partial mock |
+| `moduleNameMapper` | Assets / aliases |
+| `jest.unstable_mockModule` | ESM (experimental) |
+
+Factories run in a sandboxed scope; hoist rules apply to `jest.mock`.
+
+## 💡 Examples
+
+**Manual mock:**
+
+```text
+src/
+  api.js
+  __mocks__/
+    api.js
+```
+
+```js
+// __mocks__/api.js
+export const getUser = jest.fn();
+```
+
+```js
+jest.mock('./api');
+import { getUser } from './api';
+getUser.mockResolvedValue({ id: 1 });
+```
+
+**Virtual mock:**
+
+```js
+jest.mock('analytics', () => ({ track: jest.fn() }), { virtual: true });
+```
+
+**Asset mapper:**
+
+```js
+moduleNameMapper: {
+  '\\.svg$': '<rootDir>/test/svgrMock.js',
+  '\\.(css)$': 'identity-obj-proxy',
+},
+```
+
+**Unmock / isolate:**
+
+```js
+jest.unmock('./api');
+jest.isolateModules(() => {
+  const mod = require('./fresh');
+});
+```
+
+## ⚠️ Pitfalls
+
+- Factory referencing out-of-scope variables (TDZ / hoist).
+- Manual mocks not picked up because path casing/OS differs.
+- Mocking ESM named exports incorrectly (namespace shape).
+- Leaving automock on globally (`automock: true`) — surprising.
+- Circular deps with `requireActual` causing partial undefineds.
+
+## 🔗 Related
+
+- [Mocks](mocks.md)
+- [Spies](spies.md)
+- [Config](config.md)
+- [TypeScript](typescript.md)
+- [Setup & teardown](setup_teardown.md)
+- [Migration to Vitest](migration_vitest.md)

@@ -1,0 +1,88 @@
+---
+title: Conditionals
+description: Bash · Reference cheat sheet
+---
+
+# Conditionals
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Bash branches with `if`/`elif`/`else`, `case`, and `[[ ]]` / `[ ]` / `(( ))` tests. Prefer `[[ ]]` for strings and files; `(( ))` for integers. Exit status `0` is true; non-zero is false.
+
+## 🔧 Core concepts
+
+| Construct | Use |
+| --- | --- |
+| `if cmd; then …; fi` | Branch on exit status |
+| `[[ expr ]]` | Bash test (safer, richer) |
+| `[ expr ]` / `test` | POSIX test |
+| `(( expr ))` | Arithmetic; 0 → false, non-zero → true |
+| `case $x in … esac` | Pattern match |
+| `&&` / `\|\|` | Short-circuit |
+
+**`[[ ]]` operators:** `-eq -ne -lt -le -gt -ge` (numbers as strings carefully), `=`, `==`, `!=`, `=~` regex, `-z` empty, `-n` non-empty, `-f -d -e -L -r -w -x` files, `-nt` / `-ot` newer/older.
+
+## 💡 Examples
+
+**File and string checks:**
+
+```shellscript
+if [[ -f "$config" && -r "$config" ]]; then
+  source "$config"
+elif [[ -z "${config:-}" ]]; then
+  echo "No config" >&2
+  exit 1
+fi
+```
+
+**Numeric:**
+
+```shellscript
+if (( count > 10 )); then
+  echo "too many"
+fi
+
+if [[ "$count" -gt 10 ]]; then …; fi   # integer compare in [[ ]]
+```
+
+**Regex and case:**
+
+```shellscript
+if [[ "$email" =~ ^[A-Za-z0-9._%+-]+@ ]]; then
+  echo "looks like email"
+fi
+
+case "$1" in
+  start|on)  start_svc ;;
+  stop|off)  stop_svc ;;
+  *)         echo "usage: $0 start|stop" >&2; exit 2 ;;
+esac
+```
+
+**One-liners:**
+
+```shellscript
+[[ -d "$dir" ]] || mkdir -p "$dir"
+command -v jq >/dev/null || { echo "jq required"; exit 1; }
+```
+
+## ⚠️ Pitfalls
+
+- `[ $a = $b ]` breaks on empty/spaces; always quote: `[ "$a" = "$b" ]`.
+- `==` inside `[ ]` is non-POSIX; use `=` or switch to `[[ ]]`.
+- `(( ))` treats empty/unset as 0 with `set -u` risks—initialize first.
+- `=~` right-hand side should be unquoted to be a regex; quoted = literal.
+- Prefer `[[ ]]` over `[ ]` in bash scripts; keep `[ ]` for `sh` portability.
+- `if cmd` tests exit code—not stdout. Capture output separately.
+
+## 🔗 Related
+
+- [exit_codes.md](./exit_codes)
+- [loops.md](./loops)
+- [quoting.md](./quoting)
+- [variables.md](./variables)
+- [debugging.md](./debugging)

@@ -1,0 +1,27 @@
+{
+  "title": "GitHub Actions",
+  "description": "CI/CD workflows",
+  "icon": "Rocket",
+  "root": true,
+  "pages": [
+    "index",
+    "artifacts",
+    "caching",
+    "checkout",
+    "composite-actions",
+    "docker",
+    "environments",
+    "events-triggers",
+    "expressions",
+    "github-pages",
+    "jobs-steps",
+    "matrix",
+    "permissions",
+    "reusable-workflows",
+    "runners",
+    "secrets-env",
+    "setup-node",
+    "setup-python",
+    "workflow-syntax"
+  ]
+}

@@ -20,6 +20,12 @@ const TOPIC_MAP = [
   { src: 'CSS', slug: 'css', title: 'CSS', description: 'Layout, cascade, modern CSS', icon: 'Palette' },
   { src: 'Html', slug: 'html', title: 'HTML', description: 'Semantic markup, media, a11y', icon: 'FileCode' },
   { src: 'Django', slug: 'django', title: 'Django', description: 'ORM, views, auth, DRF', icon: 'Server' },
+  { src: 'Playwright', slug: 'playwright', title: 'Playwright', description: 'E2E browser testing', icon: 'Bug' },
+  { src: 'Pytest', slug: 'pytest', title: 'Pytest', description: 'Python testing framework', icon: 'Beaker' },
+  { src: 'Jest', slug: 'jest', title: 'Jest', description: 'JavaScript testing framework', icon: 'CircleCheck' },
+  { src: 'Bash', slug: 'bash', title: 'Bash', description: 'Shell scripting essentials', icon: 'Terminal' },
+  { src: 'Powershell', slug: 'powershell', title: 'PowerShell', description: 'Windows shell & automation', icon: 'Monitor' },
+  { src: 'Github Actions', slug: 'github-actions', title: 'GitHub Actions', description: 'CI/CD workflows', icon: 'Rocket' },
   { src: 'Git', slug: 'git', title: 'Git', description: 'Everyday Git, recovery, GitHub CLI', icon: 'GitBranch' },
   { src: 'SQL', slug: 'sql', title: 'SQL', description: 'Queries, schema, advanced SQL', icon: 'Database' },
 ];

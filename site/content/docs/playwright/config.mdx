@@ -1,0 +1,95 @@
+---
+title: Config
+description: Playwright · Reference cheat sheet
+---
+
+# Config
+
+_Playwright · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`playwright.config.ts` defines projects, timeouts, reporters, base URL, and shared `use` options. One config drives local runs and CI.
+
+## 🔧 Core concepts
+
+| Option | Purpose |
+| --- | --- |
+| `testDir` | Where specs live |
+| `timeout` | Per-test limit (ms) |
+| `expect.timeout` | Assertion wait |
+| `retries` | Flake recovery |
+| `workers` | Parallel processes |
+| `use` | Shared browser/context opts |
+| `projects` | Browser / device matrix |
+| `reporter` | list, html, github, etc. |
+
+## 💡 Examples
+
+**Typical config:**
+
+```ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: [['html', { open: 'never' }], ['list']],
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
+  webServer: {
+    command: 'npm run start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+**Env overrides:**
+
+```shellscript
+npx playwright test --config=playwright.config.ts
+npx playwright test --project=chromium --workers=4
+PWDEBUG=1 npx playwright test
+```
+
+**Timeouts:**
+
+```ts
+export default defineConfig({
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  use: { actionTimeout: 15_000, navigationTimeout: 30_000 },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Hardcoding `localhost` without `baseURL` / `webServer` breaks CI.
+- Too many workers on shared CI runners causes flakes and OOM.
+- `trace: 'on'` for every test balloons artifacts — prefer `on-first-retry`.
+- Forgetting `forbidOnly` lets `.only` slip into main.
+- Device presets vs custom viewport — pick one strategy per project.
+
+## 🔗 Related
+
+- [Install](install)
+- [Parallel](parallel)
+- [CI](ci)
+- [Tracing](tracing)
+- [Screenshots & video](screenshots_video)
+- [Mobile emulation](mobile_emulation)

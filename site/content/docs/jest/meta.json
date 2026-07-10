@@ -1,0 +1,25 @@
+{
+  "title": "Jest",
+  "description": "JavaScript testing framework",
+  "icon": "CheckCircle",
+  "root": true,
+  "pages": [
+    "index",
+    "async",
+    "config",
+    "coverage",
+    "custom-matchers",
+    "install",
+    "matchers",
+    "migration-vitest",
+    "mocks",
+    "module-mocks",
+    "react-testing-library",
+    "setup-teardown",
+    "snapshots",
+    "spies",
+    "timers",
+    "typescript",
+    "watch-mode"
+  ]
+}

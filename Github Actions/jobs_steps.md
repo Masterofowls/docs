@@ -1,0 +1,75 @@
+# Jobs & Steps
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Jobs run in parallel by default on separate runners. Steps within a job run sequentially and share the workspace. Use `needs` for dependencies, `if` for conditions, and map outputs between jobs.
+
+## 🔧 Core concepts
+
+| Key | Role |
+| --- | --- |
+| `jobs.<id>.runs-on` | Runner label |
+| `needs` | Job dependencies |
+| `if` | Conditional execution |
+| `steps[].uses` | Run an action |
+| `steps[].run` | Shell command |
+| `steps[].name` | UI label |
+| `steps[].id` | Reference outputs |
+| `outputs` | Job-level outputs |
+| `continue-on-error` | Soft-fail step |
+| `timeout-minutes` | Cap duration |
+
+Each step can set `working-directory`, `env`, and `shell`. Failures cancel dependent jobs unless configured otherwise.
+
+## 💡 Examples
+
+**Dependent jobs + outputs:**
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying ${{ needs.build.outputs.version }}"
+```
+
+**Multi-line script:**
+
+```yaml
+- name: Build
+  run: |
+    npm ci
+    npm run build
+```
+
+## ⚠️ Pitfalls
+
+- Jobs don’t share filesystem—pass data via artifacts or outputs.
+- `needs` + `if: always()` patterns are easy to get wrong for cleanup jobs.
+- Step outputs must be written to `$GITHUB_OUTPUT` (not deprecated `set-output`).
+- Matrix jobs expand into many jobs—watch billing and `fail-fast`.
+- `working-directory` doesn’t apply to `uses:` the same way—check action docs.
+- Shell differences: bash on Linux/macOS, PowerShell default on Windows.
+
+## 🔗 Related
+
+- [runners.md](./runners.md)
+- [matrix.md](./matrix.md)
+- [artifacts.md](./artifacts.md)
+- [expressions.md](./expressions.md)
+- [workflow_syntax.md](./workflow_syntax.md)

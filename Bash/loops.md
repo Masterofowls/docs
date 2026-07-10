@@ -1,0 +1,81 @@
+# Loops
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Bash offers `for`, `while`, `until`, and C-style `for (( ))`. Prefer iterating arrays or null-delimited streams over unquoted globs. Use `break` / `continue` to control flow; avoid parsing `ls`.
+
+## 🔧 Core concepts
+
+| Loop | Typical use |
+| --- | --- |
+| `for x in list; do …; done` | Fixed word list / array |
+| `for ((i=0; i<n; i++)); do` | Numeric index |
+| `while cmd; do …; done` | Until command fails |
+| `until cmd; do …; done` | Until command succeeds |
+| `select` | Simple menus |
+| `break` / `continue` | Exit / skip iteration |
+| `break n` / `continue n` | Nested levels |
+
+Read lines safely with `while IFS= read -r line` (and `-d ''` for NUL). Process substitution or pipes run the loop in a subshell unless you use lastpipe / redirect.
+
+## 💡 Examples
+
+**Array and C-style:**
+
+```bash
+files=(*.txt)
+for f in "${files[@]}"; do
+  echo "file: $f"
+done
+
+for ((i = 0; i < 5; i++)); do
+  echo "$i"
+done
+```
+
+**Read file line by line:**
+
+```bash
+while IFS= read -r line || [[ -n "$line" ]]; do
+  printf '%s\n' "$line"
+done < "$input"
+```
+
+**Find with NUL (safe for spaces):**
+
+```bash
+while IFS= read -r -d '' path; do
+  echo "$path"
+done < <(find . -type f -print0)
+```
+
+**While with counter:**
+
+```bash
+n=0
+while (( n < 3 )); do
+  ((n++)) || true
+  echo "$n"
+done
+```
+
+## ⚠️ Pitfalls
+
+- `for f in $(ls)` breaks on spaces/newlines—use globs or `find -print0`.
+- Pipeline `cmd | while read` runs `while` in a subshell; variables won’t persist.
+- Unquoted `for f in $list` word-splits; use arrays: `"${arr[@]}"`.
+- `for f in *.txt` leaves literal `*.txt` if no match unless `nullglob` is set.
+- `((n++))` returns status 1 when expression is 0—watch with `set -e`.
+- Infinite loops: ensure the condition or `break` can fire.
+
+## 🔗 Related
+
+- [arrays.md](./arrays.md)
+- [globbing.md](./globbing.md)
+- [conditionals.md](./conditionals.md)
+- [pipes_redirection.md](./pipes_redirection.md)
+- [subshells.md](./subshells.md)

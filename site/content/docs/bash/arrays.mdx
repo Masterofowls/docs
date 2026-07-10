@@ -1,0 +1,86 @@
+---
+title: Arrays
+description: Bash · Reference cheat sheet
+---
+
+# Arrays
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Bash has indexed arrays (`declare -a`) and associative arrays (`declare -A`, bash 4+). Always expand with `"$\{arr[@]\}"` to preserve elements. Arrays are the safe alternative to storing lists in a single string.
+
+## 🔧 Core concepts
+
+| Syntax | Meaning |
+| --- | --- |
+| `arr=(a b c)` | Indexed array |
+| `arr[i]=val` | Set element |
+| `"$\{arr[@]\}"` | All elements (separate words) |
+| `"$\{arr[*]\}"` | Joined with first IFS char when quoted |
+| `$\{#arr[@]\}` | Length |
+| `$\{!arr[@]\}` | Indices / keys |
+| `arr+=(x)` | Append |
+| `unset 'arr[i]'` | Remove element |
+| `declare -A map` | Associative array |
+| `map=([k]=v)` | Assoc init |
+
+Sparse indexed arrays keep original indices after `unset`. Iterate keys with `"$\{!arr[@]\}"`.
+
+## 💡 Examples
+
+**Indexed:**
+
+```shellscript
+files=("a b.txt" "c.txt")
+files+=("d.txt")
+echo "${#files[@]}"
+for f in "${files[@]}"; do
+  echo "$f"
+done
+echo "${files[0]}"
+```
+
+**Slice and copy:**
+
+```shellscript
+slice=("${files[@]:1:2}")     # 2 elems from index 1
+copy=("${files[@]}")
+```
+
+**Associative:**
+
+```shellscript
+declare -A ports=([web]=80 [db]=5432)
+ports[cache]=6379
+for k in "${!ports[@]}"; do
+  echo "$k -> ${ports[$k]}"
+done
+```
+
+**From command (mapfile):**
+
+```shellscript
+mapfile -t lines < file.txt
+mapfile -d '' -t paths < <(find . -print0)
+```
+
+## ⚠️ Pitfalls
+
+- `"$\{arr[@]\}"` vs `$\{arr[@]\}`: always quote.
+- `"$\{arr[*]\}"` is one string when quoted—wrong for iterating items with spaces.
+- Associative arrays need bash 4+; macOS system bash may be 3.2—use Homebrew bash or avoid.
+- `arr=($string)` splits on IFS; prefer `read -a` or `mapfile`.
+- `unset arr` removes whole array; `unset 'arr[0]'` one element.
+- Indices are not re-packed after delete; don’t assume contiguous `0..n-1`.
+
+## 🔗 Related
+
+- [variables.md](./variables)
+- [quoting.md](./quoting)
+- [loops.md](./loops)
+- [string_ops.md](./string_ops)
+- [globbing.md](./globbing)

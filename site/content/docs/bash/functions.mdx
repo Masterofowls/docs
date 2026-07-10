@@ -1,0 +1,98 @@
+---
+title: Functions
+description: Bash · Reference cheat sheet
+---
+
+# Functions
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Functions group reusable commands. They share the shell’s process (unless you spawn a subshell). Arguments arrive as `$1`…`"$@"`. Prefer `local` for internals and explicit `return` status (0–255).
+
+## 🔧 Core concepts
+
+| Topic | Detail |
+| --- | --- |
+| Define | `name() \{ …; \}` or `function name \{ …; \}` |
+| Call | `name arg1 arg2` (no parentheses) |
+| Args | `$1`, `$2`, `"$@"`, `$#` |
+| Locals | `local var=value` |
+| Return | `return N` (exit status); stdout for data |
+| Scope | Dynamic; locals shadow globals |
+| `declare -f` | List function bodies |
+
+Functions cannot return structured data via `return`—print to stdout and capture with `$(...)`, or use namerefs (`declare -n`) / globals carefully.
+
+## 💡 Examples
+
+**Basic with locals:**
+
+```shellscript
+greet() {
+  local who="${1:-world}"
+  echo "Hello, $who"
+}
+greet "Ada"
+```
+
+**Return status vs output:**
+
+```shellscript
+is_dir() {
+  [[ -d "$1" ]]
+}
+
+path_join() {
+  local a="$1" b="$2"
+  echo "${a%/}/$b"
+}
+
+if is_dir "/tmp"; then
+  out="$(path_join "/var" "log")"
+fi
+```
+
+**Nameref (bash 4.3+):**
+
+```shellscript
+append() {
+  local -n _arr=$1
+  shift
+  _arr+=("$@")
+}
+list=()
+append list a b
+```
+
+**Guard usage:**
+
+```shellscript
+usage() { echo "usage: $0 <file>" >&2; }
+
+main() {
+  [[ $# -ge 1 ]] || { usage; return 2; }
+  …
+}
+main "$@"
+```
+
+## ⚠️ Pitfalls
+
+- `local var=$(cmd)` masks `cmd`’s exit status; split assign and check.
+- Forgetting `local` leaks variables into the global scope.
+- `return` outside a function exits the shell when sourced carefully—use only in functions.
+- Recursion depth and performance: bash functions are not optimized like compiled code.
+- Defining functions in a pipeline/subshell does not affect the parent shell.
+- Name clashes with external commands: prefer project prefixes (`myapp_`).
+
+## 🔗 Related
+
+- [variables.md](./variables)
+- [exit_codes.md](./exit_codes)
+- [scripts_best_practices.md](./scripts_best_practices)
+- [subshells.md](./subshells)
+- [getopts.md](./getopts)

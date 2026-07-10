@@ -1,0 +1,79 @@
+# GitHub Pages
+
+_GitHub Actions · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Deploy static sites to GitHub Pages with Actions using `actions/upload-pages-artifact` and `actions/deploy-pages`. Configure the repo to deploy from **GitHub Actions** (not the classic branch). Grant `pages: write` and `id-token: write`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Pages source | Settings → Pages → GitHub Actions |
+| `upload-pages-artifact` | Package static files |
+| `deploy-pages` | Publish artifact |
+| `environment: github-pages` | Standard env + URL output |
+| Custom domain | Repo Pages settings + DNS |
+| Project vs user site | `/{repo}` vs `username.github.io` |
+
+Build with any static generator (Next export, Vite, Hugo, MkDocs). Only static assets are served.
+
+## 💡 Examples
+
+**Classic static deploy:**
+
+```yaml
+name: Deploy Pages
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `id-token: write` breaks OIDC-based Pages deploy.
+- Wrong artifact `path` uploads empty/wrong site—verify build output dir.
+- SPA routing needs `404.html` tricks or platform rules—Pages is static only.
+- Base path for project sites (`/repo-name/`) must match bundler `base` config.
+- Custom domains require both DNS and Pages settings; HTTPS provisioning takes time.
+- Don’t commit secrets into static JS—anything in `dist` is public.
+
+## 🔗 Related
+
+- [permissions.md](./permissions.md)
+- [artifacts.md](./artifacts.md)
+- [environments.md](./environments.md)
+- [setup_node.md](./setup_node.md)
+- [jobs_steps.md](./jobs_steps.md)

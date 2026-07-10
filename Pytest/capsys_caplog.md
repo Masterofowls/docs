@@ -1,0 +1,80 @@
+# capsys & caplog
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`capsys` / `capfd` capture stdout/stderr; `caplog` captures logging records. Use them to assert CLI output and log messages without polluting the terminal.
+
+## 🔧 Core concepts
+
+| Fixture | Captures |
+| --- | --- |
+| `capsys` | sys.stdout / sys.stderr |
+| `capfd` | OS-level fd 1/2 |
+| `capsysbinary` | Binary stdout/stderr |
+| `caplog` | logging module records |
+| `caplog.at_level` | Temporary level |
+
+`readouterr()` returns a named tuple `(out, err)` and clears buffers.
+
+## 💡 Examples
+
+**stdout:**
+
+```python
+def test_cli(capsys):
+    print("hello")
+    captured = capsys.readouterr()
+    assert captured.out == "hello\n"
+```
+
+**Disable capture temporarily:**
+
+```python
+def test_debug(capsys):
+    with capsys.disabled():
+        print("visible during test")
+```
+
+**Logging:**
+
+```python
+import logging
+
+def test_log(caplog):
+    logger = logging.getLogger("app")
+    with caplog.at_level(logging.INFO, logger="app"):
+        logger.info("started")
+        logger.error("boom")
+    assert "started" in caplog.text
+    assert any(r.levelname == "ERROR" for r in caplog.records)
+```
+
+**capfd for C extensions / subprocess writing to fd:**
+
+```python
+def test_fd(capfd):
+    import os
+    os.write(1, b"raw\n")
+    assert "raw" in capfd.readouterr().out
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `readouterr()` clears — second call is empty.
+- Using `capsys` when the code writes via OS fds — use `capfd`.
+- Asserting on log format strings instead of message/record fields.
+- Leaving logger level too high and capturing nothing.
+- Relying on capture order with concurrent threads.
+
+## 🔗 Related
+
+- [Fixtures](fixtures.md)
+- [Asserts](asserts.md)
+- [CLI](cli.md)
+- [Mocking](mocking.md)
+- [tmp_path](tmp_path.md)
+- [conftest](conftest.md)

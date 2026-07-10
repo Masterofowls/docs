@@ -1,0 +1,77 @@
+# Variables
+
+_PowerShell · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Variables start with `$` and hold typed .NET objects. Scopes include `local`, `script`, `global`, and `private`. Prefer meaningful names; use `$script:` for module/script-level state and avoid polluting `$global:`.
+
+## 🔧 Core concepts
+
+| Syntax | Meaning |
+| --- | --- |
+| `$name = value` | Assign |
+| `${name-with-dashes}` | Unusual names |
+| `$env:PATH` | Environment variable |
+| `$null` | Null |
+| `Remove-Variable` / `rv` | Delete |
+| `Get-Variable` | Inspect |
+| `Set-Variable -Option ReadOnly` | Protect |
+| `$true` / `$false` | Booleans |
+| `[int]$n = 5` | Constrained type |
+| `$$` / `$^` | Last/first token of last line (interactive) |
+
+Automatic variables: `$_`, `$PSItem`, `$args`, `$PSScriptRoot`, `$PSCommandPath`, `$LASTEXITCODE`, `$?`, `$Error`.
+
+## 💡 Examples
+
+**Types and env:**
+
+```powershell
+[int]$port = 8080
+$name = 'Ada'
+$env:NODE_ENV = 'development'
+"$name runs on $port"
+```
+
+**Scopes:**
+
+```powershell
+$script:counter = 0
+function Tick {
+  $script:counter++
+  $local = 'only here'
+}
+```
+
+**Null-conditional / coalescing (PS 7+):**
+
+```powershell
+$value = $config?.Timeout ?? 30
+```
+
+**Splatting:**
+
+```powershell
+$params = @{ Path = '.\a.txt'; Destination = '.\b.txt'; Force = $true }
+Copy-Item @params
+```
+
+## ⚠️ Pitfalls
+
+- `$false`, `0`, empty string, and empty arrays are all “falsy” in conditionals—know the rules.
+- Assigning to `$env:VAR` affects the process environment only (not permanently unless you set user/machine env).
+- `$?` is boolean success of last **PowerShell** statement; native commands also set `$LASTEXITCODE`.
+- Variable names are not case-sensitive.
+- Expanding in double quotes calls `.ToString()`—objects may stringify poorly; use subexpressions `"$($obj.Prop)"`.
+- Don’t use `$input` casually—it’s reserved for pipeline enumerators in functions.
+
+## 🔗 Related
+
+- [objects.md](./objects.md)
+- [conditionals.md](./conditionals.md)
+- [functions.md](./functions.md)
+- [scripting.md](./scripting.md)
+- [vs_bash.md](./vs_bash.md)

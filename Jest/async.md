@@ -1,0 +1,80 @@
+# Async
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Jest supports promises, async/await, and callbacks (`done`). Prefer returning/awaiting promises; use `.resolves` / `.rejects` matchers for clarity.
+
+## 🔧 Core concepts
+
+| Style | Pattern |
+| --- | --- |
+| async/await | `await` inside `test` |
+| Promise return | `return fetch().then(...)` |
+| resolves/rejects | `await expect(p).resolves.toBe(...)` |
+| done | Legacy callbacks — avoid if possible |
+| Fake timers | Interact carefully with promises |
+
+Unhandled rejections fail the test when properly awaited.
+
+## 💡 Examples
+
+**async/await:**
+
+```js
+test('loads user', async () => {
+  const user = await api.getUser(1);
+  expect(user.id).toBe(1);
+});
+```
+
+**resolves / rejects:**
+
+```js
+await expect(api.getUser(1)).resolves.toMatchObject({ id: 1 });
+await expect(api.getUser(-1)).rejects.toThrow(/not found/);
+await expect(api.getUser(-1)).rejects.toMatchObject({ status: 404 });
+```
+
+**Promise return (no async):**
+
+```js
+test('ok', () => {
+  return api.ping().then((r) => expect(r).toBe('pong'));
+});
+```
+
+**Timeouts:**
+
+```js
+test('slow', async () => {
+  await longJob();
+}, 15_000);
+```
+
+**Concurrent (Jest 29+):**
+
+```js
+test.concurrent('a', async () => { /* ... */ });
+test.concurrent('b', async () => { /* ... */ });
+```
+
+## ⚠️ Pitfalls
+
+- Missing `await` / `return` → false green tests.
+- Mixing `done` with promises incorrectly.
+- Asserting before microtasks flush — await or `await Promise.resolve()`.
+- Fake timers + real promises deadlocks without `advanceTimers`.
+- Swallowing errors in try/catch without rethrow/expect.
+
+## 🔗 Related
+
+- [Matchers](matchers.md)
+- [Timers](timers.md)
+- [Mocks](mocks.md)
+- [Spies](spies.md)
+- [Setup & teardown](setup_teardown.md)
+- [React Testing Library](react_testing_library.md)

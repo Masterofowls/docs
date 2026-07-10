@@ -1,0 +1,79 @@
+---
+title: xdist
+description: Pytest · Reference cheat sheet
+---
+
+# xdist
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`pytest-xdist` runs tests in parallel across CPUs or distributed workers. Use `-n auto` locally; ensure tests are isolated (no shared files/DB rows).
+
+## 🔧 Core concepts
+
+| Flag | Meaning |
+| --- | --- |
+| `-n N` / `-n auto` | Worker count |
+| `--dist loadscope` | Group by module/class |
+| `--dist loadfile` | Keep file on one worker |
+| `--looponfail` | Re-run on change (dev) |
+| `worker_id` | `gw0`, `master`, etc. |
+
+Each worker is a separate process with its own imports and fixtures (session fixtures run per worker).
+
+## 💡 Examples
+
+**Install & run:**
+
+```shellscript
+python -m pip install pytest-xdist
+pytest -n auto
+pytest -n 4 --dist loadscope
+```
+
+**Unique resources per worker:**
+
+```python
+import os
+import pytest
+
+@pytest.fixture(scope="session")
+def db_name(worker_id):
+    if worker_id == "master":
+        return "test_db"
+    return f"test_db_{worker_id}"
+```
+
+**Loadfile for order-sensitive modules:**
+
+```shellscript
+pytest -n 4 --dist loadfile
+```
+
+**Detect xdist:**
+
+```python
+def test_only_parallel(worker_id):
+    assert worker_id.startswith("gw") or worker_id == "master"
+```
+
+## ⚠️ Pitfalls
+
+- Shared temp paths / ports colliding across workers.
+- Session-scoped DB fixtures assuming a single process.
+- Flaky tests that only fail under `-n auto`.
+- Coverage needing compatible `pytest-cov` settings with xdist.
+- Using `--looponfail` in CI (dev-only workflow).
+
+## 🔗 Related
+
+- [Install](install)
+- [Fixtures](fixtures)
+- [Coverage](coverage)
+- [CLI](cli)
+- [tmp_path](tmp_path)
+- [Plugins](plugins)

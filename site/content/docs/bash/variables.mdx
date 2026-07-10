@@ -1,0 +1,85 @@
+---
+title: Variables
+description: Bash · Reference cheat sheet
+---
+
+# Variables
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Bash variables hold strings (and, with care, integers/arrays). Assignment has no spaces: `name=value`. Expand with `$name` or `$\{name\}`. Prefer quoting expansions to avoid word-splitting and globbing.
+
+## 🔧 Core concepts
+
+| Syntax | Meaning |
+| --- | --- |
+| `var=value` | Assign (no spaces around `=`) |
+| `$var` / `$\{var\}` | Expand |
+| `$\{var:-default\}` | Default if unset or empty |
+| `$\{var:=default\}` | Assign default if unset/empty |
+| `$\{var:?err\}` | Error if unset/empty |
+| `$\{var:+alt\}` | Expand `alt` if set and non-empty |
+| `readonly VAR=1` | Immutable |
+| `local x=1` | Function-scoped (inside functions) |
+| `export VAR=1` | Pass to child processes |
+| `declare -i n=0` | Integer attribute |
+| `declare -r` / `-a` / `-A` | Readonly / indexed / associative |
+
+Special: `$0` script name, `$1`…`$n` args, `$#` count, `$@` / `$*` all args, `$?` last exit, `$$` PID, `$!` last background PID, `$_` last arg of previous command.
+
+## 💡 Examples
+
+**Basics and defaults:**
+
+```shellscript
+name="Ada"
+echo "Hello, ${name}"
+port="${PORT:-8080}"
+: "${API_KEY:?API_KEY is required}"
+```
+
+**Export and env:**
+
+```shellscript
+export DATABASE_URL="postgres://localhost/app"
+env | grep DATABASE
+printenv DATABASE_URL
+```
+
+**Arithmetic:**
+
+```shellscript
+declare -i count=0
+count+=1
+((count++))
+echo $((count * 2))
+```
+
+**Safe empty check:**
+
+```shellscript
+if [[ -z "${var:-}" ]]; then
+  echo "unset or empty"
+fi
+```
+
+## ⚠️ Pitfalls
+
+- `var = value` runs command `var` (spaces break assignment).
+- Unquoted `$var` splits on `IFS` and expands globs.
+- `$1` vs `"$1"`: always quote unless you intentionally want splitting.
+- `$*` vs `$@`: use `"$@"` to preserve argument boundaries.
+- Environment variables are always strings; `(( ))` / `declare -i` for math.
+- `local` only works inside functions; using it at top level errors.
+
+## 🔗 Related
+
+- [quoting.md](./quoting)
+- [arrays.md](./arrays)
+- [string_ops.md](./string_ops)
+- [functions.md](./functions)
+- [conditionals.md](./conditionals)

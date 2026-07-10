@@ -1,0 +1,87 @@
+---
+title: Configuration
+description: Pytest · Reference cheat sheet
+---
+
+# Configuration
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Configure pytest in `pytest.ini`, `pyproject.toml`, or `tox.ini`. Prefer `[tool.pytest.ini_options]` in modern projects; keep discovery and defaults versioned.
+
+## 🔧 Core concepts
+
+| Key | Role |
+| --- | --- |
+| `testpaths` | Where to look |
+| `python_files` / `_classes` / `_functions` | Discovery patterns |
+| `addopts` | Default CLI flags |
+| `markers` | Register marks |
+| `filterwarnings` | Warning policy |
+| `minversion` | Require pytest version |
+| `pythonpath` | Import roots (pytest 7+) |
+
+INI values are strings; TOML can use lists.
+
+## 💡 Examples
+
+**pyproject.toml:**
+
+```toml
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+markers = [
+  "slow: long tests",
+  "integration: needs services",
+]
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:legacy_pkg.*",
+]
+```
+
+**pytest.ini equivalent:**
+
+```ini
+[pytest]
+testpaths = tests
+addopts = -ra --strict-markers
+markers =
+    slow: long tests
+```
+
+**Env:**
+
+```shellscript
+export PYTEST_ADDOPTS="-q --tb=short"
+```
+
+**Per-directory:** nested `conftest.py` + local `pytest.ini` (rare; prefer one root config).
+
+## ⚠️ Pitfalls
+
+- Duplicate config in both `pytest.ini` and `pyproject.toml` — one source of truth.
+- `addopts` including `--cov` making bare `pytest` slow for quick runs.
+- Forgetting `--strict-markers` then typos silently create new marks.
+- Wrong `pythonpath` masking packaging issues.
+- Setting `norecursedirs` too aggressively and skipping test folders.
+
+## 🔗 Related
+
+- [Install](install)
+- [CLI](cli)
+- [Markers](markers)
+- [conftest](conftest)
+- [Plugins](plugins)
+- [Coverage](coverage)

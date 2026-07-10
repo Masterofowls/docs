@@ -1,0 +1,98 @@
+---
+title: Django pytest
+description: Pytest · Reference cheat sheet
+---
+
+# Django pytest
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`pytest-django` replaces `manage.py test` with pytest fixtures: `client`, `admin_client`, `db`, `django_user_model`, and DB access markers.
+
+## 🔧 Core concepts
+
+| Fixture / mark | Role |
+| --- | --- |
+| `db` / `django_db` | Enable DB access |
+| `client` | Django test client |
+| `admin_client` | Logged-in staff |
+| `rf` | RequestFactory |
+| `settings` | Override settings |
+| `live_server` | Live HTTP server |
+
+Configure `DJANGO_SETTINGS_MODULE` in pytest config or env.
+
+## 💡 Examples
+
+**Install:**
+
+```shellscript
+python -m pip install pytest-django
+```
+
+```toml
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "myproject.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+```
+
+**View test:**
+
+```python
+import pytest
+
+@pytest.mark.django_db
+def test_home(client):
+    res = client.get("/")
+    assert res.status_code == 200
+```
+
+**Model + user:**
+
+```python
+@pytest.mark.django_db
+def test_user(django_user_model):
+    u = django_user_model.objects.create_user("ada", password="x")
+    assert u.username == "ada"
+```
+
+**Settings override:**
+
+```python
+def test_debug(settings):
+    settings.DEBUG = True
+    assert settings.DEBUG is True
+```
+
+**Transactional / live:**
+
+```python
+@pytest.mark.django_db(transaction=True)
+def test_signal():
+    ...
+
+@pytest.mark.django_db
+def test_api(live_server, client):
+    assert live_server.url.startswith("http")
+```
+
+## ⚠️ Pitfalls
+
+- Accessing DB without `django_db` / `db` fixture → error.
+- Relying on migration state without `pytest-django` DB setup.
+- Using unittest `TestCase` transactions mixed with pytest fixtures carelessly.
+- Factory Boy / fixtures creating data without cleanup in non-db tests.
+- Pointing `DJANGO_SETTINGS_MODULE` at production settings.
+
+## 🔗 Related
+
+- [Fixtures](fixtures)
+- [Markers](markers)
+- [Configuration](configuration)
+- [Plugins](plugins)
+- [Mocking](mocking)
+- [Install](install)

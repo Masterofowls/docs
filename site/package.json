@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "sync:content": "node scripts/sync-content.mjs",
-    "predev": "node scripts/sync-content.mjs",
-    "prebuild": "node scripts/sync-content.mjs",
+    "predev": "node scripts/sync-content.mjs && fumadocs-mdx",
+    "prebuild": "node scripts/sync-content.mjs && fumadocs-mdx",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",

@@ -1,0 +1,27 @@
+{
+  "title": "Playwright",
+  "description": "E2E browser testing",
+  "icon": "Bug",
+  "root": true,
+  "pages": [
+    "index",
+    "actions",
+    "api-testing",
+    "assertions",
+    "authentication",
+    "ci",
+    "codegen",
+    "config",
+    "fixtures",
+    "install",
+    "locators",
+    "mobile-emulation",
+    "navigation",
+    "network",
+    "page-object",
+    "parallel",
+    "screenshots-video",
+    "tracing",
+    "visual-comparisons"
+  ]
+}

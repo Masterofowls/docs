@@ -1,0 +1,81 @@
+---
+title: Subshells
+description: Bash · Reference cheat sheet
+---
+
+# Subshells
+
+_Bash · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A subshell is a child shell process. Changes to variables, `cd`, and shell options inside it do not affect the parent. Subshells appear with `(…)`, pipelines, command substitution `$(…)`, and process substitution contexts.
+
+## 🔧 Core concepts
+
+| Construct | Subshell? |
+| --- | --- |
+| `( cd /tmp && pwd )` | Yes |
+| `\{ cd /tmp && pwd; \}` | No (group command; needs trailing `;`) |
+| `$(cmd)` / `` `cmd` `` | Yes |
+| `cmd \| cmd` | Each side may be (bash: last may not with `lastpipe`) |
+| `coproc` | Separate process |
+| Background `cmd &` | Child process |
+
+Use subshells to isolate `cd`, temporary `umask`, or option changes. Use `\{ …; \}` when you need side effects in the current shell.
+
+## 💡 Examples
+
+**Isolate directory change:**
+
+```shellscript
+pwd
+( cd /tmp && ls )
+pwd   # unchanged
+```
+
+**Group vs subshell:**
+
+```shellscript
+{ echo a; echo b; } > both.txt     # current shell
+( echo a; echo b ) > both.txt      # subshell (usually fine for I/O)
+```
+
+**Capture without polluting:**
+
+```shellscript
+version="$(
+  cd "$repo" || exit 1
+  git describe --tags
+)"
+```
+
+**Avoid pipeline subshell for vars:**
+
+```shellscript
+# bad: count lost
+# printf '%s\n' a b | while read -r x; do ((count++)); done
+
+count=0
+while read -r x; do ((count++)) || true; done < <(printf '%s\n' a b)
+echo "$count"   # 2
+```
+
+## ⚠️ Pitfalls
+
+- Variable assignments in pipelines often don’t persist—use process substitution or lastpipe.
+- `(exit 1)` only exits the subshell; parent continues unless you check status.
+- Nested subshells add process overhead; don’t overuse in tight loops.
+- `cd` in scripts: prefer subshell or `pushd`/`popd` over relying on later `cd -`.
+- Functions defined in a subshell vanish when it ends.
+- `export` inside subshell does not affect parent environment.
+
+## 🔗 Related
+
+- [process_substitution.md](./process_substitution)
+- [pipes_redirection.md](./pipes_redirection)
+- [variables.md](./variables)
+- [loops.md](./loops)
+- [functions.md](./functions)
