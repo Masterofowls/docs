@@ -1,0 +1,21 @@
+{
+  "title": "Examples",
+  "pages": [
+    "index",
+    "cli-tool",
+    "convert-files",
+    "csv-excel",
+    "dataclass-pipeline",
+    "encrypt",
+    "http-requests",
+    "list-to-dict",
+    "manage-files",
+    "merge-lists",
+    "pytest-example",
+    "retry-backoff",
+    "scrape-html",
+    "server",
+    "sqlite",
+    "tg-bot"
+  ]
+}

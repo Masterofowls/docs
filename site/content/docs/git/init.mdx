@@ -1,0 +1,63 @@
+---
+title: init
+description: Git · Reference cheat sheet
+---
+
+# init
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git init` creates a new repository (a `.git` directory) in the current or given folder. Optionally set the initial branch name and template; then add a remote and make the first commit.
+
+## 🔧 Core concepts
+
+- **Repo root** — `.git/` holds objects, refs, config.
+- **Initial branch** — `-b main` (or `init.defaultBranch`).
+- **Bare** — `git init --bare` for remotes without a working tree.
+- **Template** — `--template=<dir>` copies hooks/info.
+- **Reinit** — safe to re-run; won’t overwrite existing history.
+
+## 💡 Examples
+
+```shellscript
+mkdir my-app && cd my-app
+git init -b main
+
+# Or
+git init
+git branch -M main
+
+echo "# my-app" > README.md
+git add README.md
+git commit -m "chore: initial commit"
+
+git remote add origin git@github.com:org/my-app.git
+git push -u origin main
+
+# Bare remote-style repo
+git init --bare /srv/git/my-app.git
+
+# Shared permissions (server)
+git init --shared=group
+```
+
+## ⚠️ Pitfalls
+
+- Don’t `git init` inside an existing repo unless you intend a nested repo (usually wrong).
+- Forgetting `.gitignore` before the first add can commit secrets/build artifacts.
+- Default branch may still be `master` on older Git — set `-b main` explicitly.
+- Bare repos have no working tree — don’t develop directly in them.
+- Nested `git init` in monorepo packages breaks tooling — use one root repo.
+
+## 🔗 Related
+
+- [clone.md](./clone)
+- [commit.md](./commit)
+- [remote.md](./remote)
+- [gitignore.md](./gitignore)
+- [hooks.md](./hooks)
+- [stage.md](./stage)

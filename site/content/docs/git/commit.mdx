@@ -1,0 +1,62 @@
+---
+title: Commit
+description: _Git · Reference cheat sheet_ 
+---
+
+# Commit
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+A commit records a snapshot of the staged index with metadata (author, message, parent). Prefer small, purposeful commits with clear messages; amend only when safe (unpushed, intentional).
+
+## 🧩 Core concepts
+
+- **Snapshot model** — commit points at a tree; parents form history.
+- **Message** — subject (+ optional body); conventional prefixes (`feat:`, `fix:`) are team conventions.
+- **Amend** — `git commit --amend` rewrites the latest commit (changes hash).
+- **Sign-off / GPG** — `-s` / `-S` for DCO or signed commits when required.
+- **Empty commits** — `--allow-empty` for CI triggers or markers (rare).
+- **Hooks** — `pre-commit` / `commit-msg` can block or rewrite messages.
+
+## 💡 Examples
+
+```shellscript
+# Commit staged changes
+git commit -m "feat: add login form validation"
+
+# Stage tracked files and commit
+git commit -am "fix: handle null user in session"
+
+# Amend message only
+git commit --amend -m "feat: add login form validation"
+
+# Amend and include newly staged files (unpushed only)
+git add src/login.ts
+git commit --amend --no-edit
+
+# Show last commit
+git log -1 --stat
+git show HEAD
+
+# Skip hooks only if you must (usually avoid)
+# git commit --no-verify -m "wip"
+```
+
+## ⚠️ Pitfalls
+
+- Amending a commit already pushed requires force-push — coordinate with the team.
+- `-a` ignores untracked files — new files still need `git add`.
+- Huge commits are hard to review and revert — split by concern.
+- Never put secrets in commit messages or blobs; rewriting history later is painful.
+
+## 🔗 Related
+
+- [Stage](./stage)
+- [Branch](./branch)
+- [Push](./push)
+- [Rebase](./rebase)
+- [Merge](./merge)

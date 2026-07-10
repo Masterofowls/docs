@@ -1,0 +1,110 @@
+---
+title: "OOP (Classes & Prototypes)"
+description: JavaScript · Reference cheat sheet
+---
+
+# OOP (Classes & Prototypes)
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+JavaScript OOP is prototype-based. `class` syntax is sugar over constructor functions and prototypes, adding inheritance via `extends`, `super`, public/private fields, and static members.
+
+## 🔧 Core concepts
+
+- **Class**: `constructor`, instance methods, getters/setters, fields.
+- **Private**: `#field`, `#method` — truly private per class.
+- **Static**: `static` props/methods on the constructor.
+- **Inheritance**: `extends`, `super()` before using `this` in subclass constructors.
+- **Prototype**: `obj.__proto__` / `Object.getPrototypeOf`; methods live on `.prototype`.
+- **`instanceof`**: walks the prototype chain.
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    return `${this.name} makes a noise`;
+  }
+}
+```
+
+## 💡 Examples
+
+```js
+class Dog extends Animal {
+  #tricks = [];
+
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+
+  speak() {
+    return `${super.speak()} — woof`;
+  }
+
+  addTrick(t) {
+    this.#tricks.push(t);
+  }
+
+  get tricks() {
+    return [...this.#tricks];
+  }
+
+  static fromJSON(json) {
+    const data = JSON.parse(json);
+    return new Dog(data.name, data.breed);
+  }
+}
+
+const d = new Dog("Rex", "lab");
+d instanceof Dog; // true
+d instanceof Animal; // true
+
+// Mix-in pattern
+const Timestamped = (Base) =>
+  class extends Base {
+    createdAt = new Date();
+  };
+class Job extends Timestamped(Object) {}
+
+// Prototype check
+Object.getPrototypeOf(d) === Dog.prototype;
+```
+
+```js
+// Composition over deep hierarchies
+class Engine {
+  start() {
+    return "vroom";
+  }
+}
+class Car {
+  constructor() {
+    this.engine = new Engine();
+  }
+  start() {
+    return this.engine.start();
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Subclass constructors must call `super()` before accessing `this`.
+- Arrow methods as class fields are not on the prototype (per-instance; can’t be easily mocked via proto).
+- Private fields are not accessible in subclasses or outside the declaring class.
+- `this` in callbacks needs binding or arrows — class methods are not auto-bound.
+- Overusing inheritance creates brittle hierarchies — prefer composition.
+
+## 🔗 Related
+
+- [new.md](./new) — construction
+- [objects.md](./objects) — prototypes & literals
+- [properties.md](./properties) — descriptors
+- [map.md](./map) — WeakMap privacy pattern
+- [error.md](./error) — custom Error subclasses
+- [import_export.md](./import_export) — exporting classes

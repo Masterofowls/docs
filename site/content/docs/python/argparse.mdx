@@ -1,0 +1,97 @@
+---
+title: Argparse
+description: Python · Reference cheat sheet
+---
+
+# Argparse
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`argparse` builds CLI interfaces: options, flags, subcommands, and help text. Prefer it from the stdlib for scripts; consider `typer`/`click` for richer apps.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `ArgumentParser` | Root parser |
+| `add_argument` | Positional or optional |
+| `nargs` | `?` `*` `+` or int |
+| `type=` | Converter (`int`, `Path`) |
+| `choices=` | Allowed values |
+| `required=` | For optionals |
+| Subparsers | Subcommands |
+| `parse_args` | Returns namespace |
+
+Flags start with `-`/`--`. Positionals do not. Auto `--help` is included.
+
+## 💡 Examples
+
+**Simple script:**
+
+```python
+import argparse
+from pathlib import Path
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Resize images")
+    p.add_argument("input", type=Path, help="input file")
+    p.add_argument("-o", "--output", type=Path, required=True)
+    p.add_argument("-v", "--verbose", action="store_true")
+    p.add_argument("--quality", type=int, default=85, choices=range(1, 101))
+    args = p.parse_args()
+    if args.verbose:
+        print("in", args.input, "out", args.output)
+
+if __name__ == "__main__":
+    main()
+```
+
+**Subcommands:**
+
+```python
+import argparse
+
+parser = argparse.ArgumentParser(prog="tool")
+sub = parser.add_subparsers(dest="cmd", required=True)
+
+run = sub.add_parser("run", help="run job")
+run.add_argument("--workers", type=int, default=1)
+
+show = sub.add_parser("show", help="show status")
+show.add_argument("job_id")
+
+args = parser.parse_args()
+print(args)
+```
+
+**Mutual exclusion:**
+
+```python
+import argparse
+
+p = argparse.ArgumentParser()
+g = p.add_mutually_exclusive_group()
+g.add_argument("--json", action="store_true")
+g.add_argument("--plain", action="store_true")
+```
+
+## ⚠️ Pitfalls
+
+- `type=bool` is wrong for flags — use `action="store_true"`.
+- `choices=range(...)` works but help text is huge — validate manually if needed.
+- Forgetting `required=True` on subparsers (pre-3.7 patterns) allows empty cmd.
+- Don't parse args at import time — gate with `main` / `if __name__`.
+- Path args still need existence checks — `type=Path` only converts.
+
+## 🔗 Related
+
+- [Examples: cli tool](Examples/cli_tool)
+- [Pathlib](pathlib)
+- [Print / input](print_input)
+- [Logging](logging)
+- [Packaging](packaging)
+- [Venv](venv)

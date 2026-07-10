@@ -1,0 +1,93 @@
+---
+title: Pagination
+description: Django · Reference cheat sheet
+---
+
+# Pagination
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`Paginator` splits a queryset or sequence into pages. Use in function views, `ListView` (`paginate_by`), or DRF pagination classes. Prefer queryset pagination (LIMIT/OFFSET or keyset) over loading all rows into memory.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Paginator(object_list, per_page)` | Build pages |
+| `page(number)` | `Page` object |
+| `Page.object_list` | Items on page |
+| `has_next` / `has_previous` | Navigation |
+| `ListView.paginate_by` | CBV helper |
+| `InvalidPage` / `EmptyPage` / `PageNotAnInteger` | Errors |
+
+DRF: `PageNumberPagination`, `LimitOffsetPagination`, `CursorPagination`.
+
+## 💡 Examples
+
+**Function view:**
+
+```python
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
+
+from .models import Article
+
+
+def article_list(request):
+    qs = Article.objects.filter(is_published=True).order_by("-pk")
+    paginator = Paginator(qs, 20)
+    page_number = request.GET.get("page")
+    try:
+        page = paginator.page(page_number)
+    except PageNotAnInteger:
+        page = paginator.page(1)
+    except EmptyPage:
+        page = paginator.page(paginator.num_pages)
+    return render(request, "blog/list.html", {"page": page})
+```
+
+**ListView:**
+
+```python
+from django.views.generic import ListView
+
+
+class ArticleList(ListView):
+    model = Article
+    paginate_by = 20
+    queryset = Article.objects.filter(is_published=True)
+```
+
+**Template:**
+
+```html
+{% for article in page %}
+  <li>{{ article.title }}</li>
+{% endfor %}
+{% if page.has_previous %}
+  <a href="?page={{ page.previous_page_number }}">Prev</a>
+{% endif %}
+{% if page.has_next %}
+  <a href="?page={{ page.next_page_number }}">Next</a>
+{% endif %}
+```
+
+## ⚠️ Pitfalls
+
+- Unordered querysets → unstable pages; always `order_by`.
+- Large OFFSET is slow—consider cursor/keyset pagination for deep pages.
+- Counting huge tables on every request—cache `count` or approximate.
+- Mixing GET filters without preserving querystring in page links.
+- Evaluating full queryset before paginating.
+
+## 🔗 Related
+
+- [QuerySet](queryset)
+- [Views](views)
+- [Templates](templates)
+- [REST framework](rest_framework)
+- [buildin_views](buildin_views)

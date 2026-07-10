@@ -1,0 +1,66 @@
+---
+title: Merge
+description: _Git · Reference cheat sheet_ 
+---
+
+# Merge
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`git merge` joins histories by integrating another branch into the current one. Fast-forward moves the pointer when possible; otherwise Git creates a merge commit. Resolve conflicts, then complete the merge commit.
+
+## 🧩 Core concepts
+
+- **Fast-forward** — no merge commit if current tip is ancestor of incoming.
+- **True merge** — creates a commit with two parents when histories diverged.
+- **`--no-ff`** — always create a merge commit (preserves feature-branch topology).
+- **`--squash`** — stage combined changes without a merge commit (then commit yourself).
+- **Conflict markers** — edit files, `git add`, then `git commit` / `git merge --continue`.
+- **Abort** — `git merge --abort` returns to pre-merge state.
+
+## 💡 Examples
+
+```shellscript
+git switch main
+git fetch origin
+git merge origin/main
+
+# Feature into main
+git switch main
+git merge --no-ff feature/checkout
+
+# Squash merge locally
+git merge --squash feature/checkout
+git commit -m "feat: checkout flow"
+
+# During conflicts
+git status
+# edit files, remove <<<<<<< ======= >>>>>>> markers
+git add path/to/file
+git commit   # completes merge
+
+# Abort
+git merge --abort
+
+# Prefer ff-only on release branches
+git merge --ff-only origin/main
+```
+
+## ⚠️ Pitfalls
+
+- Merging the wrong direction (main into feature vs feature into main) confuses PR history.
+- Leaving conflict markers in committed files breaks builds — search for `&lt;&lt;&lt;&lt;&lt;&lt;&lt;`.
+- Squash merges on the remote make local feature branches diverge — delete/recreate after.
+- Recursive/ort strategies handle most text; binary conflicts need manual choice.
+
+## 🔗 Related
+
+- [Rebase](./rebase)
+- [Pull](./pull)
+- [Branch](./branch)
+- [Commit](./commit)
+- [Fetch](./fetch)

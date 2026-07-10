@@ -1,0 +1,86 @@
+---
+title: "Spread & Rest"
+description: JavaScript · Reference cheat sheet
+---
+
+# Spread & Rest
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`...` is rest when collecting values into an array/object, and spread when expanding an iterable or object into places that expect multiple elements/properties. Same syntax, opposite direction — context decides.
+
+## 🔧 Core concepts
+
+- **Rest (collect)**: function params, array/object destructuring — must be last.
+- **Spread (expand)**: call args, array literals, object literals (own enumerable props).
+- **Arrays/iterables**: spread uses the iterator protocol.
+- **Objects**: shallow copy / merge — later keys win.
+- **Clone caveats**: spread is shallow; nested objects stay shared by reference.
+
+```js
+const nums = [1, 2, 3];
+Math.max(...nums); // 3
+const copy = [...nums];
+const merged = { ...a, ...b };
+```
+
+## 💡 Examples
+
+```js
+// Rest parameters
+function logAll(label, ...items) {
+  console.log(label, items);
+}
+logAll("ids", 1, 2, 3); // items === [1, 2, 3]
+
+// Spread into call
+const args = [10, 20];
+sum(...args);
+
+// Concat / insert
+const a = [1, 2];
+const b = [0, ...a, 3]; // [0, 1, 2, 3]
+
+// Copy Set / NodeList
+const unique = [...new Set([1, 1, 2])];
+const els = [...document.querySelectorAll("li")];
+
+// Object merge (shallow)
+const defaults = { theme: "light", lang: "en" };
+const prefs = { theme: "dark" };
+const config = { ...defaults, ...prefs }; // theme: "dark"
+
+// Rest in destructuring
+const [head, ...tail] = [1, 2, 3, 4];
+const { id, ...meta } = { id: 1, name: "x", role: "admin" };
+
+// Spread Map entries into object (string keys)
+const m = new Map([["a", 1], ["b", 2]]);
+const obj = Object.fromEntries(m);
+```
+
+```js
+// Immutable update pattern
+const state = { user: { name: "Ada" }, count: 0 };
+const next = { ...state, count: state.count + 1 };
+```
+
+## ⚠️ Pitfalls
+
+- Object spread does not copy inherited or non-enumerable properties; symbols need care.
+- Spreading huge arrays into args can hit call-stack / argument limits — use loops.
+- `...null` / `...undefined` in objects is a no-op; in arrays they throw.
+- Rest in objects excludes the listed keys but does not deep-clone nested values.
+- Spread order matters for overrides: put overrides last.
+
+## 🔗 Related
+
+- [destructuring.md](./destructuring) — rest patterns
+- [arrays.md](./arrays) — array copy/concat
+- [objects.md](./objects) — object assign/merge
+- [functions.md](./functions) — rest params
+- [iterator.md](./iterator) — iterable protocol

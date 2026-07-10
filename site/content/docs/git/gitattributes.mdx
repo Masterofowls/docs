@@ -1,0 +1,75 @@
+---
+title: Gitattributes
+description: _Git · Reference cheat sheet_ 
+---
+
+# Gitattributes
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`.gitattributes` assigns attributes to paths: line-ending normalization, diff/merge drivers, linguist overrides, and Git LFS filters. Keep it committed so every clone behaves the same.
+
+## 🧩 Core concepts
+
+- **`text` / `eol`** — normalize LF in the repo; checkout `lf` or `crlf` per path.
+- **`binary`** — skip text conversion/diff for binaries.
+- **`diff` / `merge`** — custom drivers for generated or vendor files.
+- **`export-ignore`** — omit paths from `git archive`.
+- **Linguist** — `linguist-language`, `linguist-vendored`, `linguist-generated` for GitHub stats.
+- **LFS filter** — `filter=lfs diff=lfs merge=lfs -text` for large files.
+
+## 💡 Examples
+
+```ini
+# Normalize text; force LF in working tree for these
+* text=auto eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=lf
+
+# Binaries
+*.png binary
+*.jpg binary
+*.pdf binary
+*.zip binary
+
+# Generated / vendored (GitHub Linguist)
+dist/** linguist-generated=true
+vendor/** linguist-vendored=true
+
+# Custom diff for lockfiles (optional)
+package-lock.json -diff
+pnpm-lock.yaml -diff
+
+# LFS (after git lfs track)
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+
+# Archives
+docs/internal/** export-ignore
+```
+
+```shellscript
+# Refresh working tree after attributes change
+git add --renormalize .
+git status
+```
+
+## ⚠️ Pitfalls
+
+- Changing `eol` mid-project causes huge diffs unless you renormalize carefully.
+- Marking text as `binary` hides useful diffs and can complicate merges.
+- LFS patterns belong here *and* need `git lfs install` on each machine.
+- Attributes are path-based — rename/move files can drop intended rules if patterns are too narrow.
+
+## 🔗 Related
+
+- [Gitignore](./gitignore)
+- [Git LFS](./git_lfs)
+- [Commit](./commit)
+- [Merge](./merge)
+- [Stage](./stage)

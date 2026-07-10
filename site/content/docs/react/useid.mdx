@@ -1,0 +1,67 @@
+---
+title: useId
+description: React · Reference cheat sheet
+---
+
+# useId
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useId()` generates a unique, stable ID string per component instance—safe for SSR hydration. Use to link labels and inputs (`htmlFor` / `id`) or ARIA attributes. Do not use as a list `key`.
+
+## 🔧 Core concepts
+
+- **Stable** — same ID across re-renders for that instance.
+- **SSR-safe** — matches server and client trees when structure matches.
+- **Prefix** — React may prefix (`:r1:`)—valid in HTML `id` / `htmlFor`.
+- **Multiple** — call once and suffix (`$\{id\}-name`, `$\{id\}-email`) for related fields.
+
+## 💡 Examples
+
+```tsx
+import { useId } from "react";
+
+export function NameField() {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id}>Name</label>
+      <input id={id} name="name" />
+    </div>
+  );
+}
+```
+
+**Shared base for several controls:**
+
+```tsx
+function PasswordFields() {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={`${id}-pw`}>Password</label>
+      <input id={`${id}-pw`} type="password" aria-describedby={`${id}-hint`} />
+      <p id={`${id}-hint`}>At least 8 characters</p>
+    </>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using `useId` as React `key`—keys must come from data identity.
+- Generating IDs with `Math.random()` / incrementing counters → hydration mismatches.
+- Calling different numbers of `useId` on server vs client.
+- Assuming format of the string—treat as opaque.
+
+## 🔗 Related
+
+- [forms.md](./forms) — accessible forms
+- [hooks.md](./hooks) — rules
+- [jsx.md](./jsx) — attributes
+- [strict_mode.md](./strict_mode) — double-invoke in dev
+- [testing.md](./testing) — queries by label

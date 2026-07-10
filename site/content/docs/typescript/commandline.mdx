@@ -1,0 +1,81 @@
+---
+title: Command Line
+description: _TypeScript · Reference cheat sheet_ 
+---
+
+# Command Line
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+The TypeScript compiler CLI (`tsc`) type-checks and optionally emits JavaScript. Install via `typescript` and run with `npx tsc` or a local `node_modules` binary. Most options mirror `tsconfig.json` compiler flags.
+
+## 🧩 Core concepts
+
+- **Project mode** — `tsc -p tsconfig.json` (default: nearest/implicit config).
+- **Emit vs check** — `noEmit` / `--noEmit` for CI typecheck; omit for JS output.
+- **Watch** — `--watch` / `-w` rebuilds on change.
+- **Incremental** — `--incremental` + `.tsbuildinfo` for faster rebuilds.
+- **Build mode** — `tsc -b` for project references (`composite` projects).
+- **Show config** — `--showConfig` prints the effective resolved config.
+
+## 💡 Examples
+
+```shellscript
+# Install
+npm install -D typescript
+npx tsc --version
+
+# Init a tsconfig
+npx tsc --init
+
+# Typecheck only (CI-friendly)
+npx tsc -p tsconfig.json --noEmit
+
+# Emit to outDir from config
+npx tsc -p tsconfig.json
+
+# Watch mode
+npx tsc -p tsconfig.json --watch
+
+# Build solution (project references)
+npx tsc -b packages/utils packages/app --force
+
+# One-off compile without relying on config paths
+npx tsc src/index.ts --target ES2022 --module NodeNext --outdir dist
+
+# Effective config
+npx tsc --showConfig
+
+# Common flags
+npx tsc --strict --pretty false --listFiles false
+```
+
+`package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json"
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- CLI flags override `tsconfig` when both are set — know which wins for CI.
+- Compiling a single `.ts` file ignores most of your project `paths`/`include` setup.
+- `tsc -b` requires `composite: true` (and usually `declaration: true`) on referenced projects.
+- Global `tsc` may be an older version than the project’s local TypeScript — prefer `npx`/`npm exec`.
+
+## 🔗 Related
+
+- [Config](./config)
+- [Module](./module)
+- [Types](./types)
+- [Decorators](./decorators)
+- [Class](./class)

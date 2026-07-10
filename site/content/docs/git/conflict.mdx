@@ -1,0 +1,67 @@
+---
+title: conflict
+description: Git · Reference cheat sheet
+---
+
+# conflict
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Conflicts occur when merge, rebase, cherry-pick, or revert can’t auto-apply changes. Git marks files with conflict markers; you resolve, `git add`, then continue the operation. Abort to return to the pre-operation state.
+
+## 🔧 Core concepts
+
+- **Markers** — `&lt;&lt;&lt;&lt;&lt;&lt;&lt;`, `=======`, `>>>>>>>` (ours / theirs depend on command).
+- **Ours/theirs** — merge: ours = current branch; rebase: ours = upstream (inverted mental model).
+- **Tools** — `git mergetool`, IDE 3-way merge, `diff --cc`.
+- **Continue** — `merge --continue` / `rebase --continue` / `cherry-pick --continue`.
+- **Abort** — `--abort` restores pre-op state (if possible).
+
+## 💡 Examples
+
+```shellscript
+git status   # unmerged paths
+# edit files — remove markers, keep correct code
+git add path/to/file.ts
+git merge --continue   # or rebase / cherry-pick
+
+# Take one side for a file
+git checkout --ours -- path/to/file.ts
+git checkout --theirs -- path/to/file.ts
+git add path/to/file.ts
+
+git merge --abort
+git rebase --abort
+
+git diff   # unmerged diff
+git mergetool
+```
+
+```plaintext
+<<<<<<< HEAD
+current change
+=======
+incoming change
+>>>>>>> feature
+```
+
+## ⚠️ Pitfalls
+
+- Leaving conflict markers in committed files breaks builds — search for `&lt;&lt;&lt;&lt;&lt;&lt;&lt;`.
+- Ours/theirs flip meaning during rebase vs merge — verify with `status` / content.
+- Binary conflicts can’t use markers — choose one version explicitly.
+- Resolving then forgetting `git add` blocks `--continue`.
+- Don’t abort if you’ve already fixed a lot without backup — commit WIP or stash carefully.
+
+## 🔗 Related
+
+- [merge.md](./merge)
+- [rebase.md](./rebase)
+- [cherry_pick.md](./cherry_pick)
+- [revert.md](./revert)
+- [status.md](./status)
+- [diff.md](./diff)

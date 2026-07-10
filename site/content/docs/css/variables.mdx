@@ -1,0 +1,87 @@
+---
+title: CSS Variables
+description: CSS · Reference cheat sheet
+---
+
+# CSS Variables
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Custom properties (`--name`) store reusable values that cascade and inherit. They enable theming, runtime tweaks via JS, and cleaner design tokens. Declare on `:root` or a scope; use with `var(--name, fallback)`.
+
+## 🔧 Core concepts
+
+- **Define**: `--accent: #3366ff;` on any element.
+- **Use**: `color: var(--accent);` / `var(--accent, blue)`.
+- **Inheritance**: custom props inherit by default; reset with `initial` or new value.
+- **Scope**: set on a component host to theme a subtree.
+- **Computation**: can hold any token sequence; invalid at computed-value time falls back.
+- **JS**: `element.style.setProperty("--x", "1rem")`, `getComputedStyle(el).getPropertyValue("--x")`.
+
+```css
+:root {
+  --space: 0.5rem;
+  --text: #111;
+  --accent: oklch(60% 0.2 250);
+}
+.button {
+  padding: calc(var(--space) * 2);
+  color: var(--text);
+  background: var(--accent);
+}
+```
+
+## 💡 Examples
+
+```css
+/* Theming */
+html[data-theme="dark"] {
+  --text: #f5f5f5;
+  --bg: #121212;
+}
+body {
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Component tokens */
+.card {
+  --card-pad: 1rem;
+  padding: var(--card-pad);
+}
+.card.compact {
+  --card-pad: 0.5rem;
+}
+
+/* Fallback chain */
+color: var(--brand, var(--accent, navy));
+
+/* With relative color / calc */
+--h: 200;
+background: oklch(70% 0.1 var(--h));
+width: calc(100% - var(--sidebar, 0px));
+```
+
+```js
+document.documentElement.style.setProperty("--accent", userColor);
+```
+
+## ⚠️ Pitfalls
+
+- `--x: 10` without units breaks `calc` expecting lengths — store units in the variable or multiply carefully.
+- Custom properties are not CSS variables in the preprocessor sense — invalid values fail at computed-value time.
+- Animating custom props needs `@property` for typed interpolation in many cases.
+- Overusing global tokens without scopes creates coupling.
+- `var()` inside URLs / some older contexts has quirks — test.
+
+## 🔗 Related
+
+- [color_functions.md](./color_functions) — modern colors
+- [calc_min_max_clamp.md](./calc_min_max_clamp) — calc with vars
+- [dark_mode.md](./dark_mode) — theme switching
+- [cascade_layers.md](./cascade_layers) — cascade order
+- [specificity.md](./specificity) — vs !important

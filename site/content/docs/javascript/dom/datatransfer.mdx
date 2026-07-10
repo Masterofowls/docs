@@ -1,0 +1,101 @@
+---
+title: "DataTransfer & Drag-and-Drop"
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# DataTransfer & Drag-and-Drop
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+`DataTransfer` carries payload during drag-and-drop and clipboard operations. Set data in `dragstart`, read it in `drop`. Use `DataTransferItemList` for files and multiple MIME types.
+
+## 🔧 Core concepts
+
+- **Events**: `dragstart`, `drag`, `dragenter`, `dragover`, `dragleave`, `drop`, `dragend`.
+- **`event.dataTransfer`**: `setData`, `getData`, `clearData`, `types`, `files`, `items`.
+- **`effectAllowed` / `dropEffect`**: copy | move | link | none.
+- **`setDragImage(element, x, y)`**: custom ghost image.
+- **Clipboard**: `ClipboardEvent.clipboardData` is also a `DataTransfer`.
+
+```js
+el.addEventListener("dragstart", (e) => {
+  e.dataTransfer.setData("text/plain", el.id);
+  e.dataTransfer.effectAllowed = "move";
+});
+```
+
+## 💡 Examples
+
+```js
+const source = document.querySelector("#source");
+const target = document.querySelector("#target");
+
+source.draggable = true;
+
+source.addEventListener("dragstart", (e) => {
+  e.dataTransfer.setData("application/x-item-id", source.dataset.id);
+  e.dataTransfer.setData("text/plain", source.textContent);
+  e.dataTransfer.effectAllowed = "copyMove";
+});
+
+// Must preventDefault on dragover to allow drop
+target.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  target.classList.add("drag-over");
+});
+
+target.addEventListener("dragleave", () => {
+  target.classList.remove("drag-over");
+});
+
+target.addEventListener("drop", (e) => {
+  e.preventDefault();
+  target.classList.remove("drag-over");
+  const id = e.dataTransfer.getData("application/x-item-id");
+  const node = document.querySelector(`[data-id="${CSS.escape(id)}"]`);
+  if (node) target.append(node);
+});
+
+// File drop
+target.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  const files = [...e.dataTransfer.files];
+  for (const file of files) {
+    console.log(file.name, file.type, file.size);
+  }
+});
+```
+
+```js
+// Clipboard paste image
+editor.addEventListener("paste", (e) => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith("image/")) {
+      const file = item.getAsFile();
+      // upload / preview file
+    }
+  }
+});
+```
+
+## ⚠️ Pitfalls
+
+- Without `preventDefault` on `dragover`, `drop` will not fire.
+- `getData` for custom types may be empty outside `drop` in some browsers (security).
+- `files` is only populated for file drags — not for element drags.
+- MIME type strings are case-sensitive conventions (`text/plain`).
+- Touch devices often lack HTML5 DnD — provide click alternatives.
+
+## 🔗 Related
+
+- [events.md](./events) — event handling
+- [form.md](./form) — file inputs
+- [attributes.md](./attributes) — draggable / data-*
+- [create_add_remove.md](./create_add_remove) — moving nodes
+- [../api.md](../api) — File / Blob APIs
+- [../async.md](../async) — async file reads

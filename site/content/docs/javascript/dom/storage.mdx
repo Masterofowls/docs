@@ -1,0 +1,93 @@
+---
+title: Web Storage
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Web Storage
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+`localStorage` and `sessionStorage` provide synchronous key/value string storage per origin. Use them for small preferences — not for large datasets or secrets. Prefer IndexedDB for structured/offline data.
+
+## 🔧 Core concepts
+
+- **`localStorage`**: persists across sessions until cleared.
+- **`sessionStorage`**: per-tab session; survives reload, not new tabs (usually).
+- **API**: `getItem`, `setItem`, `removeItem`, `clear`, `key(i)`, `length`.
+- **Quota**: throws `QuotaExceededError` when full.
+- **Events**: `storage` fires in *other* documents of the same origin on `localStorage` changes.
+- **Only strings**: JSON-encode objects.
+
+```js
+localStorage.setItem("theme", "dark");
+const theme = localStorage.getItem("theme");
+```
+
+## 💡 Examples
+
+```js
+const storage = {
+  get(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw == null ? fallback : JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+  remove(key) {
+    localStorage.removeItem(key);
+  },
+};
+
+storage.set("user", { id: 1, name: "Ada" });
+const user = storage.get("user", {});
+
+// Cross-tab sync
+window.addEventListener("storage", (e) => {
+  if (e.key === "theme") {
+    applyTheme(e.newValue);
+  }
+});
+
+// sessionStorage wizard draft
+sessionStorage.setItem("draft", JSON.stringify(formState));
+
+// Enumerate
+for (let i = 0; i < localStorage.length; i++) {
+  const k = localStorage.key(i);
+  console.log(k, localStorage.getItem(k));
+}
+```
+
+```js
+try {
+  localStorage.setItem("cache", bigString);
+} catch (err) {
+  if (err.name === "QuotaExceededError") {
+    localStorage.removeItem("cache");
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Synchronous and blocking — avoid huge reads/writes on the main thread.
+- Never store tokens/passwords in accessible storage without a clear threat model.
+- Private mode / blocked storage can throw on access — wrap in try/catch.
+- `storage` event does not fire in the writer’s document.
+- Values are strings — forgetting `JSON.parse` yields subtle bugs.
+
+## 🔗 Related
+
+- [window.md](./window) — window.localStorage
+- [events.md](./events) — storage event
+- [../json.md](../json) — serialize values
+- [../error.md](../error) — quota errors
+- [navigation.md](./navigation) — session lifecycle
+- [../objects.md](../objects) — plain data shapes

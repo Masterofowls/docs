@@ -1,0 +1,89 @@
+---
+title: Declaration files (.d.ts)
+description: TypeScript · Reference cheat sheet
+---
+
+# Declaration files (.d.ts)
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Declaration files describe types for JavaScript libraries and ambient globals without emitting runtime code. Use them for untyped deps, augmenting modules, and publishing typed packages (`types` / `exports` in `package.json`).
+
+## 🔧 Core concepts
+
+| Pattern | Purpose |
+| --- | --- |
+| `declare module "pkg"` | Types for a module |
+| `declare module "*.css"` | Wildcard asset modules |
+| `declare global \{ \}` | Augment global scope |
+| `export \{\}` | Force file to be a module |
+| `export as namespace` | UMD / global + module |
+| Triple-slash `/// <reference` | Legacy refs / lib deps |
+
+- **DefinitelyTyped** — `@types/name` packages.
+- **Bundled types** — library ships its own `.d.ts`.
+- **`allowJs` + `checkJs` / JSDoc** — infer types from JS without hand-written d.ts.
+
+## 💡 Examples
+
+```ts
+// types/shim.d.ts
+declare module "legacy-lib" {
+  export function doThing(x: string): number;
+  const legacyLib: { version: string };
+  export default legacyLib;
+}
+
+declare module "*.svg" {
+  const url: string;
+  export default url;
+}
+
+// Augment global
+export {}; // make this a module
+declare global {
+  interface Window {
+    APP_VERSION: string;
+  }
+  var APP_VERSION: string;
+}
+
+// Ambient namespace (older libs)
+declare namespace MyLib {
+  function init(opts: { debug?: boolean }): void;
+}
+```
+
+```json
+// package.json (publisher)
+{
+  "name": "my-lib",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Missing `export \{\}` in an augment file can accidentally create a script global scope.
+- Duplicate `@types` + bundled types cause conflicts — prefer package’s own types.
+- `declare module` without proper exports leads to `any` default imports.
+- Don’t commit generated `.d.ts` that drift from source — emit from `tsc` / bundler.
+- Path mapping in `tsconfig` must resolve `.d.ts` consistently in editors and CI.
+
+## 🔗 Related
+
+- [module.md](./module)
+- [namespaces.md](./namespaces)
+- [config.md](./config)
+- [types.md](./types)
+- [strict_options.md](./strict_options)

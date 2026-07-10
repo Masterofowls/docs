@@ -1,0 +1,101 @@
+---
+title: Closures
+description: Python · Reference cheat sheet
+---
+
+# Closures
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A closure is a function that remembers variables from an enclosing scope after that scope has finished. Closures power decorators, callbacks, and lightweight factories without full classes.
+
+## 🔧 Core concepts
+
+| Idea | Detail |
+| --- | --- |
+| Free variable | Name used but not defined in the inner function |
+| Cell | Storage for closed-over values |
+| `nonlocal` | Rebind an enclosing (non-global) name |
+| `global` | Rebind a module-level name |
+| Late binding | Looks up the name at call time, not definition time |
+
+Inner functions are closures when they reference enclosing locals. Inspect with `fn.__closure__`.
+
+## 💡 Examples
+
+**Factory:**
+
+```python
+def make_multiplier(factor: int):
+    def multiply(x: int) -> int:
+        return x * factor
+    return multiply
+
+double = make_multiplier(2)
+print(double(5))  # 10
+```
+
+**Stateful counter with nonlocal:**
+
+```python
+def counter(start: int = 0):
+    value = start
+
+    def inc(step: int = 1) -> int:
+        nonlocal value
+        value += step
+        return value
+
+    return inc
+
+c = counter()
+print(c(), c(), c(5))  # 1 2 7
+```
+
+**Late binding in loops:**
+
+```python
+funcs = []
+for i in range(3):
+    funcs.append(lambda: i)          # all see final i
+print([f() for f in funcs])          # [2, 2, 2]
+
+funcs = [lambda i=i: i for i in range(3)]
+print([f() for f in funcs])          # [0, 1, 2]
+```
+
+**Decorator as closure:**
+
+```python
+def ensure_positive(fn):
+    def wrapper(x: int) -> int:
+        if x < 0:
+            raise ValueError("x must be >= 0")
+        return fn(x)
+    return wrapper
+
+@ensure_positive
+def sqrt_int(x: int) -> int:
+    return int(x**0.5)
+```
+
+## ⚠️ Pitfalls
+
+- Late binding: closures capture the variable, not the value at creation.
+- Assignment in an inner function makes a name local unless `nonlocal`/`global`.
+- Closures keep objects alive — can delay GC of large data.
+- Prefer explicit objects when state has many fields or methods.
+- Mutable closed-over containers can be mutated without `nonlocal`.
+
+## 🔗 Related
+
+- [Functions](functions)
+- [Decorators](decorators)
+- [Scope / namespaces](scope_namespaces)
+- [Lambda](lambda)
+- [Classes](classes)
+- [Walrus](walrus)

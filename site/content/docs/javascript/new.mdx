@@ -1,0 +1,94 @@
+---
+title: new Operator
+description: JavaScript · Reference cheat sheet
+---
+
+# new Operator
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`new` constructs an instance from a constructor function or class. It creates an object, sets its prototype, binds `this`, and returns the object (unless the constructor returns another object).
+
+## 🔧 Core concepts
+
+- **Steps**: create `\{\}` → set `[[Prototype]]` → call constructor with `this` → return object (or explicit object return).
+- **Classes**: `new Person()` required; calling without `new` throws.
+- **`new.target`**: meta-property detecting construct calls.
+- **`new.target` / subclassing**: works with `extends` and `super`.
+- **Built-ins**: `new Map()`, `new Date()`, `new Error()` — some built-ins differ if called as functions.
+
+```js
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+const p = new Point(1, 2);
+```
+
+## 💡 Examples
+
+```js
+// Classic constructor
+function User(name) {
+  if (new.target === undefined) {
+    return new User(name); // allow factory-style call
+  }
+  this.name = name;
+}
+User.prototype.hello = function () {
+  return `Hi, ${this.name}`;
+};
+
+const u = new User("Ada");
+u instanceof User; // true
+Object.getPrototypeOf(u) === User.prototype; // true
+
+// Class fields & private
+class Counter {
+  #n = 0;
+  get value() {
+    return this.#n;
+  }
+  inc() {
+    this.#n += 1;
+  }
+}
+const c = new Counter();
+
+// Return override
+function Weird() {
+  this.a = 1;
+  return { b: 2 }; // instance discarded
+}
+new Weird(); // { b: 2 }
+
+// Reflect.construct
+const d = Reflect.construct(Date, [2026, 0, 1]);
+```
+
+```js
+// Array exotic
+const a = new Array(3); // length 3 sparse
+const b = Array.of(3); // [3]
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `new` on old constructors sets properties on the global/`undefined` (strict) — prefer `class`.
+- Returning a primitive from a constructor is ignored; returning an object replaces `this`.
+- `arrow functions` cannot be constructors — no `new`.
+- `Symbol` / `BigInt` are not constructible with `new`.
+- `instanceof` can be spoofed; use brands or `new.target` checks for security-sensitive code.
+
+## 🔗 Related
+
+- [oop.md](./oop) — classes & inheritance
+- [objects.md](./objects) — prototypes
+- [properties.md](./properties) — defining instance props
+- [error.md](./error) — `new Error`
+- [map.md](./map) — `new Map`
+- [date.md](./date) — `new Date`

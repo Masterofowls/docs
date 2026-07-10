@@ -1,0 +1,83 @@
+---
+title: Template Literals
+description: JavaScript · Reference cheat sheet
+---
+
+# Template Literals
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Template literals use backticks `` ` `` for strings with interpolation `$\{expr\}`, multi-line text, and tagged templates. They replace most string concatenation and enable DSLs (e.g. sanitizers, CSS-in-JS) via tag functions.
+
+## 🔧 Core concepts
+
+- **Interpolate**: `` `Hello $\{name\}` `` — any expression inside `$\{\}`.
+- **Multi-line**: newlines are preserved as written.
+- **Escape**: `\``, `\$`, `\\` as needed.
+- **Tagged**: `tag\`...\`` calls `tag(strings, ...values)`.
+- **Raw**: `String.raw\`C:\path\file\`` — backslashes mostly literal.
+- **Nested**: templates can nest inside `$\{\}`.
+
+```js
+const name = "Ada";
+const msg = `Hello, ${name}!`;
+const block = `line1
+line2`;
+```
+
+## 💡 Examples
+
+```js
+const a = 3,
+  b = 4;
+`sum=${a + b}`; // "sum=7"
+
+// Expressions
+`User: ${user?.name ?? "guest"}`;
+`Items: ${items.map((i) => i.id).join(", ")}`;
+
+// HTML snippet (sanitize user input!)
+const html = `<li class="item">${escapeHtml(text)}</li>`;
+
+// Tagged template
+function highlight(strings, ...values) {
+  return strings.reduce(
+    (out, str, i) => out + str + (values[i] != null ? `<b>${values[i]}</b>` : ""),
+    "",
+  );
+}
+highlight`Hello ${"world"}`; // "Hello <b>world</b>"
+
+// String.raw
+String.raw`\n`; // "\\n" (two chars: \ and n)
+
+// Nested
+const rows = people.map((p) => `<tr><td>${p.name}</td></tr>`).join("");
+const table = `<table>${rows}</table>`;
+```
+
+```js
+// Dynamic property in message
+const key = "count";
+`Total ${key}=${data[key]}`;
+```
+
+## ⚠️ Pitfalls
+
+- Interpolating untrusted HTML/SQL causes XSS/injection — escape or use safe APIs.
+- `$\{obj\}` becomes `obj.toString()` — often `"[object Object]"`; format explicitly.
+- Older engines / some tooling mishandle tagged templates — know your targets.
+- Accidental nesting of quotes is fine with backticks, but `$\{` inside needs care.
+- Large templates rebuilt every render can allocate heavily — cache static parts.
+
+## 🔗 Related
+
+- [strings.md](./strings) — string methods
+- [f-string style](./strings) — formatting
+- [optional_chaining.md](./optional_chaining) — in interpolations
+- [regex.md](./regex) — patterns vs templates
+- [encode.md](./encode) — escaping

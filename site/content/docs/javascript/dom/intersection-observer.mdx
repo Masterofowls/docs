@@ -1,0 +1,92 @@
+---
+title: Intersection Observer
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Intersection Observer
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`IntersectionObserver` asynchronously reports when a target element’s visibility crosses thresholds relative to a root (viewport or element). Use it for lazy-loading, infinite scroll, ad viewability, and scroll-driven UI — without scroll event spam.
+
+## 🔧 Core concepts
+
+- **Create**: `new IntersectionObserver(callback, options)`.
+- **Options**: `root`, `rootMargin`, `threshold` (0–1 or array).
+- **Callback**: receives `entries` and the observer; runs off the main scroll path.
+- **Entry**: `isIntersecting`, `intersectionRatio`, `boundingClientRect`, `rootBounds`, `target`, `time`.
+- **Control**: `observe`, `unobserve`, `disconnect`, `takeRecords`.
+
+```js
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) load(e.target);
+  }
+});
+io.observe(document.querySelector("img[data-src]"));
+```
+
+## 💡 Examples
+
+```js
+// Lazy images
+const io = new IntersectionObserver(
+  (entries, obs) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const img = e.target;
+      img.src = img.dataset.src;
+      obs.unobserve(img);
+    }
+  },
+  { rootMargin: "200px 0px", threshold: 0.01 },
+);
+document.querySelectorAll("img[data-src]").forEach((img) => io.observe(img));
+
+// Infinite scroll sentinel
+const sentinel = document.querySelector("#sent");
+new IntersectionObserver(async ([e]) => {
+  if (e.isIntersecting) await loadMore();
+}).observe(sentinel);
+
+// Multiple thresholds for progress
+new IntersectionObserver(
+  ([e]) => {
+    bar.style.width = `${e.intersectionRatio * 100}%`;
+  },
+  { threshold: Array.from({ length: 21 }, (_, i) => i / 20) },
+).observe(article);
+
+// Section spy / active nav
+const sections = document.querySelectorAll("section[id]");
+const navIo = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e) => {
+      const link = document.querySelector(`a[href="#${e.target.id}"]`);
+      link?.classList.toggle("active", e.isIntersecting);
+    });
+  },
+  { rootMargin: "-40% 0px -40% 0px", threshold: 0 },
+);
+sections.forEach((s) => navIo.observe(s));
+```
+
+## ⚠️ Pitfalls
+
+- `root` must be an ancestor of the target (or `null` for viewport).
+- Zero-size targets may never intersect — ensure measurable box.
+- Callbacks are batched and async — not frame-perfect with scroll position.
+- Always `unobserve`/`disconnect` when done to avoid leaks.
+- `rootMargin` uses CSS margin syntax — percentages resolve against root size.
+
+## 🔗 Related
+
+- [mutation_observer.md](./mutation_observer) — DOM change watching
+- [resize_observer.md](./resize_observer) — size changes
+- [events.md](./events) — scroll events alternative
+- [position.md](./position) — geometry
+- [../timers.md](../timers) — rAF pairing

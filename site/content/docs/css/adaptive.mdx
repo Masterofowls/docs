@@ -1,0 +1,146 @@
+---
+title: Adaptive design
+description: CSS · Reference cheat sheet
+---
+
+# Adaptive design
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Adaptive design adjusts layout, typography, and interaction patterns to the viewport, input method, and user preferences. In CSS this is driven by media queries, container queries, and preference queries (`prefers-*`). Use it when a single fixed layout cannot serve phones, tablets, desktops, and accessibility needs equally well.
+
+Prefer fluid units and container queries for component-level adaptation; reserve viewport media queries for page chrome and major breakpoints.
+
+## 🔧 Core concepts
+
+### Media features
+
+| Feature | Typical use |
+| --- | --- |
+| `width` / `min-width` / `max-width` | Viewport breakpoints |
+| `height` / `orientation` | Tall vs wide layouts |
+| `hover` / `pointer` | Touch vs mouse affordances |
+| `prefers-reduced-motion` | Disable or soften animation |
+| `prefers-color-scheme` | Light / dark themes |
+| `prefers-contrast` | High-contrast adjustments |
+
+### Breakpoint pattern
+
+```css
+/* Mobile-first: base styles, then enhance */
+.card { padding: 1rem; }
+
+@media (min-width: 48rem) {
+  .card { padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 80rem) {
+  .card { grid-template-columns: 1fr 1fr 1fr; }
+}
+```
+
+### Container queries
+
+| Property / rule | Role |
+| --- | --- |
+| `container-type: inline-size` | Establish a size query container |
+| `container-name` | Name a container for targeted queries |
+| `@container (min-width: …)` | Style based on parent width, not viewport |
+
+### Logical & fluid sizing
+
+| Approach | Example |
+| --- | --- |
+| Fluid type | `font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem)` |
+| Fluid space | `padding-inline: clamp(1rem, 4vw, 3rem)` |
+| Logical props | `margin-inline`, `padding-block`, `inset-inline-start` |
+
+## 💡 Examples
+
+### Viewport media query (mobile-first)
+
+```css
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 64rem) {
+  .nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+```
+
+### Container query card
+
+```html
+<div class="card-shell">
+  <article class="card">…</article>
+</div>
+```
+
+```css
+.card-shell {
+  container-type: inline-size;
+  container-name: card;
+}
+
+.card { display: block; }
+
+@container card (min-width: 28rem) {
+  .card {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 1rem;
+  }
+}
+```
+
+### Input and motion preferences
+
+```css
+/* Coarse pointer: larger hit targets */
+@media (pointer: coarse) {
+  .btn { min-block-size: 2.75rem; padding-inline: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### Fluid layout without breakpoints
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Designing desktop-first and only shrinking with `max-width` queries often creates brittle overrides.
+- Using only viewport queries for reusable components breaks when the same card sits in a narrow sidebar.
+- Ignoring `prefers-reduced-motion` and `prefers-color-scheme` harms accessibility and OS integration.
+- Hard-coding many pixel breakpoints instead of a small set plus fluid `clamp()` / `minmax()`.
+- Testing only by resizing a desktop window—verify real devices, zoom, and landscape orientation.
+
+## 🔗 Related
+
+- [Flexbox](flex)
+- [CSS Grid](grid)
+- [Positioning](position)
+- [Scroll](scroll)

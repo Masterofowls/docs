@@ -1,0 +1,67 @@
+---
+title: Layout
+description: React Native · Reference cheat sheet
+---
+
+# Layout
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Layout uses **Flexbox** (default `flexDirection: "column"`). Yoga implements flex on both platforms. Position with `flex`, alignment, margins/padding — not CSS Grid.
+
+## 🔧 Core concepts
+
+- **Defaults** — column direction; `alignItems: stretch`.
+- **Key props** — `flex`, `justifyContent`, `alignItems`, `alignSelf`, `gap` (newer RN).
+- **Sizing** — numbers are density-independent pixels; `%` relative to parent.
+- **Absolute** — `position: "absolute"` + `top`/`left`/`right`/`bottom`.
+- **Safe area** — insets for notches / home indicator.
+
+## 💡 Examples
+
+```tsx
+import { View, StyleSheet } from "react-native";
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, padding: 16 },
+  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  card: { flex: 1, minHeight: 120, borderRadius: 12, backgroundColor: "#eee" },
+  fab: {
+    position: "absolute",
+    right: 16,
+    bottom: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+  },
+});
+
+export function Screen() {
+  return (
+    <View style={styles.screen}>
+      <View style={styles.row}>
+        <View style={styles.card} />
+        <View style={[styles.card, { marginLeft: 12 }]} />
+      </View>
+      <View style={[styles.fab, { backgroundColor: "#111" }]} />
+    </View>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Web CSS habits (`display: block`, grid) don’t apply.
+- Missing `flex: 1` on parents → children with flex don’t expand.
+- Fixed widths that overflow small phones — prefer flex + `minWidth`/`maxWidth`.
+
+## 🔗 Related
+
+- [basic_primitives.md](./basic_primitives) — View / Text
+- [dimensions.md](./dimensions) — window size
+- [statusbar.md](./statusbar) — top inset
+- [animation.md](./animation) — layout animations

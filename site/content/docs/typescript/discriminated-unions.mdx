@@ -1,0 +1,80 @@
+---
+title: Discriminated unions
+description: TypeScript · Reference cheat sheet
+---
+
+# Discriminated unions
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A discriminated (tagged) union shares a common literal field (the discriminant). Narrowing on that field unlocks variant-specific properties. Prefer this pattern for results, events, and state machines over optional-field bags.
+
+## 🔧 Core concepts
+
+- **Tag** — shared property with distinct string/number literals (`kind`, `type`, `status`).
+- **Narrowing** — `switch` / `if` on the tag refines the union.
+- **Exhaustiveness** — `never` check in `default` catches missing cases.
+- **vs optionals** — `\{ error?: string; data?: T \}` is weaker than `\{ ok: true; data: T \} | \{ ok: false; error: string \}`.
+- **Nested tags** — works with multiple levels if each level has a discriminant.
+
+## 💡 Examples
+
+```ts
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "rect"; w: number; h: number }
+  | { kind: "triangle"; base: number; height: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":
+      return Math.PI * s.radius ** 2;
+    case "rect":
+      return s.w * s.h;
+    case "triangle":
+      return (s.base * s.height) / 2;
+    default: {
+      const _exhaustive: never = s;
+      return _exhaustive;
+    }
+  }
+}
+
+type Result<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: string };
+
+function unwrap<T>(r: Result<T>): T {
+  if (r.ok) return r.value;
+  throw new Error(r.error);
+}
+
+type Event =
+  | { type: "click"; x: number; y: number }
+  | { type: "key"; key: string };
+```
+
+```ts
+// Bad: optional soup — no reliable narrowing
+type Loose = { kind?: string; radius?: number; w?: number };
+```
+
+## ⚠️ Pitfalls
+
+- Discriminant must be a literal type — plain `string` won’t narrow.
+- Mutating the tag after narrowing can confuse control flow (prefer immutable data).
+- Overlapping tags (`kind: string` on one variant) break discrimination.
+- Don’t put unrelated fields on all variants “just in case” — keep variants lean.
+- JSON parse still needs runtime checks — types don’t validate tags.
+
+## 🔗 Related
+
+- [union_types.md](./union_types)
+- [type_guards.md](./type_guards)
+- [any_unknown_never.md](./any_unknown_never)
+- [literal_types.md](./literal_types)
+- [zod_integration.md](./zod_integration)

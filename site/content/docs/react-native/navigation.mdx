@@ -1,0 +1,88 @@
+---
+title: Navigation
+description: React Native · Reference cheat sheet
+---
+
+# Navigation
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**React Navigation** is the standard stack for RN screens: native stack, bottom tabs, drawer. Define a navigator tree, pass params with types, and use hooks (`useNavigation`, `useRoute`). Expo Router is file-based on top of the same primitives—see Expo `router.md`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `NavigationContainer` | Root (bare RN; Expo Router wraps this) |
+| Native Stack | Push/pop screens |
+| Tabs / Drawer | Top-level IA |
+| Params | Typed route params |
+| Linking | Deep links ↔ routes |
+| Nested navigators | Independent histories |
+
+Prefer `@react-navigation/native-stack` over JS stack for performance.
+
+## 💡 Examples
+
+```tsx
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+type RootStackParamList = {
+  Home: undefined;
+  Details: { id: string };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+```
+
+```tsx
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteProp } from "@react-navigation/native";
+
+function HomeScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  return (
+    <Pressable onPress={() => navigation.navigate("Details", { id: "1" })}>
+      <Text>Open</Text>
+    </Pressable>
+  );
+}
+
+function DetailsScreen() {
+  const route = useRoute<RouteProp<RootStackParamList, "Details">>();
+  return <Text>{route.params.id}</Text>;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Multiple `NavigationContainer`s without a clear root.
+- Untyped params → runtime surprises.
+- Heavy work in screen components that stay mounted in tabs.
+- Ignoring deep linking / back behavior on Android.
+
+## 🔗 Related
+
+- [touchable.md](./touchable) — Pressable
+- [deeplinking.md](./deeplinking) — URL schemes
+- [drawer.md](./drawer) — drawer patterns
+- [backhandler.md](./backhandler) — Android back
+- [Expo router](./Expo/router) — file-based routing

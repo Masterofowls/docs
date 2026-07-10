@@ -1,0 +1,68 @@
+---
+title: useEffect
+description: React · Reference cheat sheet
+---
+
+# useEffect
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useEffect` runs **side effects** after paint: subscriptions, network calls, DOM sync, timers. Declare dependencies so effects re-run when values change; return a cleanup function.
+
+## 🔧 Core concepts
+
+- **Signature** — `useEffect(setup, deps?)`.
+- **Deps** — `[]` mount/unmount only; omit = every render (rare); list values used inside.
+- **Cleanup** — return `() => \{ ... \}` to unsubscribe / clear timers.
+- **Strict Mode** — React 18+ remounts once in dev to test cleanup.
+- **Prefer** — event handlers or data libraries when an “effect” is really a user action.
+
+## 💡 Examples
+
+```tsx
+import { useEffect, useState } from "react";
+
+export function User({ id }: { id: string }) {
+  const [user, setUser] = useState<{ name: string } | null>(null);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetch(`/api/users/${id}`, { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then(setUser)
+      .catch((err) => {
+        if (err.name !== "AbortError") console.error(err);
+      });
+    return () => ctrl.abort();
+  }, [id]);
+
+  if (!user) return <p>Loading…</p>;
+  return <p>{user.name}</p>;
+}
+```
+
+```tsx
+useEffect(() => {
+  const onResize = () => setWidth(window.innerWidth);
+  window.addEventListener("resize", onResize);
+  return () => window.removeEventListener("resize", onResize);
+}, []);
+```
+
+## ⚠️ Pitfalls
+
+- Missing deps → stale closures; exhaustive-deps lint is your friend.
+- Setting state in effects without guards can loop.
+- Don’t use effects to transform data for render — compute during render instead.
+- Fetch races: abort or ignore outdated responses when `id` changes.
+
+## 🔗 Related
+
+- [hooks.md](./hooks) — hooks rules
+- [useState.md](./useState) — state updates from effects
+- [component.md](./component) — function components
+- [render.md](./render) — keep render pure

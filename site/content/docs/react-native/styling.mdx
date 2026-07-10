@@ -1,0 +1,77 @@
+---
+title: Styling
+description: React Native · Reference cheat sheet
+---
+
+# Styling
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+RN styles use a subset of CSS via `StyleSheet.create` or inline objects. Layout is Flexbox by default (`flexDirection: 'column'`). No cascading selectors—compose style arrays. Prefer `StyleSheet` for identity and validation.
+
+## 🔧 Core concepts
+
+| Topic | Notes |
+| --- | --- |
+| Flexbox | `flex`, `justifyContent`, `alignItems`, `gap` (modern RN) |
+| Units | Density-independent numbers (dp), not `px` strings |
+| Platform | `Platform.select` / `.ios.md` files |
+| Composition | `style=\{[styles.base, cond && styles.active]\}` |
+| Text | Limited font props; custom fonts need linking/Expo plugin |
+
+Libraries: NativeWind, Restyle, Tamagui—optional.
+
+## 💡 Examples
+
+```tsx
+import { Platform, StyleSheet, Text, View } from "react-native";
+
+export function Card({ title }: { title: string }) {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.title}>{title}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+      },
+      android: { elevation: 3 },
+    }),
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111",
+  },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Assuming web CSS (no inheritance for most text styles beyond Text parent quirks).
+- Percentage heights without parent flex/height.
+- Inline new style objects in hot list rows without need.
+- Hardcoding colors everywhere—centralize tokens.
+
+## 🔗 Related
+
+- [layout.md](./layout) — flex patterns
+- [platform_specific.md](./platform_specific) — Platform
+- [dimensions.md](./dimensions) — size
+- [basic_primitives.md](./basic_primitives) — View/Text
+- [safe_area.md](./safe_area) — insets

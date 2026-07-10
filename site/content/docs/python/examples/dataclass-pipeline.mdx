@@ -1,0 +1,103 @@
+---
+title: Dataclass Pipeline
+description: Python · Example / how-to
+---
+
+# Dataclass Pipeline
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Model rows as dataclasses, then map/filter/validate through a small pipeline. Clear types beat anonymous dicts for ETL-style scripts.
+
+## 🔧 Core concepts
+
+| Stage | Role |
+| --- | --- |
+| Parse | Raw dict/CSV → dataclass |
+| Validate | `__post_init__` or explicit checks |
+| Transform | Pure functions returning new instances |
+| Sink | Write CSV/DB/JSON |
+
+Prefer immutable (`frozen=True`) records when transforming functionally.
+
+## 💡 Examples
+
+**Model + parse:**
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass, asdict, replace
+import csv
+from pathlib import Path
+
+@dataclass(frozen=True, slots=True)
+class Order:
+    id: int
+    customer: str
+    total: float
+
+    def __post_init__(self) -> None:
+        if self.total < 0:
+            raise ValueError("total must be >= 0")
+
+def parse_order(row: dict[str, str]) -> Order:
+    return Order(
+        id=int(row["id"]),
+        customer=row["customer"].strip(),
+        total=float(row["total"]),
+    )
+```
+
+**Pipeline:**
+
+```python
+def load_orders(path: Path) -> list[Order]:
+    with path.open(encoding="utf-8", newline="") as f:
+        return [parse_order(r) for r in csv.DictReader(f)]
+
+def with_tax(order: Order, rate: float = 0.1) -> Order:
+    return replace(order, total=round(order.total * (1 + rate), 2))
+
+def big_orders(orders: list[Order], min_total: float = 100.0) -> list[Order]:
+    return [o for o in orders if o.total >= min_total]
+
+def write_jsonl(path: Path, orders: list[Order]) -> None:
+    import json
+    lines = [json.dumps(asdict(o)) for o in orders]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+def run(src: Path, dst: Path) -> None:
+    orders = load_orders(src)
+    taxed = [with_tax(o) for o in orders]
+    write_jsonl(dst, big_orders(taxed))
+```
+
+**Sample CSV:**
+
+```plaintext
+id,customer,total
+1,Ada,120.0
+2,Bob,40.0
+```
+
+## ⚠️ Pitfalls
+
+- Mutable default fields need `field(default_factory=...)`.
+- Silent bad rows: decide whether to skip + log or fail fast.
+- Floating money — prefer integer cents in real billing systems.
+- `asdict` is shallow for nested dataclasses.
+- Mixing validation in many places — keep one parse boundary.
+
+## 🔗 Related
+
+- [CSV and Excel](csv_excel)
+- [SQLite](sqlite)
+- [Pytest example](pytest_example)
+- [../dataclasses.md](../dataclasses)
+- [../json.md](../json)
+- [../typing_hints.md](../typing_hints)

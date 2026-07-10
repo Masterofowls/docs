@@ -1,0 +1,81 @@
+---
+title: Updates (OTA)
+description: Expo · Reference cheat sheet
+---
+
+# Updates (OTA)
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**EAS Update** delivers JavaScript/asset over-the-air updates without a full store release—when native code is unchanged. Configure `expo-updates`, publish with `eas update`, and channel/branch to builds. Native module changes still need a new binary.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Runtime version | Compatibility gate with binaries |
+| Channel | Maps builds → update stream |
+| Branch | Git-like update stream |
+| `expo-updates` | Fetch/apply JS bundles |
+| Rollback | Republish previous / serve rollback |
+
+Policies: check on launch, reload when appropriate.
+
+## 💡 Examples
+
+```json
+// app.json (excerpt)
+{
+  "expo": {
+    "runtimeVersion": { "policy": "appVersion" },
+    "updates": {
+      "url": "https://u.expo.dev/<project-id>"
+    },
+    "extra": {
+      "eas": { "projectId": "<project-id>" }
+    }
+  }
+}
+```
+
+```shellscript
+eas update --branch production --message "Fix checkout copy"
+eas update:list --branch production
+```
+
+```tsx
+import * as Updates from "expo-updates";
+import { useEffect } from "react";
+
+export function useApplyUpdate() {
+  useEffect(() => {
+    (async () => {
+      if (__DEV__) return;
+      const result = await Updates.checkForUpdateAsync();
+      if (result.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      }
+    })();
+  }, []);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Shipping native changes via OTA—won't load; binary required.
+- Mismatched `runtimeVersion` → updates ignored.
+- Forcing reload mid-checkout without UX.
+- Testing only in dev (Updates disabled in `__DEV__`).
+
+## 🔗 Related
+
+- [build.md](./build) — binaries
+- [config.md](./config) — updates URL
+- [eas_submit.md](./eas_submit) — store submit
+- [commands.md](./commands) — EAS CLI
+- [plugins.md](./plugins) — native config

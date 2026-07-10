@@ -1,0 +1,119 @@
+---
+title: Positioning
+description: CSS · Reference cheat sheet
+---
+
+# Positioning
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `position` property controls how an element is placed in the document flow and how `inset` / `top` / `right` / `bottom` / `left` offsets apply. Static and relative stay in flow; absolute and fixed are removed from flow; sticky toggles between relative and fixed within a scroll ancestor. Use positioning for overlays, badges, sticky headers, and escape hatches—not as a substitute for Flexbox or Grid page layout.
+
+Prefer logical insets (`inset-block`, `inset-inline`) for writing-mode-aware UI.
+
+## 🔧 Core concepts
+
+### Position values
+
+| Value | In flow? | Containing block (offsets) |
+| --- | --- | --- |
+| `static` | Yes | Offsets ignored |
+| `relative` | Yes | Own normal position |
+| `absolute` | No | Nearest positioned ancestor (not `static`), else initial containing block |
+| `fixed` | No | Viewport (unless an ancestor transforms/filters/etc. creates a containing block) |
+| `sticky` | Yes (until stuck) | Nearest scrollport; needs inset threshold |
+
+### Inset properties
+
+| Property | Notes |
+| --- | --- |
+| `top` `right` `bottom` `left` | Physical edges |
+| `inset` | Shorthand for four physical insets |
+| `inset-block` / `inset-inline` | Logical pairs |
+| `inset-block-start` etc. | Logical singles |
+| `z-index` | Stacking within a stacking context (`auto` or integer) |
+
+### Stacking context triggers (common)
+
+`position` + `z-index` other than `auto`, `opacity &lt; 1`, `transform`, `filter`, `isolation`, `fixed`/`sticky` in many engines, and more. Nested contexts can trap `z-index`.
+
+## 💡 Examples
+
+### Badge on a relative parent
+
+```css
+.icon-wrap {
+  position: relative;
+  display: inline-grid;
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: -0.25rem;
+  inset-inline-end: -0.25rem;
+  min-inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 999px;
+  background: tomato;
+  color: white;
+  font-size: 0.65rem;
+  place-content: center;
+  display: grid;
+}
+```
+
+### Fixed toast
+
+```css
+.toast {
+  position: fixed;
+  inset-block-end: 1rem;
+  inset-inline: 1rem;
+  z-index: 1000;
+  max-inline-size: min(24rem, 100% - 2rem);
+  margin-inline-start: auto; /* push to inline-end when full width allowed */
+}
+```
+
+### Sticky section header
+
+```css
+.section__title {
+  position: sticky;
+  inset-block-start: 0;
+  background: Canvas;
+  padding-block: 0.5rem;
+  z-index: 1;
+}
+```
+
+### Full-bleed absolute overlay
+
+```css
+.modal-root {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.4);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using `absolute` for primary layout instead of Grid/Flex, causing fragile overlaps on resize.
+- Expecting `fixed` relative to the viewport when a parent has `transform`, `filter`, or `perspective`—it becomes a containing block.
+- Sticky failing because an ancestor has `overflow: hidden` / `auto` without enough scroll room.
+- Fighting stacking with huge `z-index` values instead of restructuring stacking contexts.
+- Offsetting with physical `left`/`right` only, breaking RTL layouts—prefer logical insets.
+
+## 🔗 Related
+
+- [Flexbox](flex)
+- [CSS Grid](grid)
+- [Scroll](scroll)
+- [Transforms](transform)

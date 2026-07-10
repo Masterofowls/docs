@@ -1,0 +1,101 @@
+---
+title: Iterators
+description: Python · Reference cheat sheet
+---
+
+# Iterators
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+An iterable can produce an iterator via `iter(obj)`. An iterator yields values with `next(it)` until `StopIteration`. For-loops, comprehensions, and unpacking all consume iterators.
+
+## 🔧 Core concepts
+
+| Protocol | Methods |
+| --- | --- |
+| Iterable | `__iter__` → iterator |
+| Iterator | `__iter__` (returns self) + `__next__` |
+| `iter(x)` | Get iterator |
+| `next(it, default)` | Next value or default |
+| Sequence | `__len__` + `__getitem__` also iterable |
+
+Many built-ins are iterable: `list`, `dict`, `range`, files, generators. Custom classes can implement the protocols or use generators.
+
+## 💡 Examples
+
+**Manual iteration:**
+
+```python
+it = iter([10, 20, 30])
+print(next(it))
+print(next(it))
+print(next(it, None))
+print(next(it, None))  # None — exhausted
+```
+
+**Custom iterator:**
+
+```python
+from collections.abc import Iterator
+
+class CountDown:
+    def __init__(self, start: int) -> None:
+        self.current = start
+
+    def __iter__(self) -> Iterator[int]:
+        return self
+
+    def __next__(self) -> int:
+        if self.current <= 0:
+            raise StopIteration
+        self.current -= 1
+        return self.current + 1
+
+print(list(CountDown(3)))  # [3, 2, 1]
+```
+
+**Iterable (fresh iterator each time):**
+
+```python
+class Repeat:
+    def __init__(self, value: str, times: int) -> None:
+        self.value = value
+        self.times = times
+
+    def __iter__(self):
+        for _ in range(self.times):
+            yield self.value
+
+r = Repeat("x", 3)
+print(list(r), list(r))  # both work
+```
+
+**tee / consume carefully:**
+
+```python
+from itertools import tee
+
+a, b = tee(range(3), 2)
+print(list(a), list(b))
+```
+
+## ⚠️ Pitfalls
+
+- Iterators are exhausted after one pass; iterables like `list` can re-iterate.
+- Calling `iter` on an iterator returns itself — no rewind.
+- Mutating a collection while iterating is unsafe.
+- `StopIteration` inside generators becomes runtime errors in some contexts (PEP 479).
+- Infinite iterators need explicit stopping (`islice`, `break`).
+
+## 🔗 Related
+
+- [Generators](generators)
+- [Loops](loops)
+- [Itertools](itertools)
+- [Magic methods](magic_methods)
+- [Comprehensions](comprehensions)
+- [Zip / enumerate / map / filter](zip_enumerate_map_filter)

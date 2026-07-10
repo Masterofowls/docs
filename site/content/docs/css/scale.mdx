@@ -1,0 +1,119 @@
+---
+title: Scale
+description: CSS · Reference cheat sheet
+---
+
+# Scale
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Scaling changes an element’s visual size without necessarily affecting layout the same way as `width`/`height`. In modern CSS, prefer the independent `scale` property or `transform: scale()` for UI feedback (hover grow, press shrink, zoom previews). Unlike changing box dimensions, transform-based scale typically does not reflow siblings—ideal for micro-interactions.
+
+For true layout scaling (zoom entire UI), consider `zoom` (non-standard but widely used) or rem-based design tokens; know the trade-offs.
+
+## 🔧 Core concepts
+
+### Ways to scale
+
+| Approach | Layout impact | Notes |
+| --- | --- | --- |
+| `scale: <sx> <sy>?` | Visual; used space usually unchanged | Individual transform property |
+| `transform: scale()` | Same as above | Can combine with rotate/translate |
+| `width` / `height` / `font-size` | Reflows | Real box change |
+| `zoom` | Affects layout in supporting engines | Not in formal CSS standard |
+| SVG `viewBox` / `width` | Vector scaling | Best for icons/illustrations |
+
+### Transform origin
+
+| Property | Role |
+| --- | --- |
+| `transform-origin` | Pivot for scale/rotate (`center`, `top left`, `%`) |
+| `transform-box` | `border-box` \| `fill-box` \| `view-box` (SVG-relevant) |
+
+Uniform scale: `scale: 1.05` or `scale(1.05)`. Non-uniform: `scale: 1.2 0.9`.
+
+### Accessibility
+
+Large unexpected scale animations can bother users—respect `prefers-reduced-motion` and don’t rely on scale alone for meaning.
+
+## 💡 Examples
+
+### Hover grow (compositor-friendly)
+
+```css
+.card {
+  transform-origin: center;
+  transition: scale 160ms ease;
+  scale: 1;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    scale: 1.03;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .card:hover { scale: 1; }
+}
+```
+
+### Press feedback on button
+
+```css
+.btn:active {
+  scale: 0.98;
+}
+```
+
+### Zoom preview from corner
+
+```css
+.thumb {
+  overflow: hidden;
+}
+
+.thumb img {
+  transform-origin: center;
+  transition: transform 220ms ease;
+}
+
+.thumb:hover img {
+  transform: scale(1.08);
+}
+```
+
+### Scale with translate for popover
+
+```css
+.popover[data-open="true"] {
+  scale: 1;
+  opacity: 1;
+}
+
+.popover[data-open="false"] {
+  scale: 0.96;
+  opacity: 0;
+  transition: scale 120ms ease, opacity 120ms ease;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Scaling up without `overflow: hidden` on parents so content paints outside and overlaps neighbors.
+- Using `scale` for responsive layout instead of fluid type/grid—hit targets and text reflow won’t match the visual size.
+- Forgetting `transform-origin`, so elements appear to slide while scaling.
+- Combining conflicting `transform` shorthand and individual `scale`/`translate` properties without understanding the combined used transform.
+- Animating scale on huge filtered layers, which can be costly on low-end GPUs.
+
+## 🔗 Related
+
+- [Transforms](transform)
+- [Animation](animation)
+- [Hover](hover)
+- [Images](image)

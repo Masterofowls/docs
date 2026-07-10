@@ -1,0 +1,118 @@
+---
+title: Background
+description: CSS · Reference cheat sheet
+---
+
+# Background
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Background properties paint behind an element’s content and padding (by default), including colors, images, gradients, and layered stacks. Use them for surfaces, hero imagery, patterns, and decorative layers without adding extra DOM nodes. Multiple backgrounds are listed comma-separated, drawn from top (first) to bottom (last).
+
+Prefer modern color spaces (`oklch`, `color-mix`) and `background-size` / `background-position` for responsive imagery; use `image-set()` when serving resolution variants.
+
+## 🔧 Core concepts
+
+### Core properties
+
+| Property | Role |
+| --- | --- |
+| `background-color` | Solid fill (shows through transparent images) |
+| `background-image` | URL, gradient, or `none` (stackable) |
+| `background-position` | Anchor of the image (`center`, `top right`, `%`, lengths) |
+| `background-size` | `auto` \| `cover` \| `contain` \| `<w> <h>` |
+| `background-repeat` | `repeat` \| `no-repeat` \| `space` \| `round` \| axes |
+| `background-attachment` | `scroll` \| `fixed` \| `local` |
+| `background-origin` | Positioning box: `padding-box` \| `border-box` \| `content-box` |
+| `background-clip` | Painting area; `text` for clipped text fills |
+| `background-blend-mode` | How layers blend with each other / color |
+
+Shorthand: `background: [layer], [layer], … / color` — color is listed last and is not layered the same way as images.
+
+### Layering model
+
+```css
+.hero {
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.45), transparent 60%),
+    url("/img/hero.jpg") center / cover no-repeat,
+    oklch(0.25 0.02 250);
+}
+```
+
+First layer paints on top. The final color acts as a fallback under all images.
+
+### Clipping & text fills
+
+| Value | Effect |
+| --- | --- |
+| `background-clip: border-box` | Default paint into border edge |
+| `background-clip: padding-box` | Stop under the border |
+| `background-clip: content-box` | Only content box |
+| `background-clip: text` | Fill glyphs (needs transparent text color) |
+
+## 💡 Examples
+
+### Cover photo with scrim
+
+```css
+.banner {
+  min-block-size: 20rem;
+  color: white;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.2)),
+    url("/media/banner.jpg") center / cover no-repeat;
+}
+```
+
+### Pattern tile
+
+```css
+.panel {
+  background-color: oklch(0.97 0.01 100);
+  background-image: url("/patterns/dots.svg");
+  background-size: 1.5rem 1.5rem;
+  background-repeat: repeat;
+}
+```
+
+### Gradient text
+
+```css
+.brand {
+  background-image: linear-gradient(90deg, #0ea5e9, #6366f1);
+  background-clip: text;
+  -webkit-background-clip: text; /* WebKit */
+  color: transparent;
+}
+```
+
+### Fixed parallax-style layer
+
+```css
+.parallax {
+  background-image: url("/img/texture.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Putting `background-color` in the middle of a multi-layer shorthand can drop layers or confuse cascade order—keep color last.
+- `background-attachment: fixed` is expensive and often broken or disabled on mobile browsers.
+- Using `cover` without a sensible `background-position` crops important subject matter.
+- Forgetting a solid `background-color` fallback when images fail or load slowly.
+- Relying on `background` for meaningful content—screen readers and broken-image states won’t expose it; use `<img>` for content images.
+
+## 🔗 Related
+
+- [Gradients](gradient)
+- [Images](image)
+- [Effects](effects)
+- [Text](text)

@@ -1,0 +1,94 @@
+---
+title: Testing
+description: Django · Reference cheat sheet
+---
+
+# Testing
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django ships `TestCase`, `SimpleTestCase`, `TransactionTestCase`, and `LiveServerTestCase` on top of `unittest`. Prefer `TestCase` for DB tests (wraps each test in a transaction). Use the test client for request/response; factories or fixtures for data.
+
+## 🔧 Core concepts
+
+| Class | Use |
+| --- | --- |
+| `SimpleTestCase` | No DB |
+| `TestCase` | DB + rollback per test |
+| `TransactionTestCase` | Real commits (signals, threads) |
+| `APITestCase` | DRF (if installed) |
+| Client | `self.client.get/post` |
+| `override_settings` | Temporary settings |
+| `assertNumQueries` | Catch N+1 |
+
+Run: `python manage.py test` or `pytest` + `pytest-django`.
+
+## 💡 Examples
+
+**View test:**
+
+```python
+from django.test import TestCase
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+from blog.models import Article
+
+
+class ArticleTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user("ada", password="x")
+        self.article = Article.objects.create(
+            title="Hi", slug="hi", body="...", author=self.user, is_published=True
+        )
+
+    def test_detail_ok(self):
+        url = reverse("article-detail", kwargs={"slug": "hi"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hi")
+
+    def test_create_requires_login(self):
+        url = reverse("article-create")
+        response = self.client.post(url, {"title": "X", "slug": "x", "body": "y"})
+        self.assertEqual(response.status_code, 302)
+```
+
+**Query count:**
+
+```python
+def test_list_queries(self):
+    with self.assertNumQueries(2):  # adjust to reality
+        self.client.get(reverse("article-list"))
+```
+
+**Settings override:**
+
+```python
+from django.test import override_settings
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+def test_sends_mail(self):
+    ...
+```
+
+## ⚠️ Pitfalls
+
+- Sharing mutable state across tests without isolation.
+- Hitting real email/SMS/payment APIs—mock or use locmem backends.
+- `TransactionTestCase` is slower; use only when needed.
+- Hardcoding absolute URLs—use `reverse`.
+- Flaky time-dependent tests—freeze time or use `freezegun`.
+
+## 🔗 Related
+
+- [Views](views)
+- [Models](models)
+- [Permissions](permissions)
+- [Email](email)
+- [REST framework](rest_framework)

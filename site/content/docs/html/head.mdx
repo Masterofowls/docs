@@ -1,0 +1,131 @@
+---
+title: Head
+description: HTML · Reference cheat sheet
+---
+
+# Head
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<head>` element holds **document metadata**—information about the page that is mostly not rendered as page content. Typical children: `<title>`, `<meta>`, `<link>`, `<style>`, `<script>`, and `<base>`. Browsers, crawlers, and social platforms read the head to configure charset, viewport, SEO, icons, and resource loading.
+
+There must be exactly one `<head>` per document, as a child of `<html>`, before `<body>`. Visible UI belongs in `<body>`; the head configures how that body is interpreted and presented.
+
+## 🔧 Core concepts
+
+### Minimal document
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page title</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>…</body>
+</html>
+```
+
+### Key children
+
+| Element | Purpose |
+|---------|---------|
+| `<title>` | Document title (tabs, bookmarks, SERP); **required** for valid HTML |
+| `<meta>` | Charset, viewport, description, Open Graph, robots, etc. |
+| `<link>` | Stylesheets, icons, preconnect, canonical, alternate |
+| `<style>` | Document-level CSS |
+| `<script>` | JS (prefer `defer` / module in head) |
+| `<base>` | Base URL for relative links (use sparingly—global side effects) |
+| `<noscript>` | Fallback when scripting is off (also allowed in body) |
+
+### Order matters
+
+1. **Charset** early (`<meta charset="utf-8">` within first 1024 bytes).
+2. **Viewport** for responsive mobile layout.
+3. **Title** and descriptive meta.
+4. **Preconnect / preload** hints before heavy assets.
+5. **CSS** (blocking by default—critical CSS strategies apply).
+6. **Scripts** with `defer` or `type="module"` so parsing is not blocked unnecessarily.
+
+### Title guidelines
+
+- Unique per page, human-readable, ~50–60 characters for SERPs.
+- Put distinctive info first: `Pricing — Acme` not `Acme — Pricing` if tabs truncate.
+- Do not stuff keywords; match the primary `<h1>` topic.
+
+## 💡 Examples
+
+### SEO and social basics
+
+```html
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canvas API — HTML Reference</title>
+  <meta name="description" content="Cheat sheet for the HTML canvas element and drawing API.">
+  <link rel="canonical" href="https://example.com/html/canvas">
+  <meta property="og:title" content="Canvas API — HTML Reference">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://example.com/html/canvas">
+  <meta property="og:image" content="https://example.com/og/canvas.png">
+</head>
+```
+
+### Performance hints
+
+```html
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.example.com" crossorigin>
+  <link rel="preload" href="/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+```
+
+### Icons and theme
+
+```html
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="/manifest.webmanifest">
+</head>
+```
+
+### Alternate languages
+
+```html
+<head>
+  <link rel="alternate" hreflang="en" href="https://example.com/en/docs">
+  <link rel="alternate" hreflang="es" href="https://example.com/es/docs">
+  <link rel="alternate" hreflang="x-default" href="https://example.com/docs">
+</head>
+```
+
+## ⚠️ Pitfalls
+
+- **Late charset** — Can cause mojibake; keep UTF-8 meta first.
+- **Missing viewport** — Mobile browsers may zoom out to a desktop width.
+- **Blocking scripts in head** — Without `defer`/`async`/module, parsing stalls.
+- **Multiple titles** — Invalid; only one `<title>` should exist.
+- **Secrets in head** — Meta tags are public; never put API keys there.
+- **`<base>` surprises** — Changes every relative URL, including anchors and forms.
+- **Duplicate canonicals** — Conflicting signals hurt SEO.
+
+## 🔗 Related
+
+- [Meta](meta) — meta element details
+- [Script](script) — loading JS from head or body
+- [Style](style) — `<style>` and linked CSS
+- [URL](url) — canonical and alternate URLs
+- [Language](language) — `lang` on `<html>`, hreflang
+- [XML](xml) — XHTML / polyglot considerations

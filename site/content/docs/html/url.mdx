@@ -1,0 +1,125 @@
+---
+title: URL
+description: HTML · Reference cheat sheet
+---
+
+# URL
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+URLs (Uniform Resource Locators) identify resources in HTML attributes such as `href`, `src`, `action`, and `cite`. Authors work with absolute URLs, root-relative paths, document-relative paths, and special schemes (`mailto:`, `tel:`, `data:`, `blob:`). Correct encoding, HTTPS, and stable canonical URLs matter for security, SEO, and broken-link prevention.
+
+The browser resolves relative references against the active document base URL (affected by `<base>`).
+
+## 🔧 Core concepts
+
+### Anatomy
+
+```
+https://user:pass@example.com:443/path/to/page?query=1#fragment
+\___/   \_______/ \_________/ \__/ \_________/ \_____/ \______/
+scheme  userinfo   host       port  path        query   fragment
+```
+
+In modern web apps, prefer HTTPS, avoid embedding credentials in URLs, and keep fragments client-side only (not sent to servers).
+
+### Forms used in HTML
+
+| Form | Example | Resolves to |
+|------|---------|-------------|
+| Absolute | `https://cdn.example.com/a.js` | As written |
+| Root-relative | `/images/logo.png` | Origin + path |
+| Document-relative | `../assets/app.css` | Relative to current URL path |
+| Protocol-relative | `//cdn.example.com/x` | Inherit current scheme (avoid; prefer `https://`) |
+| Same-document | `#section` | Fragment only |
+| Special | `mailto:hi@ex.com` | Handled by OS/UA |
+
+### Encoding
+
+- Encode spaces and reserved characters in paths/queries (`encodeURIComponent` for components).
+- Use `%20` or `+` in query strings per server expectations.
+- Internationalized domains use Punycode; paths may be Unicode but encoding is safer for interoperability.
+
+### HTML attributes that take URLs
+
+- Navigation: `a.href`, `area.href`, `base.href`, `link.href`
+- Resources: `img.src`, `script.src`, `iframe.src`, `source.src`, `track.src`
+- Forms: `form.action`
+- Misc: `blockquote.cite`, `q.cite`, `html.manifest` (obsolete)
+
+### Canonicalization and SEO
+
+```html
+<link rel="canonical" href="https://example.com/docs/url">
+```
+
+Pick one preferred host (`www` vs apex), trailing-slash policy, and HTTPS redirect chain. Pair with `hreflang` alternates when localized.
+
+## 💡 Examples
+
+### Relative vs absolute in links
+
+```html
+<nav>
+  <a href="/">Home</a>
+  <a href="/docs/html/forms">Forms</a>
+  <a href="https://developer.mozilla.org/">MDN</a>
+  <a href="#pitfalls">On this page</a>
+</nav>
+```
+
+### Form GET builds a query URL
+
+```html
+<form action="/search" method="get">
+  <label for="q">Search</label>
+  <input id="q" name="q" type="search" value="semantic html">
+  <button type="submit">Go</button>
+</form>
+<!-- Submits to /search?q=semantic+html -->
+```
+
+### Safe external link pattern
+
+```html
+<a href="https://example.com/partner"
+   rel="noopener noreferrer"
+   target="_blank">
+  Partner site
+</a>
+```
+
+`noopener` protects `window.opener`; `noreferrer` also omits referrer (trade-offs for analytics).
+
+### Data and blob URLs
+
+```html
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3C/%3E" alt="">
+```
+
+Prefer files for large assets; data URLs bloat HTML and cache poorly.
+
+## ⚠️ Pitfalls
+
+- **Broken relative links** after moving pages—root-relative paths are stabler for apps.
+- **`<base href>`** rewriting every relative URL unexpectedly.
+- **Open redirects** — never bounce users to unchecked query params.
+- **Credentials in URLs** — leak via history, logs, and Referer.
+- **Mixed content** — HTTP resources on HTTPS pages fail or warn.
+- **Unescaped `&` in query strings within HTML** — write `&amp;` in HTML attributes.
+- **Assuming fragments reach the server** — they do not on normal navigations.
+
+## 🔗 Related
+
+- [Src](src) — resource URL attributes
+- [Head](head) — canonical and base
+- [Form](form) — `action` and method
+- [Media](media) — media resource URLs
+- [Nav](nav) — in-site link patterns
+- [Language](language) — locale in paths / hreflang
+- [Meta](meta) — OG URLs
+- [XML](xml) — XML Base / namespaces

@@ -1,0 +1,66 @@
+---
+title: Concurrent
+description: React · Reference cheat sheet
+---
+
+# Concurrent
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Concurrent React (18+) can interrupt, prioritize, and reuse work so urgent updates (typing, clicks) stay responsive while heavier UI catches up. You opt in via APIs like `useTransition`, `useDeferredValue`, and Suspense—not by flipping a single switch beyond `createRoot`.
+
+## 🔧 Core concepts
+
+- **`createRoot`** — concurrent-capable root (vs legacy `ReactDOM.render`).
+- **Urgent vs transition** — input updates vs deferred UI.
+- **Interruptible render** — abandoned work may restart; render must be pure.
+- **Suspense** — declarative loading boundaries.
+- **Streaming / RSC** — frameworks extend the model (Next.js, etc.).
+
+## 💡 Examples
+
+```tsx
+import { createRoot } from "react-dom/client";
+import { useState, useTransition, Suspense } from "react";
+
+createRoot(document.getElementById("root")!).render(<App />);
+
+function Tabs() {
+  const [tab, setTab] = useState("home");
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => startTransition(() => setTab("photos"))}
+      >
+        Photos
+      </button>
+      {isPending ? <span>Loading tab…</span> : null}
+      <Suspense fallback={<p>Loading…</p>}>
+        {tab === "photos" ? <Photos /> : <Home />}
+      </Suspense>
+    </div>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Side effects during render—unsafe when renders restart.
+- Mutating shared objects during render.
+- Assuming every setState is concurrent—only marked updates are transitions.
+- Legacy mode / older roots without concurrent features.
+
+## 🔗 Related
+
+- [useTransition.md](./useTransition) — startTransition
+- [useDeferredValue.md](./useDeferredValue) — deferred values
+- [suspense.md](./suspense) — loading UI
+- [strict_mode.md](./strict_mode) — purity checks
+- [performance.md](./performance) — responsiveness

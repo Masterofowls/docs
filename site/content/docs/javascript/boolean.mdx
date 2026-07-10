@@ -1,0 +1,85 @@
+---
+title: Boolean
+description: JavaScript · Reference cheat sheet
+---
+
+# Boolean
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+Booleans are `true` / `false`. Many values coerce via ToBoolean in conditionals. Prefer explicit checks over truthiness when `0`, `""`, or `null` are valid data.
+
+## 🔧 Core concepts
+
+- **Literals**: `true`, `false`.
+- **`Boolean(x)` / `!!x`**: convert with ToBoolean.
+- **Falsy**: `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined`, `NaN`.
+- **Truthy**: everything else (including `[]`, `\{\}`, `"0"`).
+- **Logical ops**: `&&`, `||`, `??` (nullish), `!`.
+- **Comparisons**: `===` / `!==` preferred over `==` / `!=`.
+
+```js
+Boolean(0); // false
+Boolean([]); // true
+!!"hi"; // true
+```
+
+## 💡 Examples
+
+```js
+// Nullish vs OR
+const port = settings.port ?? 3000; // only null/undefined
+const title = name || "Guest"; // also replaces ""
+
+// Short-circuit
+user && user.profile && user.profile.id;
+user?.profile?.id; // optional chaining
+
+// Guards
+function assert(cond, msg) {
+  if (!cond) throw new Error(msg);
+}
+
+// Explicit empty checks
+function hasText(s) {
+  return typeof s === "string" && s.trim().length > 0;
+}
+
+// Toggle
+let on = false;
+on = !on;
+
+// Boolean object trap
+const boxed = new Boolean(false);
+if (boxed) {
+  // runs — object is truthy!
+}
+```
+
+```js
+// Filter truthy
+const values = [0, 1, "", "a", null, undefined, NaN, false, true];
+const truthy = values.filter(Boolean); // [1, "a", true]
+
+// Predicate helpers
+const isNil = (v) => v == null; // null or undefined
+const isPresent = (v) => v != null;
+```
+
+## ⚠️ Pitfalls
+
+- `new Boolean(false)` is an object and is truthy — never use Boolean wrappers.
+- `==` coerces: `false == 0`, `"" == 0` — use `===`.
+- Empty arrays/objects are truthy — check `.length` or `Object.keys`.
+- `??` only skips `null`/`undefined`; `||` also skips other falsy values.
+- Document APIs that return `0` or `""` so callers do not treat them as missing.
+
+## 🔗 Related
+
+- [number.md](./number) — numeric falsy values
+- [strings.md](./strings) — empty strings
+- [objects.md](./objects) — nullish patterns
+- [switch_case.md](./switch_case) — branching
+- [error.md](./error) — assertions

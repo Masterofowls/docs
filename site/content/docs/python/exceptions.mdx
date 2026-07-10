@@ -1,0 +1,103 @@
+---
+title: Exceptions
+description: Python · Reference cheat sheet
+---
+
+# Exceptions
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Exceptions signal error conditions. Use `try` / `except` / `else` / `finally`, raise with `raise`, and chain with `raise ... from`. Prefer built-in types or small custom hierarchies over bare `except:`.
+
+## 🔧 Core concepts
+
+| Construct | Role |
+| --- | --- |
+| `try` | Guarded block |
+| `except Exc as e` | Handle specific type(s) |
+| `except* ` | Exception groups (3.11+) |
+| `else` | Runs if no exception |
+| `finally` | Always runs (cleanup) |
+| `raise` | Raise / re-raise |
+| `raise X from e` | Explicit chaining |
+| `ExceptionGroup` | Multiple errors (3.11+) |
+
+Catch narrow types first. `BaseException` includes `KeyboardInterrupt` / `SystemExit` — usually do not catch those.
+
+## 💡 Examples
+
+**Try / except / else / finally:**
+
+```python
+def load(path: str) -> str:
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = f.read()
+    except FileNotFoundError:
+        return ""
+    except OSError as e:
+        raise RuntimeError(f"read failed: {path}") from e
+    else:
+        return data.strip()
+    finally:
+        pass  # close handled by `with`
+```
+
+**Custom exception:**
+
+```python
+class AppError(Exception):
+    """Base app error."""
+
+class NotFoundError(AppError):
+    def __init__(self, entity: str, key: object) -> None:
+        super().__init__(f"{entity} not found: {key!r}")
+        self.entity = entity
+        self.key = key
+
+raise NotFoundError("user", 42)
+```
+
+**Exception groups (3.11+):**
+
+```python
+def run_all() -> None:
+    errors: list[Exception] = []
+    for i in (0, 1):
+        try:
+            if i == 0:
+                raise ValueError("bad")
+            raise TypeError("wrong")
+        except Exception as e:
+            errors.append(e)
+    if errors:
+        raise ExceptionGroup("batch failed", errors)
+
+try:
+    run_all()
+except* ValueError as eg:
+    print("values", eg.exceptions)
+except* TypeError as eg:
+    print("types", eg.exceptions)
+```
+
+## ⚠️ Pitfalls
+
+- Bare `except:` or `except Exception` can hide bugs — be specific.
+- Catching and ignoring without logging loses diagnostics.
+- `finally` with `return` can swallow exceptions — avoid returning there.
+- Use `raise ... from e` (or `from None`) intentionally for traceback clarity.
+- Validating with exceptions in hot loops can be slower than checks.
+
+## 🔗 Related
+
+- [Context managers](context_managers)
+- [Classes](classes)
+- [Logging](logging)
+- [Files I/O](files_io)
+- [Testing with pytest](testing_pytest)
+- [Conditionals](conditionals)

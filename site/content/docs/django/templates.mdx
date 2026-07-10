@@ -1,0 +1,98 @@
+---
+title: Templates
+description: Django · Reference cheat sheet
+---
+
+# Templates
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django templates render HTML (or text) with variables, tags, and filters. Prefer thin templates: pass prepared context from views; use `\{% include %\}`, `\{% extends %\}`, and custom tags for reuse. Auto-escaping is on by default.
+
+## 🔧 Core concepts
+
+| Feature | Role |
+| --- | --- |
+| `\{\{ var \}\}` | Variable output (escaped) |
+| `\{\{ var\|filter \}\}` | Transform value |
+| `\{% tag %\}` | Logic: `if`, `for`, `block`, `url` |
+| `\{% extends %\}` / `\{% block %\}` | Inheritance |
+| `\{% include %\}` | Partial templates |
+| `\{% csrf_token %\}` | CSRF for POST forms |
+| `\{% static %\}` | Static asset URLs |
+| `\{% url %\}` | Reverse named routes |
+
+Engines: DjangoTemplates (default) or Jinja2 via `TEMPLATES` setting.
+
+## 💡 Examples
+
+**Base + child:**
+
+```html
+{# base.html #}
+<!DOCTYPE html>
+<html>
+<head><title>{% block title %}Site{% endblock %}</title></head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>
+```
+
+```html
+{# article_detail.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+  <h1>{{ article.title|title }}</h1>
+  <p>{{ article.body|linebreaks }}</p>
+  <a href="{% url 'article-list' %}">Back</a>
+  <img src="{% static 'blog/hero.png' %}" alt="">
+{% endblock %}
+```
+
+**View:**
+
+```python
+from django.shortcuts import render, get_object_or_404
+from .models import Article
+
+
+def article_detail(request, slug):
+    article = get_object_or_404(Article, slug=slug)
+    return render(request, "blog/article_detail.html", {"article": article})
+```
+
+**Loop and conditions:**
+
+```html
+{% for item in items %}
+  <li class="{% if forloop.first %}first{% endif %}">{{ item }}</li>
+{% empty %}
+  <li>No items</li>
+{% endfor %}
+```
+
+## ⚠️ Pitfalls
+
+- Business logic in templates—move to views, model methods, or custom tags.
+- `|safe` / `mark_safe` on untrusted input → XSS.
+- Forgetting `\{% csrf_token %\}` on POST forms.
+- Hardcoded URLs instead of `\{% url %\}`.
+- Missing `\{% load static %\}` before `\{% static %\}`.
+
+## 🔗 Related
+
+- [Views](views)
+- [Context processors](context_processors)
+- [Static files](static_files)
+- [Forms](forms)
+- [URLs](urls)
+- [i18n](i18n)

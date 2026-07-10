@@ -1,0 +1,100 @@
+---
+title: Testing with pytest
+description: Python · Reference cheat sheet
+---
+
+# Testing with pytest
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`pytest` discovers and runs tests with plain `assert`, fixtures, parametrization, and rich failure diffs. Prefer it over `unittest` for new projects. Name files `test_*.py` or `*_test.py`.
+
+## 🔧 Core concepts
+
+| Feature | Role |
+| --- | --- |
+| Discovery | `test_*` functions/classes |
+| `assert` | Rewritten with introspection |
+| Fixtures | Setup/teardown via `@pytest.fixture` |
+| `parametrize` | Data-driven cases |
+| Markers | `@pytest.mark.skip`, `slow`, etc. |
+| `raises` | Expect exceptions |
+| `tmp_path` | Temp directory fixture |
+| Plugins | `pytest-cov`, `pytest-asyncio`, … |
+
+Run with `pytest` or `python -m pytest`. Exit code 0 = all passed.
+
+## 💡 Examples
+
+**Basic tests:**
+
+```python
+# test_mathutil.py
+def add(a: int, b: int) -> int:
+    return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+
+def test_add_negative():
+    assert add(-1, 1) == 0
+```
+
+**Fixtures and tmp_path:**
+
+```python
+import pytest
+from pathlib import Path
+
+@pytest.fixture
+def sample_file(tmp_path: Path) -> Path:
+    p = tmp_path / "data.txt"
+    p.write_text("hello", encoding="utf-8")
+    return p
+
+def test_read(sample_file: Path):
+    assert sample_file.read_text(encoding="utf-8") == "hello"
+```
+
+**Parametrize and raises:**
+
+```python
+import pytest
+
+@pytest.mark.parametrize("n,expected", [(0, 0), (1, 1), (2, 4)])
+def test_square(n: int, expected: int):
+    assert n * n == expected
+
+def test_div_zero():
+    with pytest.raises(ZeroDivisionError):
+        _ = 1 / 0
+```
+
+**CLI:**
+
+```shellscript
+pytest -q
+pytest -k "add" --maxfail=1
+pytest --cov=mypkg --cov-report=term-missing
+```
+
+## ⚠️ Pitfalls
+
+- Tests that depend on execution order or shared global state flake.
+- Overusing mocks hides real integration bugs — mix unit + integration.
+- Mutable fixture state shared across tests when scope is wrong.
+- Asserting on exact error strings is brittle — match exception type.
+- Don't commit secrets into test fixtures.
+
+## 🔗 Related
+
+- [Examples: pytest example](Examples/pytest_example)
+- [Exceptions](exceptions)
+- [Venv](venv)
+- [Pip](pip)
+- [Functions](functions)
+- [Packaging](packaging)

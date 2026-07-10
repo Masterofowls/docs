@@ -1,0 +1,98 @@
+---
+title: Iteration
+description: JavaScript · Reference cheat sheet
+---
+
+# Iteration
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+JavaScript offers several iteration styles: index `for`, `for...of`, `for...in`, `while`, array methods, and iterators/generators. Choose based on whether you need indices, early exit, async, or transformation pipelines.
+
+## 🔧 Core concepts
+
+- **Indexed `for`**: full control of index and step.
+- **`for...of`**: values from iterables.
+- **`for...in`**: enumerable keys (objects) — rarely for arrays.
+- **Array methods**: `forEach`, `map`, `filter`, `reduce` — functional pipelines; `forEach` cannot `break`.
+- **`while` / `do...while`**: condition-driven loops.
+- **Async**: `for await...of`, or `Promise.all` over mapped async work.
+
+```js
+for (let i = 0; i < arr.length; i++) {
+  /* index + value: arr[i] */
+}
+```
+
+## 💡 Examples
+
+```js
+const arr = ["a", "b", "c"];
+
+// Indices + values
+for (const [i, v] of arr.entries()) {
+  console.log(i, v);
+}
+
+// Object keys / values / entries
+const obj = { x: 1, y: 2 };
+for (const key of Object.keys(obj)) console.log(key);
+for (const val of Object.values(obj)) console.log(val);
+for (const [k, v] of Object.entries(obj)) console.log(k, v);
+
+// Pipeline
+const sum = arr
+  .map((s) => s.toUpperCase())
+  .filter((s) => s !== "B")
+  .reduce((acc, s) => acc + s.length, 0);
+
+// forEach (no break)
+arr.forEach((v, i) => console.log(i, v));
+
+// Early exit → for...of
+for (const v of arr) {
+  if (v === "b") break;
+}
+
+// Nested with labeled break
+outer: for (const row of matrix) {
+  for (const cell of row) {
+    if (cell < 0) break outer;
+  }
+}
+```
+
+```js
+// Async sequential
+for (const url of urls) {
+  await fetch(url);
+}
+
+// Async parallel
+await Promise.all(urls.map((u) => fetch(u)));
+
+// Generator-driven
+function* walk(node) {
+  yield node;
+  for (const child of node.children ?? []) yield* walk(child);
+}
+```
+
+## ⚠️ Pitfalls
+
+- `forEach` ignores `async` callbacks’ promises and cannot break.
+- `for...in` on arrays includes enumerable extras and yields string keys.
+- Mutating length while iterating with index `for` needs care.
+- Prefer `Object.keys` / `entries` over `for...in` for own properties.
+
+## 🔗 Related
+
+- [for_of.md](./for_of) — for...of details
+- [while.md](./while) — while loops
+- [iterator.md](./iterator) — iterators & generators
+- [arrays.md](./arrays) — map/filter/reduce
+- [objects.md](./objects) — key enumeration
+- [async.md](./async) — async iteration
+- [map.md](./map) — Map iteration order

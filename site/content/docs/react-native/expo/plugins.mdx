@@ -1,0 +1,73 @@
+---
+title: Plugins
+description: Expo · Reference cheat sheet
+---
+
+# Plugins
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**Config plugins** are JS functions that modify native projects during **prebuild**. They let managed/CNG apps add permissions, activities, Podfile changes, and Gradle tweaks without maintaining permanent `ios/` / `android/` forks.
+
+## 🔧 Core concepts
+
+- **Declaration** — `plugins` array in `app.config`.
+- **With options** — `["expo-camera", \{ cameraPermission: "..." \}]`.
+- **Autolinking** — many `expo-*` packages ship a plugin; still list them when options are required.
+- **Custom plugins** — `plugins/withMyNativeChange.js` using `@expo/config-plugins` mods.
+- **Apply** — changes take effect on next `prebuild` / EAS Build, not in Expo Go unless the feature is already in the client.
+
+## 💡 Examples
+
+```ts
+// app.config.ts
+export default {
+  expo: {
+    plugins: [
+      [
+        "expo-camera",
+        {
+          cameraPermission: "Allow MyApp to take photos",
+          microphonePermission: "Allow MyApp to record audio",
+          recordAudioAndroid: true,
+        },
+      ],
+      "expo-secure-store",
+      ["./plugins/withAndroidQueries", { packages: ["com.android.vending"] }],
+    ],
+  },
+};
+```
+
+```js
+// plugins/withAndroidQueries.js
+const { withAndroidManifest } = require("@expo/config-plugins");
+
+function withAndroidQueries(config, { packages = [] }) {
+  return withAndroidManifest(config, (cfg) => {
+    const manifest = cfg.modResults.manifest;
+    // mutate queries / intents as needed
+    void packages;
+    return cfg;
+  });
+}
+
+module.exports = withAndroidQueries;
+```
+
+## ⚠️ Pitfalls
+
+- Expecting plugin native changes inside Expo Go — need a **dev client** or store build.
+- Forgetting to rebuild after adding a plugin.
+- Hand-editing `ios/`/`android/` then losing changes on `--clean` prebuild.
+
+## 🔗 Related
+
+- [config.md](./config) — where plugins are listed
+- [build.md](./build) — builds apply plugins
+- [commands.md](./commands) — prebuild
+- [gradle.md](./gradle) — Android mods

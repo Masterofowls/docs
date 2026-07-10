@@ -1,0 +1,97 @@
+---
+title: URLs
+description: Django · Reference cheat sheet
+---
+
+# URLs
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+URL routing maps paths to views via `urlpatterns` in `urls.py`. Use `path()` / `re_path()`, name routes for `reverse()`, and `include()` to compose per-app configs. Django 4.2+/5.x: prefer `path()` converters over complex regex unless needed.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `path(route, view, name=...)` | Primary routing |
+| Converters | `<int:pk>`, `<slug:slug>`, `<uuid:id>`, `<path:subpath>` |
+| `include()` | Nest app URLconfs |
+| `name` | Reverse lookups / `\{% url %\}` |
+| `app_name` | Namespacing |
+| `re_path` | Regex routes |
+| `static()` | Dev media/static serving |
+
+`ROOT_URLCONF` points at the project URLconf module.
+
+## 💡 Examples
+
+**Project + app URLs:**
+
+```python
+# config/urls.py
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("blog/", include("blog.urls")),
+    path("accounts/", include("allauth.urls")),
+    path("api/", include("api.urls")),
+]
+```
+
+```python
+# blog/urls.py
+from django.urls import path
+from . import views
+
+app_name = "blog"
+
+urlpatterns = [
+    path("", views.ArticleListView.as_view(), name="list"),
+    path("new/", views.ArticleCreateView.as_view(), name="create"),
+    path("<slug:slug>/", views.ArticleDetailView.as_view(), name="detail"),
+]
+```
+
+**Reverse:**
+
+```python
+from django.urls import reverse
+
+reverse("blog:detail", kwargs={"slug": "hello"})
+# "/blog/hello/"
+```
+
+```html
+<a href="{% url 'blog:detail' slug=article.slug %}">{{ article.title }}</a>
+```
+
+**Dev media:**
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+## ⚠️ Pitfalls
+
+- Trailing-slash mismatches (`APPEND_SLASH`) cause confusing redirects on POST.
+- Duplicate `name`s without namespaces break `reverse`.
+- Putting business logic in URLconfs—keep views thin but logic out of urls.
+- Forgetting `.as_view()` for CBVs.
+
+## 🔗 Related
+
+- [Views](views)
+- [Built-in class-based views](buildin_views)
+- [Settings](settings)
+- [Admin](admin)
+- [REST framework](rest_framework)
+- [django-allauth](django_allauth)

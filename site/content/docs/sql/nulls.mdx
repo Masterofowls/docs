@@ -1,0 +1,60 @@
+---
+title: NULLs
+description: SQL · Reference cheat sheet
+---
+
+# NULLs
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`NULL` means unknown/missing. Any comparison with `NULL` yields unknown (not true), so filters need `IS NULL` / `IS NOT NULL`. Aggregates, unique constraints, and outer joins all have NULL-specific behavior.
+
+## 🔧 Core concepts
+
+- **Three-valued logic** — TRUE / FALSE / UNKNOWN.
+- **IS NULL** — only correct NULL test; `= NULL` never matches.
+- **COALESCE / NULLIF** — substitute or nullify values.
+- **Aggregates** — ignore NULLs (except `COUNT(*)`).
+- **Outer joins** — non-matching side fills NULLs.
+- **DISTINCT / UNIQUE** — NULL treatment differs by dialect.
+
+## 💡 Examples
+
+```sql
+SELECT * FROM users WHERE deleted_at IS NULL;
+SELECT * FROM users WHERE deleted_at IS NOT NULL;
+
+SELECT COALESCE(display_name, email, 'unknown') AS label FROM users;
+SELECT NULLIF(trim(name), '') AS name FROM users;  -- '' → NULL
+
+SELECT COUNT(*) AS rows, COUNT(phone) AS with_phone FROM users;
+
+-- NULL-safe equality (Postgres IS NOT DISTINCT FROM)
+SELECT * FROM t WHERE a IS NOT DISTINCT FROM b;
+-- MySQL: <=> null-safe equals
+
+-- Sort NULLs
+SELECT * FROM products ORDER BY rank NULLS LAST;     -- Postgres
+-- MySQL: ORDER BY rank IS NULL, rank
+```
+
+## ⚠️ Pitfalls
+
+- `NOT IN (1, 2, NULL)` never returns true — prefer `NOT EXISTS`.
+- `UNIQUE` allowing multiple NULLs (Postgres) surprises people from other DBs.
+- `OR col = NULL` is always unknown — use `IS NULL`.
+- Expressions like `price + tax` become NULL if either is NULL — `COALESCE` to 0 when appropriate.
+- CHECK constraints: `CHECK (price > 0)` allows NULL prices unless `NOT NULL`.
+
+## 🔗 Related
+
+- [where_having.md](./where_having)
+- [constraints.md](./constraints)
+- [aggregate.md](./aggregate)
+- [joins.md](./joins)
+- [order_limit.md](./order_limit)
+- [distinct_group_by.md](./distinct_group_by)

@@ -1,0 +1,75 @@
+---
+title: Class
+description: _TypeScript · Reference cheat sheet_ 
+---
+
+# Class
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+TypeScript classes add parameter properties, visibility modifiers, `readonly`, `abstract`, and typed `implements`/`extends`. Emit targets and `useDefineForClassFields` affect field initialization semantics in TS 5.x.
+
+## 🧩 Core concepts
+
+- **Visibility** — `public` (default), `protected`, `private` (compile-time); `#private` is true runtime privacy.
+- **Parameter properties** — `constructor(private name: string)` declares and assigns in one step.
+- **`readonly` / `static` / `abstract`** — immutability, class-level members, base-only APIs.
+- **`implements`** — structural check against an interface; does not generate runtime artifacts.
+- **`override`** — marks intentional overrides (`noImplicitOverride` recommended).
+- **Generic classes** — `class Box<T> \{ ... \}`.
+
+## 💡 Examples
+
+```ts
+interface Identifiable {
+  id: string;
+}
+
+abstract class Entity implements Identifiable {
+  constructor(public readonly id: string) {}
+  abstract summarize(): string;
+}
+
+class User extends Entity {
+  #passwordHash: string;
+
+  constructor(id: string, public name: string, passwordHash: string) {
+    super(id);
+    this.#passwordHash = passwordHash;
+  }
+
+  override summarize(): string {
+    return `${this.id}:${this.name}`;
+  }
+
+  static fromJson(json: { id: string; name: string }): User {
+    return new User(json.id, json.name, "");
+  }
+}
+
+class Repo<T extends Identifiable> {
+  constructor(private items: T[] = []) {}
+  get(id: string): T | undefined {
+    return this.items.find((i) => i.id === id);
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- `private` is erased at compile time — use `#fields` for runtime encapsulation.
+- Class fields vs constructor assignment differ under `useDefineForClassFields` / target ES2022+.
+- Implementing an interface does not copy default values or methods — only checks shape.
+- Arrow-function class fields are not on the prototype (affects inheritance/`this` binding).
+
+## 🔗 Related
+
+- [Object types](./object_types)
+- [Decorators](./decorators)
+- [Generic types](./generic_types)
+- [Type guards](./type_guards)
+- [Module](./module)

@@ -1,0 +1,110 @@
+---
+title: switch / case
+description: JavaScript · Reference cheat sheet
+---
+
+# switch / case
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`switch` selects a branch by strict equality (`===`) against a discriminant. Cases fall through until `break`, `return`, or `throw`. Prefer maps/objects or early returns when branches share little structure.
+
+## 🔧 Core concepts
+
+- **Syntax**: `switch (expr) \{ case v: ... break; default: ... \}`.
+- **Matching**: strict equality; no pattern matching built-in.
+- **Fall-through**: intentional sharing of bodies; always comment intentional fall-through.
+- **Scope**: wrap case bodies in `\{ \}` when using `let`/`const` to avoid TDZ clashes.
+- **Alternatives**: lookup tables, `Map`, if/else chains, pattern libs.
+
+```js
+switch (status) {
+  case 200:
+    return "ok";
+  case 404:
+    return "missing";
+  default:
+    return "other";
+}
+```
+
+## 💡 Examples
+
+```js
+function httpLabel(code) {
+  switch (code) {
+    case 200:
+    case 201:
+    case 204:
+      return "success";
+    case 301:
+    case 302:
+      return "redirect";
+    case 400:
+    case 401:
+    case 403:
+    case 404:
+      return "client-error";
+    case 500:
+      return "server-error";
+    default:
+      return "unknown";
+  }
+}
+
+// Block scope per case
+switch (kind) {
+  case "user": {
+    const id = crypto.randomUUID();
+    return { kind, id };
+  }
+  case "guest": {
+    const id = "guest";
+    return { kind, id };
+  }
+  default:
+    throw new Error(`bad kind: ${kind}`);
+}
+
+// Dispatch table
+const handlers = {
+  ping: () => "pong",
+  time: () => Date.now(),
+};
+const result = (handlers[cmd] ?? (() => "noop"))();
+
+// switch (true) pattern (use sparingly)
+switch (true) {
+  case score >= 90:
+    return "A";
+  case score >= 80:
+    return "B";
+  default:
+    return "C";
+}
+```
+
+```js
+// Exhaustiveness helper for unions (manual)
+function assertNever(x) {
+  throw new Error(`unexpected: ${x}`);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Missing `break` causes accidental fall-through bugs.
+- `case` values are compared with `===` — `"1"` does not match `1`.
+- `let`/`const` in a case without braces collide with other cases.
+- Large switches are harder to test — prefer strategy maps for open sets of commands.
+- `default` is optional but recommended for unexpected values.
+
+## 🔗 Related
+
+- [boolean.md](./boolean) — conditions
+- [objects.md](./objects) — dispatch tables
+- [map.md](./map) — Map-based dispatch
+- [error.md](./error) — default throws
+- [oop.md](./oop) — polymorphic alternatives

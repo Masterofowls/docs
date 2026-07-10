@@ -1,0 +1,102 @@
+---
+title: AbortController
+description: JavaScript · Reference cheat sheet
+---
+
+# AbortController
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`AbortController` and `AbortSignal` cancel async operations — `fetch`, streams, and custom tasks. Create a controller, pass `signal` to APIs, call `abort()` to reject pending work and run abort listeners. Essential for timeouts, navigation changes, and avoiding race conditions.
+
+## 🔧 Core concepts
+
+- **`new AbortController()`** → `\{ signal, abort(reason?) \}`.
+- **`signal.aborted`**, **`signal.reason`**, **`signal.throwIfAborted()`**.
+- **`signal.addEventListener("abort", ...)`** — once fired, stays aborted.
+- **`AbortSignal.timeout(ms)`**: auto-abort after delay.
+- **`AbortSignal.any([s1, s2])`**: abort when any aborts (modern).
+- **Fetch**: `fetch(url, \{ signal \})` rejects with `AbortError` / `TimeoutError`.
+
+```js
+const c = new AbortController();
+fetch("/api", { signal: c.signal }).catch((e) => {
+  if (e.name === "AbortError") return;
+  throw e;
+});
+c.abort();
+```
+
+## 💡 Examples
+
+```js
+// Timeout via helper
+const data = await fetch("/slow", {
+  signal: AbortSignal.timeout(5000),
+}).then((r) => r.json());
+
+// Manual timeout
+const c = new AbortController();
+const t = setTimeout(() => c.abort("timeout"), 3000);
+try {
+  await fetch("/api", { signal: c.signal });
+} finally {
+  clearTimeout(t);
+}
+
+// Cancel on new request (race guard)
+let current;
+function search(q) {
+  current?.abort();
+  current = new AbortController();
+  return fetch(`/search?q=${encodeURIComponent(q)}`, {
+    signal: current.signal,
+  });
+}
+
+// Custom abortable work
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    signal?.throwIfAborted();
+    const id = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(id);
+        reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
+      },
+      { once: true },
+    );
+  });
+}
+
+// Combine signals
+const userCancel = new AbortController();
+const signal = AbortSignal.any([userCancel.signal, AbortSignal.timeout(10_000)]);
+```
+
+```js
+// Event listener option
+el.addEventListener("click", handler, { signal: c.signal });
+c.abort(); // removes listener
+```
+
+## ⚠️ Pitfalls
+
+- Aborted fetch throws — always handle `AbortError` so UI doesn’t treat cancel as failure.
+- Reusing an already-aborted signal keeps operations aborted — create a new controller per run.
+- Not all APIs support signals yet — wrap manually with listeners.
+- `abort(reason)` reason support varies; check `signal.reason`.
+- Forgetting to abort on unmount leaks in-flight requests.
+
+## 🔗 Related
+
+- [fetch.md](./fetch) — fetch + signal
+- [timers.md](./timers) — timeout patterns
+- [promise.md](./promise) — rejection handling
+- [DOM/events.md](./DOM/events) — signal option
+- [event_loop.md](./event_loop) — async cancellation

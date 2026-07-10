@@ -1,0 +1,68 @@
+---
+title: Branch
+description: _Git · Reference cheat sheet_ 
+---
+
+# Branch
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Branches are movable pointers to commits. Create feature branches for isolated work, switch with `switch`/`checkout`, and delete when merged. Track remote branches with upstreams for `pull`/`push` defaults.
+
+## 🧩 Core concepts
+
+- **Local branch** — ref under `refs/heads/`.
+- **Remote-tracking branch** — e.g. `origin/main` under `refs/remotes/`.
+- **Upstream** — `-u` / `--set-upstream-to` links local ↔ remote for defaults.
+- **Detached HEAD** — checked out commit is not a branch tip; create a branch before committing.
+- **Naming** — `feature/…`, `fix/…`, `chore/…` conventions help navigation.
+- **Protection** — host rules may block force-push/delete on `main`.
+
+## 💡 Examples
+
+```shellscript
+# List
+git branch
+git branch -vv
+git branch -a
+
+# Create and switch
+git switch -c feature/checkout
+# equivalent: git checkout -b feature/checkout
+
+# Switch existing
+git switch main
+
+# Create from remote tip
+git switch -c feature/api origin/feature/api
+
+# Rename
+git branch -m feature/checkout feature/cart
+
+# Delete local (merged)
+git branch -d feature/cart
+git branch -D feature/cart   # force
+
+# Set upstream
+git push -u origin feature/cart
+git branch --set-upstream-to=origin/main main
+```
+
+## ⚠️ Pitfalls
+
+- Deleting a branch does not delete unmerged work until GC — recover via `reflog` soon.
+- Working on detached HEAD loses easy branch pointers — `git switch -c` immediately.
+- Stale remote-tracking branches linger until `git fetch --prune`.
+- Long-lived branches drift — rebase or merge from main regularly.
+
+## 🔗 Related
+
+- [Commit](./commit)
+- [Merge](./merge)
+- [Rebase](./rebase)
+- [Push](./push)
+- [Pull](./pull)

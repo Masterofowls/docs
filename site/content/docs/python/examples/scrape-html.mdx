@@ -1,0 +1,97 @@
+---
+title: Scrape HTML
+description: Python · Example / how-to
+---
+
+# Scrape HTML
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Fetch HTML over HTTP and parse it with Beautiful Soup (`bs4`). Respect robots.txt, rate limits, and site terms. Prefer official APIs when available.
+
+## 🔧 Core concepts
+
+| Step | Tool |
+| --- | --- |
+| Fetch | `requests` + timeout |
+| Parse | `BeautifulSoup(html, "html.parser")` or `lxml` |
+| Select | CSS via `select` / `select_one` |
+| Text | `.get_text(strip=True)` |
+| Attrs | `tag["href"]`, `.get("href")` |
+
+Install: `python -m pip install requests beautifulsoup4`. Optional: `lxml` for speed.
+
+## 💡 Examples
+
+**Extract links:**
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+def extract_links(url: str) -> list[str]:
+    resp = requests.get(url, timeout=15, headers={"User-Agent": "docs-bot/1.0"})
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.text, "html.parser")
+    links: list[str] = []
+    for a in soup.select("a[href]"):
+        href = a.get("href")
+        if href:
+            links.append(href)
+    return links
+
+if __name__ == "__main__":
+    print(extract_links("https://example.com")[:5])
+```
+
+**Table-ish content:**
+
+```python
+from bs4 import BeautifulSoup
+
+html = """
+<ul class="items">
+  <li data-id="1">Ada</li>
+  <li data-id="2">Bob</li>
+</ul>
+"""
+soup = BeautifulSoup(html, "html.parser")
+people = [
+    {"id": li["data-id"], "name": li.get_text(strip=True)}
+    for li in soup.select("ul.items li")
+]
+print(people)
+```
+
+**Absolute URLs:**
+
+```python
+from urllib.parse import urljoin
+import requests
+from bs4 import BeautifulSoup
+
+base = "https://example.com"
+soup = BeautifulSoup(requests.get(base, timeout=15).text, "html.parser")
+abs_links = [urljoin(base, a["href"]) for a in soup.select("a[href]")]
+```
+
+## ⚠️ Pitfalls
+
+- Scraping JS-rendered pages needs a browser tool — BS4 only sees HTML.
+- Fragile CSS selectors break when sites redesign.
+- Aggressive crawling can get you blocked — throttle and cache.
+- Encoding: use `resp.content` + apparent encoding when text looks wrong.
+- Legal/ToS: check before scraping; don't bypass paywalls/auth.
+
+## 🔗 Related
+
+- [HTTP requests](http_requests)
+- [Retry backoff](retry_backoff)
+- [../regex.md](../regex)
+- [../strings.md](../strings)
+- [../json.md](../json)
+- [../exceptions.md](../exceptions)

@@ -1,0 +1,95 @@
+---
+title: "Drag & Drop"
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Drag & Drop
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+HTML Drag and Drop uses `draggable` elements and drag events (`dragstart`, `dragover`, `drop`, …) with `DataTransfer` payloads. Good for reordering lists and file drops. For complex apps, consider Pointer Events libraries — native DnD has quirks across browsers.
+
+## 🔧 Core concepts
+
+- **Make draggable**: `draggable="true"` on elements (images/links are draggable by default).
+- **Events (source)**: `dragstart`, `drag`, `dragend`.
+- **Events (target)**: `dragenter`, `dragover`, `dragleave`, `drop`.
+- **`dataTransfer`**: `setData`/`getData`, `effectAllowed`, `dropEffect`, `files`, `items`.
+- **Must `preventDefault` on `dragover`** to allow dropping.
+- **File drop**: read `e.dataTransfer.files`.
+
+```js
+el.draggable = true;
+el.addEventListener("dragstart", (e) => {
+  e.dataTransfer.setData("text/plain", el.id);
+});
+zone.addEventListener("dragover", (e) => e.preventDefault());
+zone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  const id = e.dataTransfer.getData("text/plain");
+});
+```
+
+## 💡 Examples
+
+```js
+// Reorder list item
+list.querySelectorAll("[data-id]").forEach((item) => {
+  item.draggable = true;
+  item.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", item.dataset.id);
+    item.classList.add("dragging");
+  });
+  item.addEventListener("dragend", () => item.classList.remove("dragging"));
+});
+
+list.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  const after = getDragAfterElement(list, e.clientY);
+  const dragging = list.querySelector(".dragging");
+  if (!after) list.append(dragging);
+  else list.insertBefore(dragging, after);
+});
+
+// File drop zone
+zone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  zone.classList.add("over");
+});
+zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+zone.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  zone.classList.remove("over");
+  const files = [...e.dataTransfer.files];
+  for (const file of files) await upload(file);
+});
+
+// Custom ghost image
+e.dataTransfer.setDragImage(img, 10, 10);
+e.dataTransfer.effectAllowed = "move";
+```
+
+```js
+// Types
+e.dataTransfer.types; // ["text/plain", "Files", ...]
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `preventDefault` on `dragover` silently blocks `drop`.
+- `getData` may be empty in `dragover` in some browsers for security — read on `drop`.
+- Touch devices historically weak for HTML DnD — provide alternatives.
+- Draggable text selection conflicts — manage UX carefully.
+- See also Pointer Events for custom drag implementations.
+
+## 🔗 Related
+
+- [datatransfer.md](./datatransfer) — DataTransfer deep dive
+- [events.md](./events) — event model
+- [clipboard_api.md](./clipboard_api) — clipboard data
+- [form.md](./form) — file inputs
+- [../encode.md](../encode) — MIME types

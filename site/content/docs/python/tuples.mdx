@@ -1,0 +1,85 @@
+---
+title: Tuples
+description: Python · Reference cheat sheet
+---
+
+# Tuples
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+A `tuple` is an ordered, immutable sequence. Use for fixed records, multiple return values, and hashable keys (when all elements are hashable). Prefer tuples over lists when the length and contents should not change.
+
+## 🔧 Core concepts
+
+| Operation | Example |
+| --- | --- |
+| Create | `(1, 2)`, `1, 2`, `tuple(iterable)`, `()` |
+| Single element | `(1,)` — trailing comma required |
+| Index / slice | `t[0]`, `t[1:]` |
+| Unpack | `a, b = t`, `a, *rest = t` |
+| Concat / repeat | `t + u`, `t * n` (new tuples) |
+| Named | `collections.namedtuple`, `typing.NamedTuple` |
+
+Immutability means you cannot assign `t[i] = x` or `append`. Nested mutable objects inside a tuple can still mutate.
+
+## 💡 Examples
+
+**Returns and unpacking:**
+
+```python
+def divmod_pair(a: int, b: int) -> tuple[int, int]:
+    return a // b, a % b
+
+q, r = divmod_pair(17, 5)
+```
+
+**As dict keys:**
+
+```python
+point = (3, 4)
+grid: dict[tuple[int, int], str] = {point: "occupied"}
+print(grid[(3, 4)])
+```
+
+**NamedTuple (typed record):**
+
+```python
+from typing import NamedTuple
+
+class User(NamedTuple):
+    id: int
+    name: str
+    active: bool = True
+
+u = User(1, "Ada")
+print(u.name, u._asdict())
+```
+
+**Tuple vs list choice:**
+
+```python
+coords = (10.0, 20.0)      # fixed pair — tuple
+history: list[float] = []  # grows over time — list
+history.append(1.5)
+```
+
+## ⚠️ Pitfalls
+
+- `(1)` is just `int` 1 — use `(1,)` for a one-element tuple.
+- Tuples containing lists/dicts are not hashable.
+- `t += (x,)` rebinds `t` to a new tuple (ok for local names; confusing for aliases).
+- Prefer `NamedTuple` / `dataclass(frozen=True)` over anonymous long tuples for clarity.
+- Slicing a tuple returns a tuple, not a list.
+
+## 🔗 Related
+
+- [Lists](lists)
+- [Sets](sets)
+- [Dataclasses](dataclasses)
+- [Unpacking](unpacking)
+- [Types](types)
+- [Dictionaries](dictionaries)

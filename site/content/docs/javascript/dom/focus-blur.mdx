@@ -1,0 +1,91 @@
+---
+title: "Focus & Blur"
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Focus & Blur
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Focus determines which element receives keyboard input. Manage it with `focus()`, `blur()`, `tabIndex`, autofocus, and focus events. Critical for accessibility, modals, and forms. Prefer moving focus intentionally; never trap keyboard users without an escape.
+
+## 🔧 Core concepts
+
+- **Methods**: `el.focus(\{ preventScroll? \})`, `el.blur()`.
+- **Events**: `focus`, `blur` (no bubble); `focusin`, `focusout` (bubble).
+- **`document.activeElement`**: currently focused element.
+- **Tab order**: DOM order + `tabindex` (`0` in order, positive avoid, `-1` programmatic only).
+- **Focusable**: links, buttons, inputs, `[tabindex]`, some custom with `tabindex=0`.
+- **`:focus-visible`**: keyboard-ish focus styling (CSS).
+
+```js
+input.focus();
+input.addEventListener("focus", () => input.select());
+```
+
+## 💡 Examples
+
+```js
+// focusin delegation
+form.addEventListener("focusin", (e) => {
+  e.target.closest(".field")?.classList.add("focused");
+});
+form.addEventListener("focusout", (e) => {
+  e.target.closest(".field")?.classList.remove("focused");
+});
+
+// Modal open: focus first control, restore later
+let prev;
+function openModal(modal) {
+  prev = document.activeElement;
+  modal.showModal?.() ?? modal.removeAttribute("hidden");
+  modal.querySelector("button, [href], input")?.focus();
+}
+function closeModal(modal) {
+  modal.close?.() ?? modal.setAttribute("hidden", "");
+  prev?.focus();
+}
+
+// Programmatic-only focus target
+const panel = document.querySelector("#panel");
+panel.tabIndex = -1;
+panel.focus({ preventScroll: true });
+
+// Detect focus leaving container
+container.addEventListener("focusout", (e) => {
+  if (!container.contains(e.relatedTarget)) {
+    // focus left container
+  }
+});
+
+// Roving tabindex pattern (toolbar)
+function setActive(items, active) {
+  items.forEach((el) => (el.tabIndex = el === active ? 0 : -1));
+  active.focus();
+}
+```
+
+```js
+// Don’t steal focus on every render
+if (document.activeElement !== input) input.focus();
+```
+
+## ⚠️ Pitfalls
+
+- `focus`/`blur` don’t bubble — use `focusin`/`focusout` for delegation.
+- Positive `tabindex` creates maintenance nightmares — prefer DOM order + `0`/`-1`.
+- Focusing hidden elements fails or confuses AT — show first, then focus.
+- `preventScroll` support matters for sticky headers.
+- Removing a focused node moves focus to `<body>` — restore deliberately.
+
+## 🔗 Related
+
+- [events.md](./events) — focus events
+- [forms_validation.md](./forms_validation) — form UX
+- [../Html/dialog.md](../../Html/dialog) — modal focus
+- [../Html/accessibility.md](../../Html/accessibility) — a11y
+- [../Html/aria.md](../../Html/aria) — aria-activedescendant

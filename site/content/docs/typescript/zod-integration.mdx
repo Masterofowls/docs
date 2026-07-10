@@ -1,0 +1,86 @@
+---
+title: Zod integration
+description: TypeScript · Reference cheat sheet
+---
+
+# Zod integration
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Zod defines runtime schemas that infer TypeScript types (`z.infer<typeof schema>`). Use it at trust boundaries (HTTP, forms, env, JSON) instead of assertions. Patterns below target Zod 3.x with TS 5.x.
+
+## 🔧 Core concepts
+
+- **Single source** — schema → `z.infer` type; avoid duplicating interfaces.
+- **Parse vs safeParse** — throw vs `\{ success, data | error \}`.
+- **Compose** — `object`, `union`, `discriminatedUnion`, `array`, `optional`, `nullable`.
+- **Transforms** — `.transform` / `.pipe` for coercion and branding.
+- **Shared** — export schemas from a `packages/shared` or `lib/schemas` module.
+
+## 💡 Examples
+
+```ts
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(["admin", "user"]),
+  age: z.number().int().positive().optional(),
+});
+type User = z.infer<typeof UserSchema>;
+
+const raw: unknown = JSON.parse(body);
+const user = UserSchema.parse(raw); // User or throw
+
+const result = UserSchema.safeParse(raw);
+if (!result.success) {
+  console.error(result.error.flatten());
+} else {
+  console.log(result.data.email);
+}
+
+const ResultSchema = z.discriminatedUnion("ok", [
+  z.object({ ok: z.literal(true), value: z.string() }),
+  z.object({ ok: z.literal(false), error: z.string() }),
+]);
+
+const UserIdSchema = z.string().min(1).brand<"UserId">();
+type UserId = z.infer<typeof UserIdSchema>;
+
+// Env
+const EnvSchema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]),
+  PORT: z.coerce.number().default(9000),
+});
+const env = EnvSchema.parse(process.env);
+```
+
+```ts
+// Express / fetch handler
+async function handler(req: Request) {
+  const json: unknown = await req.json();
+  const input = UserSchema.parse(json);
+  return Response.json(input);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Don’t `as User` after partial checks — parse the full schema.
+- `.optional()` vs `.nullable()` vs `.nullish()` — pick intentionally.
+- `z.coerce` can hide bad input (e.g. `Number("") === 0`).
+- Huge nested schemas slow cold start — split and lazy-load if needed.
+- Keep server and client schemas in sync via a shared package.
+
+## 🔗 Related
+
+- [branded_types.md](./branded_types)
+- [any_unknown_never.md](./any_unknown_never)
+- [discriminated_unions.md](./discriminated_unions)
+- [type_assertions.md](./type_assertions)
+- [tsx_react.md](./tsx_react)

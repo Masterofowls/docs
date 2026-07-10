@@ -1,0 +1,87 @@
+---
+title: MediaQueryList
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# MediaQueryList
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`window.matchMedia(query)` returns a `MediaQueryList` for CSS media queries in JS — responsive behavior, dark mode detection, and reduced-motion preferences. Listen with `addEventListener("change", ...)` (not deprecated `addListener` in new code).
+
+## 🔧 Core concepts
+
+- **Create**: `const mql = matchMedia("(min-width: 768px)")`.
+- **`mql.matches`**: boolean current state.
+- **`mql.media`**: serialized query string.
+- **Events**: `change` when match flips.
+- **Common queries**: width, `prefers-color-scheme`, `prefers-reduced-motion`, `hover`, `pointer`, `display-mode`.
+- **CSS sync**: same syntax as `@media`.
+
+```js
+const wide = matchMedia("(min-width: 900px)");
+if (wide.matches) enableGrid();
+wide.addEventListener("change", (e) => {
+  e.matches ? enableGrid() : enableStack();
+});
+```
+
+## 💡 Examples
+
+```js
+// Dark mode preference
+const dark = matchMedia("(prefers-color-scheme: dark)");
+function applyTheme() {
+  document.documentElement.dataset.theme = dark.matches ? "dark" : "light";
+}
+applyTheme();
+dark.addEventListener("change", applyTheme);
+
+// Reduced motion
+const motion = matchMedia("(prefers-reduced-motion: reduce)");
+if (!motion.matches) startAnimation();
+
+// Hover-capable devices
+const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+// PWA display mode
+matchMedia("(display-mode: standalone)").matches;
+
+// Helper
+function onMedia(query, cb) {
+  const mql = matchMedia(query);
+  cb(mql.matches);
+  const handler = (e) => cb(e.matches);
+  mql.addEventListener("change", handler);
+  return () => mql.removeEventListener("change", handler);
+}
+
+const stop = onMedia("(max-width: 600px)", (isMobile) => {
+  nav.dataset.mode = isMobile ? "drawer" : "bar";
+});
+```
+
+```js
+// Older Safari used addListener/removeListener
+// mql.addListener(fn); // legacy
+```
+
+## ⚠️ Pitfalls
+
+- Don’t parse `window.innerWidth` for breakpoints you already express in CSS — prefer `matchMedia` for parity.
+- Evaluate once at load isn’t enough for rotatable devices — listen for `change`.
+- Unit differences (`em` vs `px`) follow CSS rules relative to initial viewport / font.
+- `matchMedia` is sync and cheap — still avoid creating thousands of listeners.
+- JS theme overrides should respect user preference unless explicitly overridden.
+
+## 🔗 Related
+
+- [../CSS/media_queries.md](../../CSS/media_queries) — CSS `@media`
+- [../CSS/dark_mode.md](../../CSS/dark_mode) — color schemes
+- [events.md](./events) — change events
+- [screen.md](./screen) — screen metrics
+- [window.md](./window) — viewport

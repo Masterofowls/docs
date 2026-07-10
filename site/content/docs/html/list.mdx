@@ -1,0 +1,148 @@
+---
+title: Lists
+description: HTML · Reference cheat sheet
+---
+
+# Lists
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+HTML provides three primary list types: **ordered** (`<ol>`), **unordered** (`<ul>`), and **description** (`<dl>`). Lists convey structure to assistive technologies—use them for genuine sequences and name/value groups, not merely for indentation. Navigation menus are typically lists inside `<nav>`.
+
+Related helpers: `<li>` for list items, `<dt>` / `<dd>` for terms and descriptions, and `<datalist>` for input suggestions (not a visible list widget by itself).
+
+## 🔧 Core concepts
+
+### Unordered lists (`<ul>`)
+
+Bulleted collections where order is not significant (features, tags, nav links).
+
+```html
+<ul>
+  <li>Apples</li>
+  <li>Oranges</li>
+</ul>
+```
+
+### Ordered lists (`<ol>`)
+
+Numbered sequences. Attributes:
+
+| Attribute | Effect |
+|-----------|--------|
+| `type` | `1`, `a`, `A`, `i`, `I` (prefer CSS `list-style-type`) |
+| `start` | Starting number |
+| `reversed` | Count downward |
+
+```html
+<ol start="3" reversed>
+  <li>Third</li>
+  <li>Second</li>
+  <li>First</li>
+</ol>
+```
+
+### Description lists (`<dl>`)
+
+Groups of terms (`<dt>`) and descriptions (`<dd>`). One term may have multiple descriptions and vice versa.
+
+```html
+<dl>
+  <dt>HTML</dt>
+  <dd>HyperText Markup Language</dd>
+  <dt>CSS</dt>
+  <dd>Cascading Style Sheets</dd>
+</dl>
+```
+
+### Nesting and content model
+
+- Only `<li>` may be direct children of `<ul>` / `<ol>` (plus script-supporting elements).
+- Nest lists **inside** `<li>`, not as siblings of `<li>`.
+- Flow content is allowed inside `<li>`, `<dt>`, `<dd>`.
+
+### Accessibility
+
+- Lists announce item counts in many screen readers.
+- Do not fake lists with `<div>` + bullets; rebuild as real lists.
+- For nav: `<nav><ul><li><a>…&lt;/a>&lt;/li>&lt;/ul>&lt;/nav>`.
+- Flat vs nested: reflect real hierarchy; avoid deep nesting without need.
+- Custom markers via CSS still keep list semantics if the elements remain.
+
+## 💡 Examples
+
+### Nested navigation list
+
+```html
+<nav aria-label="Docs">
+  <ul>
+    <li><a href="/html">HTML</a>
+      <ul>
+        <li><a href="/html/forms">Forms</a></li>
+        <li><a href="/html/tables">Tables</a></li>
+      </ul>
+    </li>
+    <li><a href="/css">CSS</a></li>
+  </ul>
+</nav>
+```
+
+### Steps with ordered list
+
+```html
+<ol>
+  <li>Add the <code>lang</code> attribute to <code>&lt;html&gt;</code>.</li>
+  <li>Provide a unique <code>&lt;title&gt;</code>.</li>
+  <li>Include a viewport meta tag.</li>
+</ol>
+```
+
+### Glossary with description list
+
+```html
+<dl>
+  <dt id="term-landmark">Landmark</dt>
+  <dd>
+    A region role that assistive tech can jump to
+    (e.g. <code>main</code>, <code>navigation</code>).
+  </dd>
+  <dt>Focus visible</dt>
+  <dd>Clear indication of the keyboard-focused element.</dd>
+</dl>
+```
+
+### Datalist for input suggestions
+
+```html
+<label for="browser">Browser</label>
+<input id="browser" name="browser" list="browsers" autocomplete="off">
+<datalist id="browsers">
+  <option value="Firefox">
+  <option value="Chrome">
+  <option value="Safari">
+  <option value="Edge">
+</datalist>
+```
+
+## ⚠️ Pitfalls
+
+- **Div lists** — Breaking list semantics loses count announcements and list shortcuts.
+- **Invalid children** — Putting `<p>` or `<div>` directly in `<ul>` is invalid; wrap with `<li>`.
+- **Using tables for layout lists** — Prefer lists or CSS grid.
+- **Empty bullets for spacing** — Use margin/gap, not empty `<li>` elements.
+- **`type` on `<ul>`** — Deprecated presentational habit; use CSS.
+- **Description list misuse** — Dialogues or random pairs may fit better as headings + paragraphs or cards.
+- **ARIA `role="list"` on styled lists** — Some browsers drop list semantics when `list-style: none` is applied; restoring with explicit roles may be needed—test with AT.
+
+## 🔗 Related
+
+- [Nav](nav) — menus built from lists
+- [Input](input) — `list` + `<datalist>`
+- [Section](section) — grouping list-heavy content
+- [Table](table) — when tabular data beats lists
+- [Div](div) — avoid replacing lists with divs
+- [Form](form) — option groups vs lists

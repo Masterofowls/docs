@@ -1,0 +1,99 @@
+---
+title: Object Fit
+description: CSS · Reference cheat sheet
+---
+
+# Object Fit
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`object-fit` and `object-position` control how replaced content (`img`, `video`, `canvas`) fills its box when the aspect ratios differ. Use with fixed sizes or `aspect-ratio` for consistent media frames without distortion (unless you choose `fill`).
+
+## 🔧 Core concepts
+
+| `object-fit` | Behavior |
+| --- | --- |
+| `fill` | stretch to box (default for some cases) |
+| `contain` | letterbox — entire media visible |
+| `cover` | crop — fill box, preserve ratio |
+| `none` | intrinsic size |
+| `scale-down` | none or contain, whichever is smaller |
+
+- **`object-position`**: `center`, `top`, `25% 75%`, logical positions evolving.
+- Applies to **replaced elements**, not background images (`background-size` instead).
+
+```css
+.thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center;
+}
+```
+
+## 💡 Examples
+
+```css
+/* Hero video */
+.hero video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Logo without crop */
+.logo {
+  width: 160px;
+  height: 64px;
+  object-fit: contain;
+}
+
+/* Avatar */
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Prefer cover in cards, contain in galleries of diagrams */
+.diagram {
+  object-fit: contain;
+  background: #f4f4f4;
+}
+
+/* Pair with aspect-ratio wrapper */
+.frame {
+  aspect-ratio: 16 / 9;
+}
+.frame > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+```
+
+```html
+<img src="photo.jpg" alt="" width="800" height="600" />
+```
+
+## ⚠️ Pitfalls
+
+- Without an explicit box size (or both dimensions), `object-fit` has nothing to fit into.
+- `fill` distorts — rarely what you want for photos.
+- Background images use different properties — don’t confuse with `object-*`.
+- Focal point cropping may need `object-position` or art-direction (`<picture>`).
+- Accessibility: cropped faces can remove important content — choose position carefully.
+
+## 🔗 Related
+
+- [aspect_ratio.md](./aspect_ratio) — ratio boxes
+- [image.md](./image) — image CSS
+- [background.md](./background) — background-size
+- [../Html/images.md](../Html/images) — img element
+- [../Html/picture_source.md](../Html/picture_source) — art direction

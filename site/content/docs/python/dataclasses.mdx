@@ -1,0 +1,100 @@
+---
+title: Dataclasses
+description: Python · Reference cheat sheet
+---
+
+# Dataclasses
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`dataclasses.dataclass` auto-generates `__init__`, `__repr__`, `__eq__`, and optionally ordering/hash/slots for classes that mainly store data. Prefer dataclasses over hand-written boilerplate for records and DTOs.
+
+## 🔧 Core concepts
+
+| Option | Effect |
+| --- | --- |
+| `@dataclass` | Generate methods from annotated fields |
+| `frozen=True` | Immutable instances (approx.) |
+| `slots=True` | `__slots__` (3.10+) — less memory |
+| `order=True` | `&lt;`, `&lt;=`, … from field order |
+| `kw_only=True` | Keyword-only fields (3.10+) |
+| `field(...)` | Defaults, factories, exclude from compare |
+| `asdict` / `astuple` | Convert to built-ins |
+
+Fields need type annotations. Default values must follow non-default fields (or use `kw_only`).
+
+## 💡 Examples
+
+**Basic and factory defaults:**
+
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class Config:
+    host: str
+    port: int = 8000
+    tags: list[str] = field(default_factory=list)
+
+cfg = Config("localhost", tags=["dev"])
+```
+
+**Frozen + slots:**
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True, slots=True)
+class Point:
+    x: float
+    y: float
+
+p = Point(1.0, 2.0)
+# p.x = 3  # FrozenInstanceError
+```
+
+**Post-init validation:**
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+
+    def __post_init__(self) -> None:
+        if self.age < 0:
+            raise ValueError("age must be >= 0")
+```
+
+**Replace and asdict:**
+
+```python
+from dataclasses import asdict, replace
+
+u = User("Ada", 36)
+u2 = replace(u, age=37)
+print(asdict(u2))  # {"name": "Ada", "age": 37}
+```
+
+## ⚠️ Pitfalls
+
+- Mutable defaults need `field(default_factory=...)`, not `= []`.
+- `frozen=True` is shallow — nested mutables can still change.
+- `asdict` deep-copies nested dataclasses into dicts — can be expensive.
+- Inheritance: dataclass parents/children need care with field ordering.
+- For complex validation / ORM models, consider Pydantic or attrs.
+
+## 🔗 Related
+
+- [Classes](classes)
+- [Enums](enums)
+- [Typing hints](typing_hints)
+- [Copy / deepcopy](copy_deepcopy)
+- [Examples: dataclass pipeline](Examples/dataclass_pipeline)
+- [Tuples](tuples)

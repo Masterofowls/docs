@@ -1,0 +1,74 @@
+---
+title: CTEs (WITH queries)
+description: SQL · Reference cheat sheet
+---
+
+# CTEs (WITH queries)
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Common Table Expressions (`WITH`) name subqueries for the main statement — clearer than nested derived tables. Postgres supports recursive CTEs well; MySQL 8+ supports recursive CTEs too. Use for multi-step transforms and graph/hierarchy walks.
+
+## 🔧 Core concepts
+
+- **Non-recursive** — `WITH a AS (…), b AS (…) SELECT …`.
+- **Recursive** — `WITH RECURSIVE` anchor + recursive member `UNION ALL`.
+- **Scope** — CTEs visible to the final statement (and later CTEs).
+- **Materialization** — optimizers may inline or materialize (Postgres hints/`MATERIALIZED`).
+- **DML** — `WITH … INSERT/UPDATE/DELETE` in many engines.
+
+## 💡 Examples
+
+```sql
+WITH paid AS (
+  SELECT customer_id, SUM(total) AS revenue
+  FROM orders
+  WHERE status = 'paid'
+  GROUP BY customer_id
+),
+big AS (
+  SELECT * FROM paid WHERE revenue > 1000
+)
+SELECT u.email, b.revenue
+FROM big b
+JOIN users u ON u.id = b.customer_id
+ORDER BY b.revenue DESC;
+
+-- Recursive org tree (Postgres / MySQL 8+)
+WITH RECURSIVE tree AS (
+  SELECT id, manager_id, name, 1 AS depth
+  FROM employees
+  WHERE manager_id IS NULL
+  UNION ALL
+  SELECT e.id, e.manager_id, e.name, t.depth + 1
+  FROM employees e
+  JOIN tree t ON e.manager_id = t.id
+)
+SELECT * FROM tree ORDER BY depth, name;
+```
+
+```sql
+-- Postgres: force materialize / inline (PG 12+)
+WITH cte AS MATERIALIZED (SELECT …) …
+```
+
+## ⚠️ Pitfalls
+
+- Recursive CTEs without a termination condition can loop — add depth guards.
+- Multiple references to a CTE may be recomputed or materialized — check `EXPLAIN`.
+- CTE ≠ temp table with indexes — heavy reuse may need real temp tables.
+- Column lists in recursive unions must match types/count.
+- Older MySQL (&lt;8) lacks CTEs — use derived tables.
+
+## 🔗 Related
+
+- [subquery.md](./subquery)
+- [select.md](./select)
+- [window_functions.md](./window_functions)
+- [views.md](./views)
+- [explain_analyze.md](./explain_analyze)
+- [joins.md](./joins)

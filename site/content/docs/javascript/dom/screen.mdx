@@ -1,0 +1,85 @@
+---
+title: Screen
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Screen
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+`window.screen` exposes information about the output display: pixel dimensions, color depth, and orientation. Pair with `window` viewport metrics and media queries for responsive behavior — screen size ≠ layout viewport.
+
+## 🔧 Core concepts
+
+- **Size**: `screen.width`, `screen.height` (full screen).
+- **Available**: `screen.availWidth`, `screen.availHeight` (minus OS chrome).
+- **Color**: `colorDepth`, `pixelDepth`.
+- **Orientation**: `screen.orientation.type`, `angle`, `lock()` / `unlock()` (secure contexts / UX rules).
+- **Multi-screen** (experimental): `window.getScreenDetails()` where permitted.
+- **Device pixels**: `window.devicePixelRatio`.
+
+```js
+console.log(screen.width, screen.height, devicePixelRatio);
+```
+
+## 💡 Examples
+
+```js
+// Basic readout
+const info = {
+  screen: `${screen.width}×${screen.height}`,
+  avail: `${screen.availWidth}×${screen.availHeight}`,
+  dpr: devicePixelRatio,
+  orientation: screen.orientation?.type,
+};
+
+// Orientation change
+screen.orientation?.addEventListener("change", () => {
+  console.log(screen.orientation.type, screen.orientation.angle);
+});
+
+// Prefer CSS / matchMedia for layout
+const mq = matchMedia("(orientation: portrait)");
+mq.addEventListener("change", (e) => {
+  document.body.classList.toggle("portrait", e.matches);
+});
+
+// Lock landscape (may require fullscreen + gesture)
+async function lockLandscape() {
+  try {
+    await document.documentElement.requestFullscreen();
+    await screen.orientation.lock("landscape");
+  } catch (err) {
+    console.warn("orientation lock failed", err);
+  }
+}
+
+// Canvas backing store
+canvas.width = Math.floor(cssWidth * devicePixelRatio);
+canvas.height = Math.floor(cssHeight * devicePixelRatio);
+ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+```
+
+```js
+// Don’t use screen.width for responsive layout — use viewport
+const layoutWidth = document.documentElement.clientWidth;
+```
+
+## ⚠️ Pitfalls
+
+- `screen.width` is not the browser viewport — use `innerWidth` / `clientWidth` for layout.
+- Orientation lock is heavily gated and often fails outside fullscreen/PWA.
+- Extended screen APIs need permission and are not universal.
+- Browser zoom affects CSS pixels vs device pixels — test with DPR ≠ 1.
+- Values can change when moving windows across monitors.
+
+## 🔗 Related
+
+- [window.md](./window) — viewport metrics
+- [position.md](./position) — element geometry
+- [events.md](./events) — resize / orientation
+- [navigation.md](./navigation) — fullscreen flows
+- [../math.md](../math) — rounding DPR sizes
+- [../api.md](../api) — media / display APIs

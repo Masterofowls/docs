@@ -1,2 +1,6 @@
 /ACTIVITY_LOG.md
 /README.md
+/.cursor
+/.cursor/hooks
+/.cursor/hooks/state
+/.cursor/hooks/state/continual-learning.json

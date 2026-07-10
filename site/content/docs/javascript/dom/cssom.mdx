@@ -1,0 +1,79 @@
+---
+title: CSSOM
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# CSSOM
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The CSS Object Model lets JS read and mutate stylesheets and computed style: `element.style`, `getComputedStyle`, `CSSStyleSheet` rules, and CSS variables. Prefer CSS classes for most UI state; use CSSOM for measured values, theming tokens, and dynamic rule injection.
+
+## 🔧 Core concepts
+
+- **Inline**: `el.style.color`, `el.style.setProperty("--x", "1")`, `cssText`.
+- **Computed**: `getComputedStyle(el)` — live, read-only, resolved values.
+- **Sheets**: `document.styleSheets`, `sheet.cssRules`, `insertRule` / `deleteRule`.
+- **Constructed stylesheets**: `new CSSStyleSheet()` + `adoptedStyleSheets` (shadow/document).
+- **Variables**: `getPropertyValue("--token")`, `setProperty`, `removeProperty`.
+- **OM values**: typed OM (`attributeStyleMap`) where supported.
+
+```js
+el.style.setProperty("--gap", "1rem");
+const color = getComputedStyle(el).color;
+```
+
+## 💡 Examples
+
+```js
+// Toggle via custom property
+document.documentElement.style.setProperty("--theme-bg", "#111");
+
+// Read resolved size (px strings)
+const { width, fontSize } = getComputedStyle(el);
+const w = parseFloat(width);
+
+// Avoid thrashing: batch reads/writes
+const styles = els.map((el) => getComputedStyle(el).height);
+els.forEach((el, i) => {
+  el.style.minHeight = styles[i];
+});
+
+// Insert a rule
+const sheet = document.styleSheets[0];
+const i = sheet.insertRule(".flash { outline: 2px solid red; }", sheet.cssRules.length);
+// sheet.deleteRule(i);
+
+// Constructable stylesheet (components)
+const sheet2 = new CSSStyleSheet();
+sheet2.replaceSync(`:host { display: block; } .x { color: tomato; }`);
+shadow.adoptedStyleSheets = [sheet2];
+
+// CSS.escape for dynamic selectors
+const sel = `#${CSS.escape(id)}`;
+```
+
+```js
+// Feature: typed OM
+el.attributeStyleMap.set("padding-top", CSS.px(8));
+```
+
+## ⚠️ Pitfalls
+
+- `el.style` only sees **inline** styles — not classes; use `getComputedStyle` for final values.
+- `getComputedStyle` forces layout — don’t call it in tight loops interleaved with writes.
+- Cross-origin stylesheets block rule access (SecurityError).
+- Shorthand reads from computed style may be empty or expanded inconsistently.
+- Prefer classList for state; inline styles fight specificity and CSP.
+
+## 🔗 Related
+
+- [class.md](./class) — classList
+- [attributes.md](./attributes) — style attribute
+- [position.md](./position) — layout metrics
+- [resize_observer.md](./resize_observer) — size changes
+- [../CSS/variables.md](../../CSS/variables) — custom properties

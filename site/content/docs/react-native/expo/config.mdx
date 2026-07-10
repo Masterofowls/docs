@@ -1,0 +1,81 @@
+---
+title: Config
+description: Expo · Reference cheat sheet
+---
+
+# Config
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+App identity and native behavior live in **`app.json`** or dynamic **`app.config.js/ts`**. Config plugins mutate native projects at prebuild time. Use `extra` / `EXPO_PUBLIC_*` for non-secret runtime config.
+
+## 🔧 Core concepts
+
+- **Identity** — `name`, `slug`, `version`, `orientation`, `icon`, `splash`.
+- **Platform blocks** — `ios.bundleIdentifier`, `android.package`, permissions, intents.
+- **Scheme** — deep linking `scheme`.
+- **Plugins** — `plugins: ["expo-secure-store", [...]]`.
+- **EAS** — `extra.eas.projectId`; env in EAS secrets / `.env`.
+
+## 💡 Examples
+
+```ts
+// app.config.ts
+import type { ExpoConfig } from "expo/config";
+
+const config: ExpoConfig = {
+  name: "MyApp",
+  slug: "my-app",
+  version: "1.0.0",
+  scheme: "myapp",
+  orientation: "portrait",
+  icon: "./assets/icon.png",
+  userInterfaceStyle: "automatic",
+  splash: {
+    image: "./assets/splash.png",
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
+  },
+  ios: {
+    supportsTablet: true,
+    bundleIdentifier: "com.example.myapp",
+  },
+  android: {
+    adaptiveIcon: {
+      foregroundImage: "./assets/adaptive-icon.png",
+      backgroundColor: "#ffffff",
+    },
+    package: "com.example.myapp",
+  },
+  plugins: [
+    "expo-secure-store",
+    [
+      "expo-notifications",
+      { icon: "./assets/notification-icon.png", color: "#111111" },
+    ],
+  ],
+  extra: {
+    apiUrl: process.env.EXPO_PUBLIC_API_URL,
+    eas: { projectId: "your-project-id" },
+  },
+};
+
+export default config;
+```
+
+## ⚠️ Pitfalls
+
+- Changing package / bundle ID after store release without a migration plan.
+- Secrets in `extra` or public env vars.
+- Plugin options ignored until the next native rebuild.
+
+## 🔗 Related
+
+- [plugins.md](./plugins) — config plugins
+- [build.md](./build) — applying config in builds
+- [filestructure.md](./filestructure) — where config lives
+- [commands.md](./commands) — `expo config`

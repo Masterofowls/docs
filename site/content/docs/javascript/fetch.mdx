@@ -1,0 +1,107 @@
+---
+title: Fetch
+description: JavaScript · Reference cheat sheet
+---
+
+# Fetch
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`fetch` performs HTTP requests and returns a Promise of `Response`. It only rejects on network failure or abort — HTTP 4xx/5xx still resolve. Always check `response.ok` or `status`.
+
+## 🔧 Core concepts
+
+- **Call**: `fetch(input, init?)` → `Promise<Response>`.
+- **Init**: `method`, `headers`, `body`, `credentials`, `signal`, `cache`, `redirect`, `mode`.
+- **Body helpers**: `res.json()`, `res.text()`, `res.blob()`, `res.arrayBuffer()`, `res.formData()`.
+- **Request body**: string, `Blob`, `FormData`, `URLSearchParams`, `ReadableStream`, `ArrayBuffer`.
+- **Abort**: pass `AbortSignal` via `signal`.
+
+```js
+const res = await fetch("/api/items");
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+const data = await res.json();
+```
+
+## 💡 Examples
+
+```js
+// JSON POST
+async function createUser(user) {
+  const res = await fetch("/api/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || res.statusText);
+  }
+  return res.json();
+}
+
+// Query string
+const url = new URL("/search", location.origin);
+url.searchParams.set("q", "js");
+const list = await fetch(url).then((r) => r.json());
+
+// Timeout via AbortSignal
+async function fetchWithTimeout(resource, ms, options = {}) {
+  const signal = AbortSignal.timeout(ms);
+  return fetch(resource, { ...options, signal });
+}
+
+// Credentials (cookies)
+await fetch("/api/me", { credentials: "include" });
+
+// Upload FormData
+const fd = new FormData();
+fd.append("file", fileInput.files[0]);
+fd.append("title", "doc");
+await fetch("/upload", { method: "POST", body: fd });
+
+// Read headers
+const res = await fetch("/api");
+console.log(res.headers.get("content-type"));
+```
+
+```js
+// Stream response body
+const res = await fetch("/large.bin");
+const reader = res.body.getReader();
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  console.log("chunk", value.byteLength);
+}
+
+// Parallel requests
+const [a, b] = await Promise.all([
+  fetch("/a").then((r) => r.json()),
+  fetch("/b").then((r) => r.json()),
+]);
+```
+
+## ⚠️ Pitfalls
+
+- `fetch` does not throw on 404/500 — check `ok` / `status`.
+- Body can be consumed once — clone with `res.clone()` if needed twice.
+- Default `credentials` is `"same-origin"`; cross-site cookies need `"include"` + CORS.
+- Setting `Content-Type` manually on `FormData` breaks the multipart boundary.
+- Opaque responses (`mode: "no-cors"`) hide status and body.
+
+## 🔗 Related
+
+- [promise.md](./promise) — Promise combinators
+- [async.md](./async) — async/await
+- [json.md](./json) — JSON bodies
+- [url.md](./url) — URL building
+- [encode.md](./encode) — form encoding
+- [error.md](./error) — error wrapping
+- [api.md](./api) — AbortSignal
+- [DOM/form.md](./DOM/form) — FormData from forms

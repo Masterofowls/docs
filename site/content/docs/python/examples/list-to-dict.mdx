@@ -1,0 +1,93 @@
+---
+title: List to dict
+description: Python · Example / how-to
+---
+
+# List to dict
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Turn sequences into dictionaries for O(1) lookup: pairs → mapping, list of objects → keyed by id, or group values under a key. Prefer `dict()`, comprehensions, and `collections.defaultdict` over manual loops when clear.
+
+## 🔧 Core concepts
+
+| Pattern | Idiom |
+| --- | --- |
+| Pairs | `dict(pairs)` / `\{k: v for k, v in pairs\}` |
+| Key function | `\{item.id: item for item in items\}` |
+| Enumerate | `dict(enumerate(items))` |
+| Group | `defaultdict(list)` |
+| Zip two lists | `dict(zip(keys, values))` |
+
+Duplicate keys: later values win in a comprehension/`dict`.
+
+## 💡 Examples
+
+**Zip keys and values:**
+
+```python
+keys = ["id", "name", "role"]
+values = [1, "Ada", "admin"]
+user = dict(zip(keys, values, strict=True))
+print(user)  # {'id': 1, 'name': 'Ada', 'role': 'admin'}
+```
+
+**Index objects by id:**
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class User:
+    id: int
+    name: str
+
+users = [User(1, "Ada"), User(2, "Bob")]
+by_id = {u.id: u for u in users}
+print(by_id[1].name)  # Ada
+```
+
+**Group list of dicts:**
+
+```python
+from collections import defaultdict
+
+rows = [
+    {"dept": "eng", "name": "Ada"},
+    {"dept": "hr", "name": "Bob"},
+    {"dept": "eng", "name": "Cary"},
+]
+
+grouped: dict[str, list[str]] = defaultdict(list)
+for row in rows:
+    grouped[row["dept"]].append(row["name"])
+print(dict(grouped))
+```
+
+**Pairs from nested lists:**
+
+```python
+pairs = [["a", 1], ["b", 2], ["a", 3]]
+# last wins for duplicate keys
+print(dict(pairs))  # {'a': 3, 'b': 2}
+```
+
+## ⚠️ Pitfalls
+
+- `dict(zip(keys, values))` silently truncates if lengths differ—use `strict=True` (3.10+).
+- Unhashable keys (`list`, `dict`) raise `TypeError`.
+- Building `\{i: x for i, x in enumerate(xs)\}` is rarely needed—keep the list if order matters.
+- Mutating values that are shared lists/dicts affects every reference.
+
+## 🔗 Related
+
+- [Merge lists](merge_lists)
+- [Convert files](convert_files)
+- [Manage files](manage_files)
+- [../dictionaries.md](../dictionaries)
+- [../loops.md](../loops)
+- [../types.md](../types)

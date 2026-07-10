@@ -1,0 +1,90 @@
+---
+title: Date
+description: JavaScript · Reference cheat sheet
+---
+
+# Date
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`Date` represents an instant in time as milliseconds since the Unix epoch (UTC). Local getters/setters use the host timezone. Prefer ISO 8601 strings and libraries (Temporal, Luxon, dayjs) for calendars and time zones when complexity grows.
+
+## 🔧 Core concepts
+
+- **Create**: `new Date()`, `new Date(ms)`, `new Date(isoString)`, `Date.UTC(...)`.
+- **Epoch**: `Date.now()`, `date.getTime()`, `+date`.
+- **UTC vs local**: `getUTC*` / `setUTC*` vs `get*` / `set*`.
+- **Format**: `toISOString()`, `toLocaleString(locale, options)`, `Intl.DateTimeFormat`.
+- **Parse**: `Date.parse(string)` — implementation-defined for non-ISO forms.
+
+```js
+const now = new Date();
+const utc = Date.UTC(2026, 0, 15); // month 0-based
+const fromIso = new Date("2026-07-10T08:00:00.000Z");
+```
+
+## 💡 Examples
+
+```js
+// Add days safely via ms
+function addDays(date, days) {
+  return new Date(date.getTime() + days * 86_400_000);
+}
+
+// Start of local day
+function startOfLocalDay(d = new Date()) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+// Locale format
+const fmt = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "America/Los_Angeles",
+});
+console.log(fmt.format(new Date()));
+
+// Relative (where supported)
+const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+console.log(rtf.format(-1, "day")); // yesterday
+
+// Diff in whole days (UTC calendar-ish)
+function diffDays(a, b) {
+  const ms = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
+    - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  return ms / 86_400_000;
+}
+
+// Valid check
+function isValidDate(d) {
+  return d instanceof Date && !Number.isNaN(d.getTime());
+}
+```
+
+```js
+// Prefer ISO for interchange
+JSON.stringify({ at: new Date() }); // {"at":"2026-...Z"} via toJSON
+
+// Manual components (months are 0–11!)
+const d = new Date(2026, 6, 10); // Jul 10, 2026 local
+```
+
+## ⚠️ Pitfalls
+
+- Months are **0-based** in the `Date` constructor and setters.
+- `new Date("YYYY-MM-DD")` is parsed as UTC; `YYYY-MM-DDTHH:mm` may be local — prefer full ISO with `Z` or offset.
+- Invalid dates have `getTime() === NaN`.
+- Mutator methods mutate the instance — clone before changing shared dates.
+- DST makes “add one day” via `setDate` safer than fixed hours in local math for calendar days.
+
+## 🔗 Related
+
+- [number.md](./number) — timestamps as numbers
+- [json.md](./json) — Date serialization
+- [api.md](./api) — Intl and runtime helpers
+- [strings.md](./strings) — ISO string handling
+- [math.md](./math) — rounding durations

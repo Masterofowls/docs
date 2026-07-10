@@ -1,0 +1,102 @@
+---
+title: Classes
+description: Python · Reference cheat sheet
+---
+
+# Classes
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Classes define object types: attributes + methods. Prefer clear `__init__`, type hints, and small cohesive classes. For data-heavy records, consider [dataclasses](dataclasses) first.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `class Name:` | Creates a type object |
+| `__init__` | Instance initializer |
+| `self` | Instance reference (conventional name) |
+| Instance attr | `self.x = ...` |
+| Class attr | Shared on the class body |
+| `@staticmethod` | No `self` / `cls` |
+| `@classmethod` | Receives `cls` |
+| `@property` | Managed attribute |
+
+Methods are functions on the class; binding supplies `self` on instance access.
+
+## 💡 Examples
+
+**Basic class:**
+
+```python
+class User:
+    species = "human"  # class attribute
+
+    def __init__(self, name: str, age: int) -> None:
+        self.name = name
+        self.age = age
+
+    def greet(self) -> str:
+        return f"Hi, I'm {self.name}"
+
+    @classmethod
+    def from_dict(cls, data: dict[str, object]) -> "User":
+        return cls(str(data["name"]), int(data["age"]))  # type: ignore[arg-type]
+
+    @staticmethod
+    def is_adult(age: int) -> bool:
+        return age >= 18
+
+u = User.from_dict({"name": "Ada", "age": 36})
+print(u.greet(), User.is_adult(u.age))
+```
+
+**Property:**
+
+```python
+class Temperature:
+    def __init__(self, celsius: float) -> None:
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        if value < -273.15:
+            raise ValueError("below absolute zero")
+        self._celsius = value
+```
+
+**Slots (memory / attr lock):**
+
+```python
+class Point:
+    __slots__ = ("x", "y")
+
+    def __init__(self, x: float, y: float) -> None:
+        self.x = x
+        self.y = y
+```
+
+## ⚠️ Pitfalls
+
+- Mutable class attributes are shared across instances — use instance attrs in `__init__`.
+- Forgetting `self` in method signatures causes confusing `TypeError`s.
+- `__init__` should not return a value (except `None`).
+- String annotations / `from __future__ import annotations` affect runtime `typing.get_type_hints`.
+- Prefer composition over deep inheritance trees.
+
+## 🔗 Related
+
+- [Inheritance](inheritance)
+- [Dataclasses](dataclasses)
+- [Magic methods](magic_methods)
+- [Properties / descriptors](properties_descriptors)
+- [Enums](enums)
+- [ABC / protocols](abc_protocols)

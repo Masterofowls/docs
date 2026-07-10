@@ -1,0 +1,112 @@
+---
+title: Magic Methods
+description: Python · Reference cheat sheet
+---
+
+# Magic Methods
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Magic (dunder) methods customize object behavior for operators, iteration, context managers, formatting, and more. Implement only what you need; keep them consistent (`__eq__` with `__hash__`, rich comparisons together).
+
+## 🔧 Core concepts
+
+| Category | Methods |
+| --- | --- |
+| Lifecycle | `__init__`, `__new__`, `__del__` |
+| Repr / str | `__repr__`, `__str__`, `__format__` |
+| Compare | `__eq__`, `__lt__`, `__le__`, … |
+| Hash | `__hash__` (immutable value types) |
+| Container | `__len__`, `__getitem__`, `__setitem__`, `__contains__` |
+| Numeric | `__add__`, `__radd__`, `__iadd__`, … |
+| Call | `__call__` |
+| Context | `__enter__`, `__exit__` |
+| Iter | `__iter__`, `__next__`, `__aiter__` |
+
+Returning `NotImplemented` from binary ops lets Python try the reflected method.
+
+## 💡 Examples
+
+**Value object:**
+
+```python
+from __future__ import annotations
+
+class Money:
+    def __init__(self, cents: int) -> None:
+        self.cents = cents
+
+    def __repr__(self) -> str:
+        return f"Money({self.cents})"
+
+    def __str__(self) -> str:
+        return f"${self.cents / 100:.2f}"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Money):
+            return NotImplemented
+        return self.cents == other.cents
+
+    def __hash__(self) -> int:
+        return hash(self.cents)
+
+    def __add__(self, other: Money) -> Money:
+        if not isinstance(other, Money):
+            return NotImplemented
+        return Money(self.cents + other.cents)
+```
+
+**Container protocol:**
+
+```python
+class Bag:
+    def __init__(self, items: list[str] | None = None) -> None:
+        self._items = list(items or [])
+
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __getitem__(self, index: int) -> str:
+        return self._items[index]
+
+    def __contains__(self, item: object) -> bool:
+        return item in self._items
+
+    def __iter__(self):
+        return iter(self._items)
+```
+
+**Callable instance:**
+
+```python
+class Adder:
+    def __init__(self, n: int) -> None:
+        self.n = n
+
+    def __call__(self, x: int) -> int:
+        return x + self.n
+
+add5 = Adder(5)
+print(add5(10))  # 15
+```
+
+## ⚠️ Pitfalls
+
+- Mutable objects should set `__hash__ = None` if they define `__eq__`.
+- `__repr__` should be unambiguous; `__str__` can be user-friendly.
+- Forgetting `__radd__` breaks `sum()` starting from `0` for custom types.
+- `__del__` is not a destructor guarantee — avoid critical logic there.
+- Inconsistent `__eq__` / ordering methods confuse sorts and sets.
+
+## 🔗 Related
+
+- [Classes](classes)
+- [Context managers](context_managers)
+- [Iterators](iterators)
+- [Operators](operators)
+- [Dataclasses](dataclasses)
+- [Properties / descriptors](properties_descriptors)

@@ -1,0 +1,63 @@
+---
+title: stash
+description: Git · Reference cheat sheet
+---
+
+# stash
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git stash` shelves uncommitted changes so you can switch branches cleanly, then restore them later. Prefer named stashes and explicit `pop`/`apply`; include untracked files when needed.
+
+## 🔧 Core concepts
+
+- **Default** — stashes tracked modified + staged; working tree matches HEAD.
+- **Untracked** — `-u` / `--include-untracked`; `-a` also ignored.
+- **List / show** — `stash list`, `stash show -p`.
+- **Restore** — `apply` keeps stash; `pop` applies and drops.
+- **Branch** — `stash branch <name>` creates a branch from the stash base.
+
+## 💡 Examples
+
+```shellscript
+git stash push -m "wip: login form"
+git stash list
+git stash show -p stash@{0}
+
+git stash pop
+git stash apply stash@{1}
+git stash drop stash@{1}
+git stash clear   # delete all — irreversible
+
+# Include untracked
+git stash push -u -m "wip: new files"
+
+# Stash only some paths
+git stash push -m "partial" -- src/a.ts src/b.ts
+
+# Keep index (stash unstaged only)
+git stash push --keep-index -m "keep staged"
+
+git stash branch recover-wip stash@{0}
+```
+
+## ⚠️ Pitfalls
+
+- `pop` can conflict; the stash entry may remain if apply fails (version-dependent).
+- Stashing doesn’t include ignored files unless `-a`.
+- Binary / submodule changes can make stash awkward — verify with `show -p`.
+- Don’t rely on stash as backup — commit to a WIP branch instead for long work.
+- `clear` / `drop` are hard to undo (reflog may help briefly).
+
+## 🔗 Related
+
+- [status.md](./status)
+- [branch.md](./branch)
+- [conflict.md](./conflict)
+- [reflog.md](./reflog)
+- [clean.md](./clean)
+- [commit.md](./commit)

@@ -1,0 +1,61 @@
+---
+title: EXPLAIN and ANALYZE
+description: SQL · Reference cheat sheet
+---
+
+# EXPLAIN and ANALYZE
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`EXPLAIN` shows the optimizer’s plan; `EXPLAIN ANALYZE` (Postgres) / `EXPLAIN ANALYZE` (MySQL 8.0.18+) executes the query and reports actual timings/rows. Use it to find sequential scans, bad join order, and misestimates.
+
+## 🔧 Core concepts
+
+- **Nodes** — seq scan, index scan, nested loop, hash join, sort, aggregate.
+- **Estimates vs actual** — large gaps ⇒ stale stats or correlated columns.
+- **Buffers / IO** — Postgres `BUFFERS`; track hot reads.
+- **Format** — `JSON`/`TEXT`/`YAML` (Postgres); tree vs traditional (MySQL).
+- **Stats** — `ANALYZE` table (Postgres) / `ANALYZE TABLE` (MySQL) refresh stats.
+
+## 💡 Examples
+
+```sql
+-- Postgres
+EXPLAIN SELECT * FROM orders WHERE customer_id = 42;
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
+SELECT o.*
+FROM orders o
+JOIN users u ON u.id = o.user_id
+WHERE o.created_at >= NOW() - INTERVAL '7 days';
+
+ANALYZE orders;  -- refresh statistics
+```
+
+```sql
+-- MySQL
+EXPLAIN SELECT * FROM orders WHERE customer_id = 42;
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE customer_id = 42;
+ANALYZE TABLE orders;
+```
+
+## ⚠️ Pitfalls
+
+- `EXPLAIN ANALYZE` runs the query — careful with writes/`UPDATE`/`DELETE` (use transactions + rollback where possible).
+- Reading only estimated rows without ANALYZE misleads on skewed data.
+- Missing indexes show as seq scans — confirm selectivity before indexing everything.
+- Parameterized app queries may get different plans than literal `EXPLAIN` — use actual params.
+- Caching effects make second runs look faster — warm vs cold cache matters.
+
+## 🔗 Related
+
+- [indexes.md](./indexes)
+- [select.md](./select)
+- [joins.md](./joins)
+- [order_limit.md](./order_limit)
+- [cte.md](./cte)
+- [subquery.md](./subquery)

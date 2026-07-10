@@ -1,0 +1,103 @@
+---
+title: Overflow
+description: CSS · Reference cheat sheet
+---
+
+# Overflow
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`overflow` controls how content that doesn’t fit a box is handled: visible, clipped, or scrollable. Logical longhands and `overflow-wrap` / `text-overflow` handle text. Overflow values other than `visible` often create scroll containers and affect sticky/margin collapse.
+
+## 🔧 Core concepts
+
+| Value | Behavior |
+| --- | --- |
+| `visible` | paint outside (default) |
+| `hidden` | clip, no scroll UI |
+| `clip` | clip without programmatic scroll |
+| `scroll` | always show scrollports (axes may still overlay) |
+| `auto` | scrollbars when needed |
+
+- **Shorthand**: `overflow: x y` / `overflow: auto`.
+- **Axes**: `overflow-x`, `overflow-y`, `overflow-inline`, `overflow-block`.
+- **Text**: `text-overflow: ellipsis` needs overflow ≠ visible + nowrap (usually).
+- **`overflow-wrap` / `word-break`**: wrapping long strings.
+- **Scroll**: `scroll-behavior`, `overscroll-behavior`, scroll snap.
+
+```css
+.panel {
+  max-height: 240px;
+  overflow: auto;
+}
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+```
+
+## 💡 Examples
+
+```css
+/* Prevent body scroll under modal */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Contain paint */
+.media {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Horizontal scroller */
+.scroller {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* Long URLs */
+.prose a {
+  overflow-wrap: anywhere;
+}
+
+/* Sticky inside overflow */
+.sidebar {
+  overflow: auto;
+  height: 100%;
+}
+.sidebar h2 {
+  position: sticky;
+  top: 0;
+}
+```
+
+```css
+/* overlay scrollbars hint (limited support) */
+.scroll {
+  overflow: overlay;
+} /* deprecated — use auto */
+```
+
+## ⚠️ Pitfalls
+
+- `overflow-x: hidden` + `overflow-y: visible` computes to `auto` in many cases — can’t mix freely.
+- Clipping kills `position: sticky` relative to outer viewport if an ancestor scrolls/clips incorrectly.
+- `overflow: hidden` is not a security boundary for content.
+- Nested scroll areas hurt UX — prefer one primary scroller.
+- Ellipsis requires a bounded width — flex items need `min-width: 0`.
+
+## 🔗 Related
+
+- [scroll.md](./scroll) — scrolling
+- [scroll_snap.md](./scroll_snap) — snap
+- [sticky.md](./sticky) — sticky constraints
+- [box_model.md](./box_model) — sizing
+- [text.md](./text) — wrapping

@@ -1,0 +1,95 @@
+---
+title: "Position & Geometry"
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Position & Geometry
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+Measure layout with `getBoundingClientRect`, offset/scroll properties, and `IntersectionObserver` / `ResizeObserver`. Batch reads and writes to avoid layout thrashing.
+
+## 🔧 Core concepts
+
+- **Viewport box**: `getBoundingClientRect()` → `x`, `y`, `width`, `height`, `top`, `right`, `bottom`, `left` (CSS pixels, viewport-relative).
+- **Offset**: `offsetTop`, `offsetLeft`, `offsetWidth`, `offsetHeight`, `offsetParent`.
+- **Client**: `clientWidth` / `clientHeight` (padding box, no scrollbar).
+- **Scroll**: `scrollTop`, `scrollLeft`, `scrollWidth`, `scrollHeight`, `scrollTo`.
+- **Observers**: `ResizeObserver`, `IntersectionObserver`.
+- **Visual viewport**: `window.visualViewport` (mobile chrome).
+
+```js
+const r = el.getBoundingClientRect();
+const visible = r.top < innerHeight && r.bottom > 0;
+```
+
+## 💡 Examples
+
+```js
+// Center in viewport?
+function isInViewport(el) {
+  const r = el.getBoundingClientRect();
+  return r.top >= 0 && r.bottom <= window.innerHeight;
+}
+
+// Scroll into view
+el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+// Document position
+function pageOffset(el) {
+  const r = el.getBoundingClientRect();
+  return {
+    top: r.top + window.scrollY,
+    left: r.left + window.scrollX,
+  };
+}
+
+// ResizeObserver
+const ro = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    const { width, height } = entry.contentRect;
+    chart.resize(width, height);
+  }
+});
+ro.observe(container);
+
+// IntersectionObserver lazy-load
+const io = new IntersectionObserver(
+  (entries, obs) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.src = e.target.dataset.src;
+      obs.unobserve(e.target);
+    }
+  },
+  { rootMargin: "100px" },
+);
+document.querySelectorAll("img[data-src]").forEach((img) => io.observe(img));
+```
+
+```js
+// Avoid thrashing: read all, then write
+const heights = items.map((el) => el.getBoundingClientRect().height);
+items.forEach((el, i) => {
+  el.style.minHeight = `${Math.max(...heights)}px`;
+});
+```
+
+## ⚠️ Pitfalls
+
+- Interleaving measure and mutate causes forced synchronous layout.
+- `getBoundingClientRect` is viewport-relative — add `scrollX/Y` for document coords.
+- Transforms affect bounding rects; offset props may differ.
+- `offsetParent` can be `null` for fixed/hidden elements.
+- Subpixel floats — round when comparing to integers.
+
+## 🔗 Related
+
+- [window.md](./window) — scrollX / innerHeight
+- [screen.md](./screen) — screen metrics
+- [class.md](./class) — class-driven layout
+- [events.md](./events) — scroll / resize
+- [selectors.md](./selectors) — targeting elements
+- [../math.md](../math) — clamping / rounding

@@ -1,0 +1,114 @@
+---
+title: Encrypt
+description: Python · Example / how-to
+---
+
+# Encrypt
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Encrypt secrets at rest with modern cryptography—not homemade XOR. For passwords use one-way hashing (`hashlib.scrypt` / `bcrypt`). For reversible data use authenticated encryption (Fernet or AES-GCM via the `cryptography` package). Never commit keys; load from environment.
+
+## 🔧 Core concepts
+
+| Goal | Approach |
+| --- | --- |
+| Password storage | Slow hash + salt (`scrypt`, `argon2`, `bcrypt`) |
+| Symmetric encrypt | Fernet (AES + HMAC) or AES-GCM |
+| Key storage | Env var / secret manager—not source |
+| Integrity | Prefer AEAD; detect tampering |
+| Stdlib only | `hashlib`, `secrets`, `hmac`—limited for full AEAD |
+
+Install: `pip install cryptography`
+
+## 💡 Examples
+
+**Password hashing (stdlib scrypt):**
+
+```python
+import hashlib
+import secrets
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_bytes(16)
+    digest = hashlib.scrypt(
+        password.encode("utf-8"),
+        salt=salt,
+        n=2**14,
+        r=8,
+        p=1,
+        dklen=32,
+    )
+    return f"{salt.hex()}${digest.hex()}"
+
+def verify_password(password: str, stored: str) -> bool:
+    salt_hex, digest_hex = stored.split("$", 1)
+    salt = bytes.fromhex(salt_hex)
+    digest = hashlib.scrypt(
+        password.encode("utf-8"),
+        salt=salt,
+        n=2**14,
+        r=8,
+        p=1,
+        dklen=32,
+    )
+    return secrets.compare_digest(digest.hex(), digest_hex)
+
+if __name__ == "__main__":
+    stored = hash_password("s3cret!")
+    assert verify_password("s3cret!", stored)
+```
+
+**Fernet encrypt / decrypt:**
+
+```python
+import os
+from cryptography.fernet import Fernet
+
+def get_fernet() -> Fernet:
+    key = os.environ.get("APP_FERNET_KEY")
+    if not key:
+        # generate once: Fernet.generate_key().decode()
+        raise RuntimeError("Set APP_FERNET_KEY")
+    return Fernet(key.encode("utf-8") if isinstance(key, str) else key)
+
+def encrypt_text(plain: str) -> bytes:
+    return get_fernet().encrypt(plain.encode("utf-8"))
+
+def decrypt_text(token: bytes) -> str:
+    return get_fernet().decrypt(token).decode("utf-8")
+
+if __name__ == "__main__":
+    # Demo only — set a real key in production
+    os.environ["APP_FERNET_KEY"] = Fernet.generate_key().decode()
+    token = encrypt_text("hello")
+    print(decrypt_text(token))
+```
+
+**Generate a key once:**
+
+```python
+from cryptography.fernet import Fernet
+
+print(Fernet.generate_key().decode())
+```
+
+## ⚠️ Pitfalls
+
+- MD5/SHA-1 alone are not password hashes—use scrypt/argon2/bcrypt.
+- Reusing IVs/nonces with AES-GCM is catastrophic; Fernet handles this for you.
+- Logging plaintext or keys defeats encryption.
+- `hashlib.md5` for “checksums” is fine for non-security integrity only.
+
+## 🔗 Related
+
+- [Manage files](manage_files)
+- [Convert files](convert_files)
+- [Server](server)
+- [Telegram bot](tg_bot)
+- [../import_export.md](../import_export)
+- [../types.md](../types)

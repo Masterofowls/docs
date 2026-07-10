@@ -1,0 +1,74 @@
+---
+title: Types
+description: _TypeScript · Reference cheat sheet_ 
+---
+
+# Types
+
+*_TypeScript · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+TypeScript adds a static type system on top of JavaScript. Types describe the shape of values so the compiler can catch mistakes before runtime. Prefer `type` aliases and `interface` for reusable shapes; use annotations where inference is unclear.
+
+## 🧩 Core concepts
+
+- **Type annotations** — `let x: number = 1` declares the expected type.
+- **Type inference** — TS often infers types from initializers; annotate public APIs.
+- **`type` vs `interface`** — both name object shapes; `interface` supports declaration merging; `type` can express unions, intersections, and mapped forms.
+- **Structural typing** — compatibility is by shape, not by nominal class name.
+- **`any` / `unknown` / `never`** — escape hatch, safe top type, and bottom type respectively.
+- **Type assertions** — `as T` or `<T>value` tell the compiler; they do not rewrite runtime values.
+
+## 💡 Examples
+
+```ts
+// Annotation + inference
+const count: number = 42;
+const message = "hello"; // inferred as string
+
+// type alias
+type UserId = string;
+type Point = { x: number; y: number };
+
+// interface
+interface User {
+  id: UserId;
+  name: string;
+}
+
+// Structural compatibility
+const p: Point = { x: 1, y: 2 };
+const alsoPoint = { x: 0, y: 0, z: 9 };
+const ok: Point = alsoPoint; // extra props allowed when assigning from a variable
+
+// unknown vs any
+function parse(json: string): unknown {
+  return JSON.parse(json);
+}
+const data = parse("{}");
+if (typeof data === "object" && data !== null && "id" in data) {
+  // narrowed
+}
+
+// Assertion (prefer narrowing when possible)
+const el = document.querySelector("#app") as HTMLDivElement | null;
+```
+
+## ⚠️ Pitfalls
+
+- Overusing `any` disables checking; prefer `unknown` and narrow.
+- Assertions lie to the compiler — invalid casts still compile.
+- Fresh object literals are excess-property checked; variables are not.
+- `interface` merging can surprise you across files; keep declarations intentional.
+
+## 🔗 Related
+
+- [Primitive types](./primitive_types)
+- [Object types](./object_types)
+- [Union types](./union_types)
+- [Generic types](./generic_types)
+- [Utility types](./utility_types)
+- [Type guards](./type_guards)

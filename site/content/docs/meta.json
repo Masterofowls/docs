@@ -1,0 +1,16 @@
+{
+  "title": "Docs",
+  "pages": [
+    "index",
+    "python",
+    "javascript",
+    "typescript",
+    "react",
+    "react-native",
+    "css",
+    "html",
+    "django",
+    "git",
+    "sql"
+  ]
+}

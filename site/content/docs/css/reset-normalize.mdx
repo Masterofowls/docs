@@ -1,0 +1,127 @@
+---
+title: "Reset & Normalize"
+description: CSS · Reference cheat sheet
+---
+
+# Reset & Normalize
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Resets and normalize stylesheets reduce browser default inconsistencies. A **reset** aggressively zeros margins/padding; **normalize** preserves useful defaults while fixing bugs. Modern projects often use a small opinionated base (e.g. border-box, margin wipe, media defaults) instead of huge legacy resets.
+
+## 🔧 Core concepts
+
+- **Goals**: predictable box model, typography baseline, media fluidity, form inheritance.
+- **`box-sizing: border-box`**: almost universal recommendation.
+- **Inheritance**: forms don’t inherit `font` by default — fix it.
+- **Lists/quotes**: decide whether to keep bullets or reset.
+- **Layers**: put reset in the earliest `@layer`.
+- **Don’t**: remove focus outlines without `:focus-visible` replacement.
+
+```css
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  * {
+    margin: 0;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+/* Focus visible, not none */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--accent, #06c);
+  outline-offset: 2px;
+}
+
+/* List opt-in */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+  padding: 0;
+}
+
+/* Button reset */
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Table normalize bits */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Reduce motion baseline */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
+```
+
+```css
+/* Prefer small modern base over * { all: unset } nukes */
+```
+
+## ⚠️ Pitfalls
+
+- Ultra-aggressive resets fight third-party widgets — scope when embedding.
+- Removing list styles without `role="list"` can hurt VoiceOver semantics in some cases.
+- Never `outline: none` without a visible `:focus-visible` alternative.
+- Duplicate normalize + framework reboot causes conflicts — pick one base.
+- Reset ≠ design system — still define tokens/type after.
+
+## 🔗 Related
+
+- [cascade_layers.md](./cascade_layers) — reset layer
+- [box_model.md](./box_model) — border-box
+- [font.md](./font) — typography base
+- [button.md](./button) — button styles
+- [pseudo_classes.md](./pseudo_classes) — focus-visible

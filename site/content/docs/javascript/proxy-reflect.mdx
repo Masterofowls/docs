@@ -1,0 +1,112 @@
+---
+title: "Proxy & Reflect"
+description: JavaScript · Reference cheat sheet
+---
+
+# Proxy & Reflect
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`Proxy` wraps a target object and intercepts fundamental operations (get, set, apply, construct, …) via traps. `Reflect` mirrors those operations as functions and returns boolean success flags — use it inside traps to forward default behavior correctly.
+
+## 🔧 Core concepts
+
+| Trap | Intercepts |
+| --- | --- |
+| `get` / `set` | property read/write |
+| `has` | `in` operator |
+| `deleteProperty` | `delete` |
+| `ownKeys` | `Object.keys` / spread keys |
+| `getOwnPropertyDescriptor` / `defineProperty` | descriptors |
+| `apply` / `construct` | function call / `new` |
+| `getPrototypeOf` / `setPrototypeOf` | prototype |
+
+- **Invariants**: traps must respect target non-configurable / non-writable constraints or throw.
+- **Revocable**: `Proxy.revocable(target, handler)` → `\{ proxy, revoke \}`.
+
+```js
+const p = new Proxy(
+  {},
+  {
+    get(t, prop, receiver) {
+      return Reflect.get(t, prop, receiver);
+    },
+  },
+);
+```
+
+## 💡 Examples
+
+```js
+// Default values
+const defaults = { theme: "light" };
+const config = new Proxy(defaults, {
+  get(t, prop, r) {
+    return prop in t ? Reflect.get(t, prop, r) : "«missing»";
+  },
+});
+
+// Validation on set
+const user = new Proxy(
+  { age: 0 },
+  {
+    set(t, prop, value, r) {
+      if (prop === "age" && (!Number.isInteger(value) || value < 0)) {
+        throw new TypeError("invalid age");
+      }
+      return Reflect.set(t, prop, value, r);
+    },
+  },
+);
+
+// Negative array index
+function wrapArray(arr) {
+  return new Proxy(arr, {
+    get(t, prop, r) {
+      if (typeof prop === "string" && /^-?\d+$/.test(prop)) {
+        let i = Number(prop);
+        if (i < 0) i = t.length + i;
+        return Reflect.get(t, String(i), r);
+      }
+      return Reflect.get(t, prop, r);
+    },
+  });
+}
+wrapArray([1, 2, 3])[-1]; // 3
+
+// Revoke access
+const { proxy, revoke } = Proxy.revocable({ secret: 1 }, {});
+revoke();
+// proxy.secret → TypeError
+
+// Observable-ish
+function observable(obj, onChange) {
+  return new Proxy(obj, {
+    set(t, p, v, r) {
+      const ok = Reflect.set(t, p, v, r);
+      if (ok) onChange(p, v);
+      return ok;
+    },
+  });
+}
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `Reflect` / wrong `receiver` breaks inheritance and accessors (`this` in getters).
+- Violating invariants (e.g. reporting a non-configurable missing property) throws.
+- Proxies are not deeply transparent — `===` identity differs from target; libraries may reject them.
+- Performance cost vs plain objects — don’t proxy hot paths without need.
+- `typeof proxy` follows the target (object/function).
+
+## 🔗 Related
+
+- [objects.md](./objects) — property model
+- [prototypes.md](./prototypes) — prototype ops
+- [symbol.md](./symbol) — well-known symbols
+- [freeze_seal.md](./freeze_seal) — hardening without Proxy
+- [oop.md](./oop) — classes vs interception

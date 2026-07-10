@@ -1,0 +1,112 @@
+---
+title: Conditionals
+description: Python · Reference cheat sheet
+---
+
+# Conditionals
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Branch with `if` / `elif` / `else` and structural `match` / `case` (3.10+). Prefer clear boolean expressions and pattern matching for nested dict/tag shapes over deep `if` ladders.
+
+## 🔧 Core concepts
+
+| Form | Use |
+| --- | --- |
+| `if` / `elif` / `else` | Boolean branches |
+| Ternary | `a if cond else b` |
+| `match` / `case` | Structural pattern matching |
+| Guards | `case x if pred:` |
+| OR patterns | `case 1 \| 2:` |
+| Capture | `case \{"id": int(uid)\}:` |
+| Wildcard | `case _:` |
+
+Truthiness rules apply in `if` — see [truthiness](truthiness). `match` compares structure and can bind names.
+
+## 💡 Examples
+
+**Classic if:**
+
+```python
+def grade(score: int) -> str:
+    if score >= 90:
+        return "A"
+    if score >= 80:
+        return "B"
+    if score >= 70:
+        return "C"
+    return "F"
+
+label = "pass" if grade(85) != "F" else "fail"
+```
+
+**Match literals and guards:**
+
+```python
+def handle(code: int) -> str:
+    match code:
+        case 200 | 201:
+            return "ok"
+        case 404:
+            return "missing"
+        case n if 500 <= n < 600:
+            return "server"
+        case _:
+            return "other"
+```
+
+**Match mapping / sequence:**
+
+```python
+def route(event: dict[str, object]) -> str:
+    match event:
+        case {"type": "user", "id": int(uid)} if uid > 0:
+            return f"user:{uid}"
+        case {"type": "ping"}:
+            return "pong"
+        case {"items": [first, *rest]}:
+            return f"first={first}, n={len(rest)+1}"
+        case _:
+            return "unknown"
+```
+
+**Match class patterns:**
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Point:
+    x: int
+    y: int
+
+def quadrant(p: Point) -> str:
+    match p:
+        case Point(x=0, y=0):
+            return "origin"
+        case Point(x=x, y=y) if x > 0 and y > 0:
+            return "I"
+        case Point():
+            return "elsewhere"
+```
+
+## ⚠️ Pitfalls
+
+- `case x:` captures everything — put specific patterns first.
+- `match` subject is evaluated once; patterns do not fall through like C `switch`.
+- Avoid chained ternaries — hard to read.
+- `==` vs `is`: use `is` for `None` / singletons.
+- Empty patterns and overlapping captures can surprise — test edge cases.
+
+## 🔗 Related
+
+- [Truthiness](truthiness)
+- [Operators](operators)
+- [Enums](enums)
+- [Dataclasses](dataclasses)
+- [Dictionaries](dictionaries)
+- [Walrus](walrus)

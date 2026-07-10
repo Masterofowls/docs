@@ -1,0 +1,137 @@
+---
+title: CSS Grid
+description: CSS · Reference cheat sheet
+---
+
+# CSS Grid
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS Grid is a two-dimensional layout system for rows and columns. Define tracks on a container with `grid-template-*`, place items with line-based or area-based positioning, and control gaps and alignment. Use Grid for page shells, card galleries, dashboards, and any UI where rows and columns interact. Prefer Flexbox for simple one-axis distribution inside a grid cell.
+
+Subgrid (`grid-template-*: subgrid`) lets nested grids inherit parent tracks for aligned columns across components.
+
+## 🔧 Core concepts
+
+### Container properties
+
+| Property | Role |
+| --- | --- |
+| `display: grid` \| `inline-grid` | Establish grid formatting context |
+| `grid-template-columns` / `rows` | Track list (`fr`, `px`, `%`, `minmax()`, `repeat()`) |
+| `grid-template-areas` | Named rectangular areas |
+| `grid-auto-columns` / `rows` | Implicit track sizing |
+| `grid-auto-flow` | `row` \| `column` \| `dense` |
+| `gap` / `row-gap` / `column-gap` | Gutters |
+| `justify-items` / `align-items` | Default cell alignment |
+| `justify-content` / `align-content` | Tracks inside the container |
+| `place-items` / `place-content` | Shorthands |
+
+### Item properties
+
+| Property | Role |
+| --- | --- |
+| `grid-column` / `grid-row` | Line start / end (`1 / 3`, `span 2`) |
+| `grid-area` | Area name or four-line shorthand |
+| `justify-self` / `align-self` | Per-item alignment |
+| `order` | Visual order (use carefully) |
+
+### Track sizing functions
+
+| Function | Use |
+| --- | --- |
+| `fr` | Share free space |
+| `minmax(min, max)` | Flexible bounds |
+| `repeat(n, …)` / `repeat(auto-fit, …)` / `auto-fill` | Patterns |
+| `fit-content()` | Clamp to content up to a limit |
+| `min-content` / `max-content` / `auto` | Content-based tracks |
+
+## 💡 Examples
+
+### Responsive card gallery
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+```
+
+### Holy grail with areas
+
+```css
+.page {
+  display: grid;
+  grid-template-columns: 12rem 1fr 12rem;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header header"
+    "nav    main   aside"
+    "footer footer footer";
+  min-block-size: 100dvh;
+  gap: 1rem;
+}
+
+.header { grid-area: header; }
+.nav    { grid-area: nav; }
+.main   { grid-area: main; }
+.aside  { grid-area: aside; }
+.footer { grid-area: footer; }
+
+@media (max-width: 48rem) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "nav"
+      "main"
+      "aside"
+      "footer";
+  }
+}
+```
+
+### Span and dense packing
+
+```css
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: dense;
+  gap: 0.5rem;
+}
+
+.board .wide {
+  grid-column: span 2;
+}
+```
+
+### Align within cells
+
+```css
+.cell-center {
+  display: grid;
+  place-items: center;
+  min-block-size: 10rem;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using only fixed `px` columns that overflow small viewports—prefer `minmax` + `auto-fit`/`fr`.
+- Confusing `auto-fit` (collapses empty tracks) with `auto-fill` (keeps empty tracks).
+- Forgetting that percentage row heights need a definite container block size.
+- Over-nesting grids when one template + areas would suffice.
+- Relying on `order` or visual placement that diverges from DOM order for keyboard users.
+
+## 🔗 Related
+
+- [Flexbox](flex)
+- [Adaptive design](adaptive)
+- [Positioning](position)
+- [Multi-column layout](column)

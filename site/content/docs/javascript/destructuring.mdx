@@ -1,0 +1,91 @@
+---
+title: Destructuring
+description: JavaScript · Reference cheat sheet
+---
+
+# Destructuring
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Destructuring unpacks values from arrays or properties from objects into distinct variables. It works in assignments, function parameters, and `for...of` loops. Combine with defaults, rest, and renaming for concise, safe extraction.
+
+## 🔧 Core concepts
+
+- **Array**: position-based — `const [a, b] = list`.
+- **Object**: name-based — `const \{ x, y \} = obj`.
+- **Defaults**: `const \{ a = 1 \} = \{\}` / `const [a = 1] = []`.
+- **Rename**: `const \{ name: userName \} = user`.
+- **Rest**: `const [head, ...tail] = arr` / `const \{ a, ...rest \} = obj`.
+- **Nested**: patterns can nest arbitrarily.
+- **Params**: `function f(\{ id, ...opts \} = \{\}) \{\}`.
+
+```js
+const [first, second] = [10, 20];
+const { title, year = 2020 } = { title: "Guide" };
+```
+
+## 💡 Examples
+
+```js
+// Swap
+let a = 1,
+  b = 2;
+[a, b] = [b, a];
+
+// Skip slots
+const [, , third] = ["a", "b", "c"]; // "c"
+
+// Nested object
+const res = { data: { user: { id: 1, name: "Ada" } } };
+const {
+  data: {
+    user: { name },
+  },
+} = res;
+
+// Rename + default
+const { width: w = 100, height: h = 100 } = { width: 80 };
+
+// Function params
+function connect({ host = "localhost", port = 5432, ssl = true } = {}) {
+  return `${host}:${port} ssl=${ssl}`;
+}
+
+// Iterate Map / entries
+for (const [key, value] of Object.entries({ a: 1, b: 2 })) {
+  console.log(key, value);
+}
+
+// Rest object (omit keys)
+const user = { id: 1, name: "Ada", password: "secret" };
+const { password, ...safe } = user;
+
+// Computed property names
+const key = "score";
+const { [key]: score } = { score: 99 };
+```
+
+```js
+// Array from iterable
+const [x, y] = new Set([1, 2, 3]); // 1, 2
+```
+
+## ⚠️ Pitfalls
+
+- Destructuring `null`/`undefined` throws — guard: `const \{ a \} = obj ?? \{\}`.
+- Array holes and missing props become `undefined` (then defaults apply).
+- Object rest copies enumerable own properties only (shallow).
+- Pattern `const \{ length \} = "hi"` works (strings are array-like) but prefer explicit APIs.
+- Left-hand patterns in assignment need parentheses when starting with `\{`: `(\{ a \} = obj)`.
+
+## 🔗 Related
+
+- [spread_rest.md](./spread_rest) — rest/spread siblings
+- [objects.md](./objects) — object shapes
+- [arrays.md](./arrays) — array unpacking
+- [functions.md](./functions) — param destructuring
+- [optional_chaining.md](./optional_chaining) — safe deep access

@@ -1,0 +1,78 @@
+---
+title: Gitignore
+description: _Git · Reference cheat sheet_ 
+---
+
+# Gitignore
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`.gitignore` lists patterns Git should treat as untracked noise (build output, deps, secrets, OS junk). Patterns apply to untracked files; already-tracked files stay tracked until removed from the index.
+
+## 🧩 Core concepts
+
+- **Pattern syntax** — globs (`*.log`), directories (`dist/`), negation (`!important.log`).
+- **Scoped rules** — root `.gitignore`, nested ignores, and global `core.excludesFile`.
+- **`/` anchoring** — leading `/` anchors to the file’s directory; trailing `/` means directory.
+- **`**` recursion** — matches across directories depending on position.
+- **Check-ignore** — debug why a path is ignored.
+- **Un-ignore tracked files** — `git rm -r --cached` then commit.
+
+## 💡 Examples
+
+```ini
+# Dependencies & build
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & caches
+*.log
+.cache/
+.coverage/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+```
+
+```shellscript
+# Test a path
+git check-ignore -v path/to/file
+
+# Stop tracking without deleting the file
+git rm -r --cached node_modules
+git rm --cached .env
+git commit -m "chore: stop tracking local env and deps"
+
+# Global ignores
+git config --global core.excludesFile ~/.gitignore_global
+```
+
+## ⚠️ Pitfalls
+
+- Ignoring after `git add` does nothing until you untrack with `--cached`.
+- Negation (`!`) cannot re-include a file inside an ignored parent directory easily — un-ignore parents carefully.
+- Committing `.env` once leaves secrets in history — rotate keys and consider history rewrite/BFG.
+- Over-broad `*` patterns can hide files you meant to commit.
+
+## 🔗 Related
+
+- [Gitattributes](./gitattributes)
+- [Stage](./stage)
+- [Commit](./commit)
+- [Git LFS](./git_lfs)
+- [GH CLI](./gh_cli)

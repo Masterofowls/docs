@@ -1,0 +1,107 @@
+---
+title: Import and export
+description: Python · Reference cheat sheet
+---
+
+# Import and export
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Python modules are `.py` files (or packages with `__init__.py`). `import` loads and binds names; there is no separate `export` keyword—public API is whatever you define and optionally list in `__all__`. Prefer absolute imports; use relative imports inside packages.
+
+## 🔧 Core concepts
+
+| Form | Meaning |
+| --- | --- |
+| `import math` | Bind module name |
+| `from math import sqrt` | Bind selected names |
+| `from math import sqrt as s` | Alias |
+| `from pkg import module` | Submodule |
+| `from . import sibling` | Relative (package only) |
+| `from .sibling import x` | Relative name |
+| `__all__` | Names exported by `from pkg import *` |
+| Entry point | `if __name__ == "__main__":` |
+
+Search path: current package, `PYTHONPATH`, site-packages. Circular imports usually mean you should restructure or lazy-import inside functions.
+
+## 💡 Examples
+
+**Package layout:**
+
+```plaintext
+mypkg/
+  __init__.py
+  utils.py
+  api.py
+```
+
+```python
+# mypkg/__init__.py
+from .api import Client
+
+__all__ = ["Client"]
+```
+
+```python
+# mypkg/api.py
+from .utils import normalize
+
+class Client:
+    def get(self, key: str) -> str:
+        return normalize(key)
+```
+
+```python
+# app.py
+from mypkg import Client
+# or: from mypkg.api import Client
+```
+
+**Selective import and alias:**
+
+```python
+import json
+from pathlib import Path
+from collections import defaultdict as dd
+
+data = json.loads(Path("data.json").read_text(encoding="utf-8"))
+```
+
+**Script vs library:**
+
+```python
+# tools/cli.py
+def main() -> None:
+    print("run")
+
+if __name__ == "__main__":
+    main()
+```
+
+**Lazy import (avoid cycles / heavy deps):**
+
+```python
+def dump(obj: object) -> str:
+    import json  # local import
+    return json.dumps(obj)
+```
+
+## ⚠️ Pitfalls
+
+- `from module import *` pollutes namespaces; avoid outside REPL/`__init__` re-exports.
+- Shadowing stdlib names (`json.py`, `random.py`) breaks imports.
+- Relative imports fail when a file is run as a script (`python pkg/mod.py`); use `-m`.
+- Mutating `sys.path` in app code is fragile—fix packaging instead.
+- Side effects at import time (DB connect, network) make testing and startup painful.
+
+## 🔗 Related
+
+- [Types](types)
+- [Docstrings](docstrings)
+- [Async / await](async)
+- [*args and **kwargs](kwags)
+- [Examples: manage files](Examples/manage_files)

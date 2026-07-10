@@ -1,0 +1,70 @@
+---
+title: Fragments
+description: React · Reference cheat sheet
+---
+
+# Fragments
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Fragments group children without adding an extra DOM node. Use `&lt;>...&lt;/>` or `<Fragment>` when a component must return multiple siblings. Keyed fragments need the long form.
+
+## 🔧 Core concepts
+
+- **Short syntax** — `&lt;>...&lt;/>` (no props, no key).
+- **Long form** — `<Fragment key=\{...\}>`.
+- **No DOM** — doesn’t affect layout/CSS selectors as a wrapper.
+- **Return** — components return one parent; fragment counts as one.
+
+## 💡 Examples
+
+```tsx
+import { Fragment } from "react";
+
+export function DefinitionList({
+  items,
+}: {
+  items: { id: string; term: string; description: string }[];
+}) {
+  return (
+    <dl>
+      {items.map((item) => (
+        <Fragment key={item.id}>
+          <dt>{item.term}</dt>
+          <dd>{item.description}</dd>
+        </Fragment>
+      ))}
+    </dl>
+  );
+}
+```
+
+```tsx
+function Columns() {
+  return (
+    <>
+      <td>A</td>
+      <td>B</td>
+    </>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Trying to pass `key` to `&lt;>...&lt;/>`—use `Fragment`.
+- Wrapping with `<div>` unnecessarily and breaking tables/flex.
+- Assuming fragments create a styling target—they don’t.
+- Returning arrays without keys when mapping.
+
+## 🔗 Related
+
+- [keys_lists.md](./keys_lists) — keyed lists
+- [jsx.md](./jsx) — JSX shape
+- [children.md](./children) — child composition
+- [component.md](./component) — return types
+- [conditional_rendering.md](./conditional_rendering) — multiple branches

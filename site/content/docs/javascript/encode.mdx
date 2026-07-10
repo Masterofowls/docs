@@ -1,0 +1,85 @@
+---
+title: Encode / Decode
+description: JavaScript · Reference cheat sheet
+---
+
+# Encode / Decode
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+Encoding turns text into safe wire formats: URI components, percent-encoding, and Base64. Use the right API for path vs query vs full URI. Pair with `TextEncoder` for UTF-8 bytes.
+
+## 🔧 Core concepts
+
+- **`encodeURI` / `decodeURI`**: encode a full URI; leaves `#`, `?`, `/`, etc.
+- **`encodeURIComponent` / `decodeURIComponent`**: encode a single component (query values, path segments).
+- **`URL` / `URLSearchParams`**: prefer structured URL building over manual concat.
+- **Base64**: `btoa` / `atob` (Latin-1); use byte-safe helpers for UTF-8.
+- **UTF-8 bytes**: `TextEncoder` / `TextDecoder`.
+
+```js
+encodeURIComponent("a b&c"); // a%20b%26c
+decodeURIComponent("a%20b%26c"); // a b&c
+```
+
+## 💡 Examples
+
+```js
+const q = new URLSearchParams({ q: "café & tea", page: "1" });
+console.log(q.toString()); // q=caf%C3%A9+%26+tea&page=1
+
+const url = new URL("https://example.com/search");
+url.searchParams.set("q", "hello world");
+console.log(url.href);
+
+// Path segment
+const slug = encodeURIComponent("foo/bar"); // foo%2Fbar
+
+// UTF-8 Base64
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+function base64ToUtf8(b64) {
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+console.log(base64ToUtf8(utf8ToBase64("✓")));
+
+// application/x-www-form-urlencoded
+const body = new URLSearchParams({ email: "a@b.co", remember: "1" });
+await fetch("/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body,
+});
+```
+
+```js
+// Wrong vs right for query values
+const bad = "https://x.test/?q=" + encodeURI("a&b"); // & still breaks
+const good = "https://x.test/?q=" + encodeURIComponent("a&b");
+```
+
+## ⚠️ Pitfalls
+
+- Never use `encodeURI` for query parameter values — use `encodeURIComponent`.
+- Double-encoding (`encode` then `encode` again) breaks servers.
+- `decodeURIComponent` throws `URIError` on malformed sequences — wrap in try/catch.
+- `+` in query strings often means space; `URLSearchParams` handles this.
+- `btoa("✓")` throws — encode UTF-8 bytes first.
+
+## 🔗 Related
+
+- [url.md](./url) — URL and search params
+- [fetch.md](./fetch) — request bodies
+- [strings.md](./strings) — string ops
+- [api.md](./api) — TextEncoder / crypto
+- [json.md](./json) — JSON payloads

@@ -1,0 +1,81 @@
+---
+title: Optional Chaining
+description: JavaScript · Reference cheat sheet
+---
+
+# Optional Chaining
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Optional chaining (`?.`) short-circuits property/call/element access when the base is `null` or `undefined`, producing `undefined` instead of throwing. Ideal for sparse APIs, optional config, and DOM lookups that may miss.
+
+## 🔧 Core concepts
+
+- **Property**: `obj?.prop`, `obj?.["key"]`.
+- **Call**: `fn?.(arg)` — skips call if `fn` is nullish.
+- **Element**: `arr?.[0]`.
+- **Chain**: `a?.b?.c?.()` — stops at first nullish link.
+- **Not a deep existence check for middle truthy holes** — only nullish bases.
+- **Assign**: cannot use `?.` on the left-hand side of assignment.
+
+```js
+const name = user?.profile?.name;
+const first = items?.[0];
+api?.log?.("hi");
+```
+
+## 💡 Examples
+
+```js
+const user = { profile: { name: "Ada" } };
+user?.profile?.name; // "Ada"
+user?.address?.city; // undefined
+null?.x; // undefined
+
+// Methods
+const maybe = Math.random() > 0.5 ? console : null;
+maybe?.log("ok");
+
+// DOM
+document.querySelector("#app")?.classList.add("ready");
+
+// Combined with nullish coalescing
+const label = config?.title ?? "Untitled";
+
+// Dynamic key
+const key = "email";
+user?.contacts?.[key];
+
+// delete with optional (modern)
+delete user?.temp; // no-op if user nullish
+
+// Array callback safety
+users.map((u) => u.roles?.includes("admin"));
+```
+
+```js
+// Guard long chains
+function getCity(order) {
+  return order?.shipping?.address?.city ?? "N/A";
+}
+```
+
+## ⚠️ Pitfalls
+
+- `?.` only guards `null`/`undefined` — other falsy values (`0`, `""`, `false`) still proceed.
+- `obj?.prop` when `obj` exists but `prop` is null returns `null`, not `undefined`.
+- Overuse hides bugs — prefer validating required data at boundaries.
+- `a?.b.c` still throws if `a.b` is nullish and you access `.c` without `?.`.
+- Optional call `fn?.()` does not invent a default function — result is `undefined`.
+
+## 🔗 Related
+
+- [nullish_coalescing.md](./nullish_coalescing) — `??` defaults
+- [destructuring.md](./destructuring) — defaults on unpack
+- [error.md](./error) — TypeError without `?.`
+- [objects.md](./objects) — property access
+- [DOM/selectors.md](./DOM/selectors) — nullable query results

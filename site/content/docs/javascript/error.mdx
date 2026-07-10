@@ -1,0 +1,112 @@
+---
+title: Errors
+description: JavaScript · Reference cheat sheet
+---
+
+# Errors
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+Errors interrupt normal control flow. Use `try` / `catch` / `finally`, typed error classes, and rethrow carefully. Prefer throwing `Error` (or subclasses) over strings so stacks and `cause` work.
+
+## 🔧 Core concepts
+
+- **Built-ins**: `Error`, `TypeError`, `RangeError`, `SyntaxError`, `URIError`, `AggregateError`.
+- **Properties**: `name`, `message`, `stack`, `cause` (ES2022).
+- **Throw**: `throw new Error("msg", \{ cause \})`.
+- **Catch**: bind the error; optional binding omission in some engines for unused catches.
+- **`finally`**: always runs (cleanup), even on return.
+- **Async**: rejections surface at `await` or `.catch`.
+
+```js
+try {
+  JSON.parse("{");
+} catch (err) {
+  console.error(err.name, err.message);
+} finally {
+  console.log("done");
+}
+```
+
+## 💡 Examples
+
+```js
+class HttpError extends Error {
+  constructor(status, message, options) {
+    super(message, options);
+    this.name = "HttpError";
+    this.status = status;
+  }
+}
+
+async function getJson(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new HttpError(res.status, res.statusText);
+    }
+    return await res.json();
+  } catch (err) {
+    throw new Error(`getJson failed: ${url}`, { cause: err });
+  }
+}
+
+// Narrowing
+function isHttpError(e) {
+  return e instanceof HttpError;
+}
+
+try {
+  await getJson("/api");
+} catch (e) {
+  if (isHttpError(e) && e.status === 404) {
+    console.warn("missing");
+  } else {
+    throw e; // rethrow unknown
+  }
+}
+
+// AggregateError (Promise.any)
+try {
+  await Promise.any([Promise.reject("a"), Promise.reject("b")]);
+} catch (e) {
+  if (e instanceof AggregateError) {
+    console.log(e.errors);
+  }
+}
+
+// Optional catch binding (when unused)
+try {
+  risky();
+} catch {
+  /* ignore */
+}
+```
+
+```js
+// AbortError from fetch
+const ac = new AbortController();
+fetch(url, { signal: ac.signal }).catch((err) => {
+  if (err.name === "AbortError") return;
+  console.error(err);
+});
+ac.abort();
+```
+
+## ⚠️ Pitfalls
+
+- Catching everything and swallowing errors hides bugs — rethrow unknowns.
+- `throw "string"` loses stack traces — throw `Error` instances.
+- `finally` can override a returned/thrown value if it returns or throws itself.
+- Async errors outside `try` around `await` become unhandled rejections.
+- `instanceof` fails across realms/iframes — check `name` as fallback.
+
+## 🔗 Related
+
+- [promise.md](./promise) — rejection handling
+- [async.md](./async) — await + try/catch
+- [fetch.md](./fetch) — HTTP failures
+- [console.md](./console) — logging errors
+- [api.md](./api) — AbortController

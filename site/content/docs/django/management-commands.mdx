@@ -1,0 +1,90 @@
+---
+title: Management commands
+description: Django · Reference cheat sheet
+---
+
+# Management commands
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Custom `manage.py` commands live under `app/management/commands/`. Subclass `BaseCommand`, implement `handle`, and optionally declare arguments. Use for one-off jobs, cron entrypoints, data backfills, and ops scripts that need Django setup.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `BaseCommand` | Base class |
+| `add_arguments` | `argparse`-style options |
+| `handle(*args, **options)` | Main body |
+| `self.stdout` / `self.stderr` | Output (respects `--verbosity`) |
+| `CommandError` | Abort with non-zero exit |
+| `requires_system_checks` | Skip/alter system checks |
+| `help` | Shown in `manage.py help` |
+
+Package layout: `management/__init__.py`, `commands/__init__.py`, `commands/my_cmd.py`.
+
+## 💡 Examples
+
+**Command with args:**
+
+```python
+# blog/management/commands/publish_drafts.py
+from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
+
+from blog.models import Article
+
+
+class Command(BaseCommand):
+    help = "Publish draft articles older than N days"
+
+    def add_arguments(self, parser):
+        parser.add_argument("--days", type=int, default=7)
+        parser.add_argument("--dry-run", action="store_true")
+
+    def handle(self, *args, **options):
+        days = options["days"]
+        cutoff = timezone.now() - timezone.timedelta(days=days)
+        qs = Article.objects.filter(is_published=False, created_at__lte=cutoff)
+        count = qs.count()
+        if options["dry_run"]:
+            self.stdout.write(f"Would publish {count} articles")
+            return
+        updated = qs.update(is_published=True, published_at=timezone.now())
+        self.stdout.write(self.style.SUCCESS(f"Published {updated}"))
+```
+
+**Run:**
+
+```shellscript
+python manage.py publish_drafts --days 3 --dry-run
+python manage.py publish_drafts --days 3
+```
+
+**Call from code:**
+
+```python
+from django.core.management import call_command
+
+call_command("publish_drafts", days=3, verbosity=0)
+```
+
+## ⚠️ Pitfalls
+
+- Missing `__init__.py` files → command not discovered.
+- Doing HTTP/request work without timeouts in long jobs.
+- Not wrapping multi-step DB work in `transaction.atomic()`.
+- Printing secrets at high verbosity.
+- Blocking the web process—run via cron/worker, not inside a view.
+
+## 🔗 Related
+
+- [Models](models)
+- [Migrations](migrations)
+- [Transactions / ORM](transactions_orm)
+- [Settings](settings)
+- [Testing](testing)

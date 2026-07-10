@@ -1,0 +1,62 @@
+---
+title: Networking
+description: React Native · Reference cheat sheet
+---
+
+# Networking
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+RN supports `fetch`, `XMLHttpRequest`, and WebSockets. Use HTTPS, handle offline, and prefer a thin API client (fetch wrapper, axios, ky, React Query).
+
+## 🔧 Core concepts
+
+- **`fetch(url, init)`** — Promise-based; no timeout built-in.
+- **JSON** — `res.json()`; set `Content-Type` on requests.
+- **Auth** — attach tokens in headers; store securely (SecureStore / Keychain).
+- **Dev** — Android cleartext / ATS exceptions only for local debug.
+- **Abort** — `AbortController` to cancel on unmount.
+
+## 💡 Examples
+
+```tsx
+async function getUser(id: string, signal?: AbortSignal) {
+  const res = await fetch(`https://api.example.com/users/${id}`, {
+    headers: { Accept: "application/json" },
+    signal,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json() as Promise<{ id: string; name: string }>;
+}
+```
+
+```tsx
+import { useEffect, useState } from "react";
+
+export function useUser(id: string) {
+  const [data, setData] = useState<{ name: string } | null>(null);
+  useEffect(() => {
+    const ctrl = new AbortController();
+    getUser(id, ctrl.signal).then(setData).catch(() => {});
+    return () => ctrl.abort();
+  }, [id]);
+  return data;
+}
+```
+
+## ⚠️ Pitfalls
+
+- No network permission issues on iOS/Android for plain HTTPS — but ATS / cleartext can block HTTP.
+- Ignoring non-2xx status — `fetch` only rejects on network failure.
+- Leaking tokens in logs.
+
+## 🔗 Related
+
+- [request.md](./request) — request helpers
+- [storage.md](./storage) — token storage
+- [permissions.md](./permissions) — related OS permissions
+- [notification.md](./notification) — push payloads

@@ -1,0 +1,72 @@
+---
+title: "Keys & lists"
+description: React · Reference cheat sheet
+---
+
+# Keys & lists
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+When rendering lists, each sibling needs a stable `key` so React can match items across updates. Keys should identify the item (id), not its position. Correct keys preserve state and avoid buggy remounts.
+
+## 🔧 Core concepts
+
+- **Purpose** — identity for reconciliation, not display.
+- **Stable** — same item → same key across renders.
+- **Unique among siblings** — not globally unique required.
+- **Avoid index** — unless the list is static and never reorders.
+- **Reset state** — changing `key` on a component remounts it.
+
+## 💡 Examples
+
+```tsx
+type Todo = { id: string; text: string; done: boolean };
+
+export function TodoList({ todos }: { todos: Todo[] }) {
+  return (
+    <ul>
+      {todos.map((todo) => (
+        <li key={todo.id}>
+          <TodoRow todo={todo} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Remount to reset form:**
+
+```tsx
+<Editor key={selectedId} documentId={selectedId} />
+```
+
+**Fragments with keys:**
+
+```tsx
+{items.map((item) => (
+  <Fragment key={item.id}>
+    <dt>{item.term}</dt>
+    <dd>{item.description}</dd>
+  </Fragment>
+))}
+```
+
+## ⚠️ Pitfalls
+
+- `key=\{index\}` with insert/reorder/delete → wrong state on inputs.
+- Random keys (`Math.random()`) every render → remount thrash.
+- Using array index after sorting/filtering.
+- Putting key on the wrong element (must be on the outermost mapped element).
+
+## 🔗 Related
+
+- [fragments.md](./fragments) — keyed fragments
+- [conditional_rendering.md](./conditional_rendering) — list empty states
+- [jsx.md](./jsx) — expressions
+- [performance.md](./performance) — list virtualization
+- [memo.md](./memo) — row memoization

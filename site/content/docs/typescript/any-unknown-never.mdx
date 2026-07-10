@@ -1,0 +1,86 @@
+---
+title: "any, unknown, never"
+description: TypeScript · Reference cheat sheet
+---
+
+# any, unknown, never
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`any` disables checking; `unknown` is the safe top type (must narrow before use); `never` is the bottom type (no values). Prefer `unknown` over `any` at boundaries; use `never` for exhaustiveness and impossible states.
+
+## 🔧 Core concepts
+
+| Type | Assignability | Use |
+| --- | --- | --- |
+| `any` | Assignable to/from almost everything | Escape hatch, gradual typing |
+| `unknown` | Accepts any value; not assignable out without narrowing | Untrusted input, JSON, catch |
+| `never` | Assignable *to* every type; nothing assignable *to* it | Exhaustive checks, empty unions |
+
+- **`strict` / `noImplicitAny`** — missing annotations become errors, not implicit `any`.
+- **Empty intersection** — `string & number` → `never`.
+- **Functions that throw / infinite loop** — return type `never`.
+
+## 💡 Examples
+
+```ts
+function parseJson(raw: string): unknown {
+  return JSON.parse(raw);
+}
+
+const data = parseJson('{"n":1}');
+if (
+  typeof data === "object" &&
+  data !== null &&
+  "n" in data &&
+  typeof (data as { n: unknown }).n === "number"
+) {
+  console.log((data as { n: number }).n);
+}
+
+function assertNever(x: never): never {
+  throw new Error(`Unexpected: ${x}`);
+}
+
+type Shape = { kind: "circle"; r: number } | { kind: "square"; s: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":
+      return Math.PI * s.r ** 2;
+    case "square":
+      return s.s ** 2;
+    default:
+      return assertNever(s); // error if a variant is missing
+  }
+}
+
+function fail(msg: string): never {
+  throw new Error(msg);
+}
+
+// any: opt-out (avoid in new code)
+function legacy(x: any) {
+  return x.foo.bar; // no check
+}
+```
+
+## ⚠️ Pitfalls
+
+- `any` infects call sites — one `any` can silence whole chains.
+- `catch (e)` is `unknown` under `useUnknownInCatchVariables` (recommended).
+- `never[]` is assignable to any array type — don’t confuse with “empty array of T”.
+- Returning `never` from a branch that can complete is a type error.
+- Prefer typed Zod / validators over casting `unknown` to concrete types blindly.
+
+## 🔗 Related
+
+- [type_guards.md](./type_guards)
+- [type_assertions.md](./type_assertions)
+- [discriminated_unions.md](./discriminated_unions)
+- [strict_options.md](./strict_options)
+- [zod_integration.md](./zod_integration)

@@ -1,0 +1,99 @@
+---
+title: ABC and Protocols
+description: Python · Reference cheat sheet
+---
+
+# ABC and Protocols
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Abstract base classes (`abc`) define explicit interfaces with optional `@abstractmethod`. `typing.Protocol` enables structural (duck) typing for static checkers without inheritance. Use ABCs when you need runtime checks; protocols when you want flexibility.
+
+## 🔧 Core concepts
+
+| Tool | Role |
+| --- | --- |
+| `ABC` | Abstract base |
+| `@abstractmethod` | Must override |
+| `isinstance` + ABC | Runtime virtual subclassing |
+| `Protocol` | Structural typing |
+| `@runtime_checkable` | `isinstance` on protocols (limited) |
+| `collections.abc` | Ready-made `Iterable`, `Mapping`, … |
+
+Register virtual subclasses with `ABC.register` when you cannot change the class hierarchy.
+
+## 💡 Examples
+
+**ABC:**
+
+```python
+from abc import ABC, abstractmethod
+
+class Repository(ABC):
+    @abstractmethod
+    def get(self, key: str) -> str: ...
+
+    def get_or_default(self, key: str, default: str = "") -> str:
+        try:
+            return self.get(key)
+        except KeyError:
+            return default
+
+class MemoryRepo(Repository):
+    def __init__(self) -> None:
+        self._data: dict[str, str] = {}
+
+    def get(self, key: str) -> str:
+        return self._data[key]
+```
+
+**Protocol:**
+
+```python
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class Closable(Protocol):
+    def close(self) -> None: ...
+
+class Handle:
+    def close(self) -> None:
+        print("closed")
+
+def shutdown(x: Closable) -> None:
+    x.close()
+
+assert isinstance(Handle(), Closable)
+```
+
+**collections.abc:**
+
+```python
+from collections.abc import Sequence
+
+def third(xs: Sequence[str]) -> str:
+    return xs[2]
+
+print(third(("a", "b", "c")))
+```
+
+## ⚠️ Pitfalls
+
+- Instantiating a class with unimplemented abstract methods raises `TypeError`.
+- `@runtime_checkable` only checks method **presence**, not signatures.
+- Protocols with non-method members have more `isinstance` limitations.
+- Prefer `collections.abc` types in annotations over concrete `list` when appropriate.
+- Don't force ABC inheritance when a Protocol suffices for typing-only needs.
+
+## 🔗 Related
+
+- [Typing hints](typing_hints)
+- [Classes](classes)
+- [Inheritance](inheritance)
+- [Collections module](collections_module)
+- [Functions](functions)
+- [Magic methods](magic_methods)

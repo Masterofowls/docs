@@ -1,0 +1,93 @@
+---
+title: JSON
+description: JavaScript · Reference cheat sheet
+---
+
+# JSON
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+JSON is a text data format. `JSON.parse` and `JSON.stringify` convert between strings and plain data (objects, arrays, numbers, strings, booleans, `null`). Functions, `undefined`, Symbols, and many class instances need custom handling.
+
+## 🔧 Core concepts
+
+- **`JSON.parse(text, reviver?)`**: string → value; throws `SyntaxError` on bad input.
+- **`JSON.stringify(value, replacer?, space?)`**: value → string; omits `undefined` in objects.
+- **Reviver / replacer**: transform keys during parse/stringify.
+- **`toJSON()`**: objects can customize serialization.
+- **Safe parse**: wrap in try/catch; validate shape after parse.
+
+```js
+const obj = JSON.parse('{"a":1}');
+const text = JSON.stringify(obj, null, 2);
+```
+
+## 💡 Examples
+
+```js
+// Pretty print
+JSON.stringify({ user: "Ada", ok: true }, null, 2);
+
+// Replacer allowlist
+JSON.stringify(user, ["id", "name"]);
+
+// Reviver for dates
+const parsed = JSON.parse(payload, (key, value) => {
+  if (key.endsWith("At") && typeof value === "string") {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return value;
+});
+
+// toJSON
+const money = {
+  amount: 10,
+  currency: "USD",
+  toJSON() {
+    return `${this.amount} ${this.currency}`;
+  },
+};
+JSON.stringify({ price: money }); // {"price":"10 USD"}
+
+// Map ↔ JSON
+function mapToJson(map) {
+  return JSON.stringify([...map.entries()]);
+}
+function jsonToMap(text) {
+  return new Map(JSON.parse(text));
+}
+
+// Deep clone via JSON (limitations!)
+const clone = JSON.parse(JSON.stringify(data));
+```
+
+```js
+function safeParse(text, fallback = null) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- `JSON.stringify` drops `undefined`, functions, and Symbols in objects; turns them to `null` in arrays for `undefined`/functions.
+- `NaN` / `Infinity` become `null`.
+- `Date` becomes ISO string; `Map`/`Set` become `\{\}` unless converted.
+- Circular structures throw `TypeError`.
+- JSON clone loses prototypes, methods, and `undefined` keys.
+
+## 🔗 Related
+
+- [objects.md](./objects) — plain objects
+- [arrays.md](./arrays) — JSON arrays
+- [fetch.md](./fetch) — JSON HTTP bodies
+- [date.md](./date) — Date ↔ ISO
+- [map.md](./map) — serializing Maps
+- [error.md](./error) — SyntaxError on parse
+- [strings.md](./strings) — text handling

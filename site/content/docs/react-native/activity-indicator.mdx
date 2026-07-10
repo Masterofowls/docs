@@ -1,0 +1,68 @@
+---
+title: Activity Indicator
+description: React Native · Reference cheat sheet
+---
+
+# Activity Indicator
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`ActivityIndicator` shows a platform-native spinner for loading states. Prefer it for indeterminate progress; use progress bars for determinate tasks. Size and color are the main knobs.
+
+## 🔧 Core concepts
+
+| Prop | Role |
+| --- | --- |
+| `animating` | Show/hide animation |
+| `size` | `small` / `large` (number on Android) |
+| `color` | Spinner color |
+| `hidesWhenStopped` | iOS hide when not animating |
+
+Place near the content that is loading; announce loading to a11y when blocking.
+
+## 💡 Examples
+
+```tsx
+import { ActivityIndicator, View, StyleSheet, Text } from "react-native";
+
+export function LoadingBlock({ label = "Loading" }: { label?: string }) {
+  return (
+    <View
+      style={styles.wrap}
+      accessibilityRole="progressbar"
+      accessibilityLabel={label}
+    >
+      <ActivityIndicator size="large" color="#111" />
+      <Text style={styles.label}>{label}</Text>
+    </View>
+  );
+}
+
+export function InlineBusy({ busy }: { busy: boolean }) {
+  return busy ? <ActivityIndicator /> : null;
+}
+
+const styles = StyleSheet.create({
+  wrap: { alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
+  label: { color: "#444" },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Full-screen spinner with no escape for slow networks.
+- Wrong contrast (`color` on similar background).
+- Leaving `animating` true forever after errors.
+- Using indicators instead of skeleton UI for large layout shifts.
+
+## 🔗 Related
+
+- [refresh_control.md](./refresh_control) — pull to refresh
+- [modal.md](./modal) — blocking overlays
+- [networking.md](./networking) — request states
+- [accesebility.md](./accesebility) — announcements
+- [styling.md](./styling) — layout

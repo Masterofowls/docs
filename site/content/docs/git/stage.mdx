@@ -1,0 +1,64 @@
+---
+title: Stage
+description: _Git · Reference cheat sheet_ 
+---
+
+# Stage
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Staging selects which changes enter the next commit via the index (staging area). Use pathspecs and patch mode to craft focused commits instead of dumping the whole working tree.
+
+## 🧩 Core concepts
+
+- **Index / staging area** — snapshot between working tree and `HEAD`.
+- **`git add`** — stage new/modified files; `git add -u` stages tracked updates/deletes.
+- **`git restore --staged`** — unstage while keeping working-tree edits.
+- **Patch staging** — `git add -p` stages hunks interactively.
+- **Intent to add** — `git add -N` tracks a new file as empty for diffing.
+- **Status** — `git status` / `git diff --cached` inspect staged vs unstaged.
+
+## 💡 Examples
+
+```shellscript
+# Stage specific paths
+git add README.md src/app.ts
+git add src/
+
+# Stage all tracked modifications + deletes (not untracked)
+git add -u
+
+# Stage everything under the repo (respects .gitignore)
+git add -A
+
+# Interactive hunks
+git add -p src/app.ts
+
+# Unstage
+git restore --staged src/app.ts
+git restore --staged .
+
+# Review
+git status
+git diff            # unstaged
+git diff --cached   # staged vs HEAD
+```
+
+## ⚠️ Pitfalls
+
+- `git add .` from a subdirectory only stages under that path — use repo-root awareness.
+- Staging secrets (`.env`) is easy to miss — keep `.gitignore` current.
+- `git add -A` can stage deletions you did not intend — review `git status` first.
+- Partial staging can leave a file both staged and unstaged with different hunks.
+
+## 🔗 Related
+
+- [Commit](./commit)
+- [Gitignore](./gitignore)
+- [Branch](./branch)
+- [Merge](./merge)
+- [Rebase](./rebase)

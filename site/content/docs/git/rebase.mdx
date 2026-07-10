@@ -1,0 +1,64 @@
+---
+title: Rebase
+description: _Git · Reference cheat sheet_ 
+---
+
+# Rebase
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`git rebase` replays commits onto a new base, rewriting history for a linear sequence. Use it to update a feature branch onto `main`, clean up before sharing, and avoid unnecessary merge commits. Do not rebase commits already shared unless the team agrees.
+
+## 🧩 Core concepts
+
+- **Replay** — take commits after the merge-base and apply onto the upstream tip.
+- **Interactive (`-i`)** — reorder, squash, reword, drop, edit commits.
+- **Continue / abort / skip** — resolve conflicts then `rebase --continue`.
+- **Onto** — `git rebase --onto` for advanced history surgery.
+- **Autosquash** — works with `fixup!` / `squash!` commit messages.
+- **Update refs** — rewritten commits get new SHAs; remotes need force-with-lease.
+
+## 💡 Examples
+
+```shellscript
+# Update feature branch onto latest main
+git switch feature/checkout
+git fetch origin
+git rebase origin/main
+
+# Interactive cleanup
+git rebase -i origin/main
+# pick / reword / squash / fixup / drop
+
+# Continue after conflicts
+git add .
+git rebase --continue
+
+git rebase --abort
+git rebase --skip
+
+# Rebase onto a different cut point
+git rebase --onto main old-base feature/checkout
+
+# Pull with rebase
+git pull --rebase origin main
+```
+
+## ⚠️ Pitfalls
+
+- Rebasing published history rewrites SHAs — collaborators must reset/rebase carefully.
+- Never rebase `main`/`master` that others base work on without coordination.
+- Long conflict chains: abort and merge instead if the cost is too high.
+- Avoid interactive rebase in environments that cannot provide a real editor session.
+
+## 🔗 Related
+
+- [Merge](./merge)
+- [Pull](./pull)
+- [Push](./push)
+- [Commit](./commit)
+- [Branch](./branch)

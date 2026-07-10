@@ -1,0 +1,88 @@
+---
+title: "Mutation Methods & Observers"
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Mutation Methods & Observers
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+Mutate the tree with node methods (`append`, `remove`, `replaceChildren`, …) and observe changes with `MutationObserver`. Use observers for integrations and accessibility hooks — not as a substitute for app state.
+
+## 🔧 Core concepts
+
+- **Child mutation**: `append`, `prepend`, `replaceChildren`, `replaceWith`, `remove`.
+- **Legacy**: `appendChild`, `insertBefore`, `removeChild`, `replaceChild`.
+- **`MutationObserver`**: callback with `MutationRecord[]`.
+- **Observe options**: `childList`, `subtree`, `attributes`, `attributeFilter`, `characterData`.
+- **Records**: `type`, `target`, `addedNodes`, `removedNodes`, `attributeName`, `oldValue`.
+
+```js
+parent.replaceChildren(...newItems);
+```
+
+## 💡 Examples
+
+```js
+const list = document.querySelector("#list");
+list.append(li1, li2);
+list.prepend(header);
+old.replaceWith(fresh);
+empty.remove();
+list.replaceChildren(); // clear
+
+// Observer
+const obs = new MutationObserver((records) => {
+  for (const r of records) {
+    if (r.type === "childList") {
+      r.addedNodes.forEach((n) => {
+        if (n.nodeType === Node.ELEMENT_NODE) enhance(n);
+      });
+    }
+    if (r.type === "attributes" && r.attributeName === "class") {
+      syncClass(r.target);
+    }
+  }
+});
+
+obs.observe(list, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ["class", "aria-expanded"],
+  attributeOldValue: true,
+});
+
+// Later
+obs.disconnect();
+```
+
+```js
+// Batch read after mutations
+requestAnimationFrame(() => {
+  const h = list.getBoundingClientRect().height;
+});
+
+// takeRecords drains the queue synchronously
+const pending = obs.takeRecords();
+for (const r of pending) handle(r);
+```
+
+## ⚠️ Pitfalls
+
+- Observers are async (microtask) — don’t expect sync delivery mid-script.
+- Observing `attributes: true` without `attributeFilter` is noisy.
+- Mutating the DOM inside the callback can recurse — guard or disconnect temporarily.
+- Live `NodeList` from `childNodes` changes as you mutate — copy first if needed.
+- Prefer explicit app updates over observing your own renders.
+
+## 🔗 Related
+
+- [create_add_remove.md](./create_add_remove) — creating nodes
+- [content_methods.md](./content_methods) — content updates
+- [events.md](./events) — user-driven changes
+- [attributes.md](./attributes) — attribute mutations
+- [selectors.md](./selectors) — finding roots
+- [../async.md](../async) — microtask timing

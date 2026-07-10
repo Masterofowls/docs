@@ -1,0 +1,73 @@
+---
+title: Joins
+description: _SQL · Reference cheat sheet_ 
+---
+
+# Joins
+
+*_SQL · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Joins combine rows from multiple tables using match conditions. Pick the join type based on whether unmatched rows from either side should appear. Prefer explicit `JOIN … ON` over old comma-style joins.
+
+## 🧩 Core concepts
+
+- **INNER JOIN** — only matching pairs.
+- **LEFT / RIGHT JOIN** — keep all rows from one side; pad the other with `NULL`.
+- **FULL OUTER JOIN** — keep unmatched rows from both sides (not in MySQL historically).
+- **CROSS JOIN** — Cartesian product.
+- **Self join** — same table aliased twice (hierarchies, comparisons).
+- **Anti/semi patterns** — `NOT EXISTS` / `LEFT JOIN … WHERE right.key IS NULL` for “missing” rows.
+
+## 💡 Examples
+
+```sql
+-- Inner
+SELECT o.id, u.email, o.total
+FROM orders o
+INNER JOIN users u ON u.id = o.user_id
+WHERE o.status = 'paid';
+
+-- Left: users even without orders
+SELECT u.id, u.email, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+GROUP BY u.id, u.email;
+
+-- Anti-join: users with no orders
+SELECT u.*
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.id IS NULL;
+
+-- Equivalent anti-join
+SELECT u.*
+FROM users u
+WHERE NOT EXISTS (
+  SELECT 1 FROM orders o WHERE o.user_id = u.id
+);
+
+-- Multiple joins
+SELECT o.id, u.email, p.sku
+FROM orders o
+JOIN users u ON u.id = o.user_id
+JOIN order_items i ON i.order_id = o.id
+JOIN products p ON p.id = i.product_id;
+```
+
+## ⚠️ Pitfalls
+
+- Filtering a `LEFT JOIN`ed table in `WHERE` can accidentally turn it into an inner join — put right-side filters in `ON` when you need outer semantics.
+- Joining on non-unique keys multiplies rows (fan-out) and inflates aggregates.
+- `SELECT *` with joins returns duplicate column names and wide rows.
+- NULL-safe equality differs by dialect (`IS NOT DISTINCT FROM` in Postgres).
+
+## 🔗 Related
+
+- [Select](./select)
+- [Indexes](./indexes)
+- [Insert / Update / Delete](./insert_update_delete)
+- [Transactions](./transactions)

@@ -1,0 +1,105 @@
+---
+title: ASGI / Channels
+description: Django · Reference cheat sheet
+---
+
+# ASGI / Channels
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+ASGI enables async Django and long-lived connections. Django 4.2+/5.x runs async views on ASGI servers (Uvicorn, Daphne, Hypercorn). **Channels** adds WebSockets, background channel layers (Redis), and consumers. Use ASGI for websockets/SSE; keep ORM calls safe (sync ORM in `sync_to_async` or async ORM where available).
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `asgi.py` | ASGI application entry |
+| `ProtocolTypeRouter` | HTTP vs WebSocket (Channels) |
+| `URLRouter` | Websocket URL patterns |
+| `AuthMiddlewareStack` | Session user on WS |
+| `AsyncConsumer` / `WebsocketConsumer` | Handlers |
+| Channel layer | Cross-process pub/sub |
+| `async_to_sync` / `sync_to_async` | Bridge sync/async |
+
+Django async views: `async def view(request)`. Prefer async-safe libraries.
+
+## 💡 Examples
+
+**asgi.py (Channels):**
+
+```python
+import os
+from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from channels.security.websocket import AllowedHostsOriginValidator
+import chat.routing
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django_asgi_app = get_asgi_application()
+
+application = ProtocolTypeRouter(
+    {
+        "http": django_asgi_app,
+        "websocket": AllowedHostsOriginValidator(
+            AuthMiddlewareStack(URLRouter(chat.routing.websocket_urlpatterns))
+        ),
+    }
+)
+```
+
+**Consumer:**
+
+```python
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+
+class ChatConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        self.room = self.scope["url_route"]["kwargs"]["room"]
+        await self.channel_layer.group_add(self.room, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.room, self.channel_name)
+
+    async def receive_json(self, content, **kwargs):
+        await self.channel_layer.group_send(
+            self.room, {"type": "chat.message", "text": content["text"]}
+        )
+
+    async def chat_message(self, event):
+        await self.send_json({"text": event["text"]})
+```
+
+**Settings:**
+
+```python
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Calling sync ORM directly in async consumers without `sync_to_async` → blocking / errors.
+- In-memory channel layer—does not work across multiple processes.
+- Missing origin validation on WebSockets.
+- Mixing WSGI deploy with Channels—need ASGI server.
+- Forgetting `type` method name mapping (`chat.message` → `chat_message`).
+
+## 🔗 Related
+
+- [Settings](settings)
+- [Middleware](middleware)
+- [Authentication](authentication)
+- [Security](security)
+- [Views](views)

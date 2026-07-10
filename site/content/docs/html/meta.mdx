@@ -1,0 +1,133 @@
+---
+title: Meta
+description: HTML · Reference cheat sheet
+---
+
+# Meta
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<meta>` element represents metadata that cannot be expressed with `<title>`, `<link>`, `<script>`, or `<style>`. It lives in `<head>` (except `itemprop` microdata cases). Meta tags configure character encoding, viewport behavior, SEO descriptions, social previews, robots directives, and HTTP-equivalent headers.
+
+Meta content is always public in the HTML source—never store secrets there.
+
+## 🔧 Core concepts
+
+### Forms of meta
+
+1. **Charset** — `<meta charset="utf-8">`
+2. **Name/content** — `<meta name="description" content="…">`
+3. **Http-equiv** — `<meta http-equiv="…" content="…">` (prefer real HTTP headers when possible)
+4. **Property** (Open Graph, etc.) — `<meta property="og:title" content="…">`
+
+### Essential tags
+
+```html
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Concise summary of the page for search and shares.">
+```
+
+Viewport notes:
+
+- `width=device-width` — match CSS pixels to device.
+- Avoid locking zoom (`user-scalable=no`, extreme `maximum-scale`)—hurts accessibility.
+- `viewport-fit=cover` — notched devices with `env(safe-area-inset-*)`.
+
+### SEO and robots
+
+| Name | Purpose |
+|------|---------|
+| `description` | Snippet candidate (~150–160 chars) |
+| `robots` | `index`/`noindex`, `follow`/`nofollow`, etc. |
+| `googlebot` | Crawler-specific overrides |
+| `author`, `keywords` | Low impact today; keywords largely ignored |
+
+```html
+<meta name="robots" content="index, follow">
+<meta name="googlebot" content="max-image-preview:large">
+```
+
+### Social and app meta
+
+Open Graph and Twitter cards drive link previews:
+
+```html
+<meta property="og:title" content="Forms — HTML Reference">
+<meta property="og:description" content="Cheat sheet for the form element.">
+<meta property="og:image" content="https://example.com/og/forms.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+```
+
+Also common: `theme-color`, `color-scheme`, `application-name`, Apple mobile web app tags.
+
+### Http-equiv (use carefully)
+
+| http-equiv | Notes |
+|------------|-------|
+| `refresh` | Redirect/refresh—prefer HTTP 301/302; a11y concerns |
+| `content-security-policy` | Prefer CSP HTTP header |
+| `X-UA-Compatible` | Legacy IE; obsolete for modern sites |
+
+## 💡 Examples
+
+### Solid default head metas
+
+```html
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tables — HTML Reference</title>
+  <meta name="description" content="Accessible HTML table patterns, scope, and captions.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0f766e">
+</head>
+```
+
+### Noindex draft page
+
+```html
+<meta name="robots" content="noindex, nofollow">
+```
+
+### Open Graph article
+
+```html
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prefer semantic lists">
+<meta property="og:url" content="https://example.com/blog/lists">
+<meta property="og:image" content="https://example.com/og/lists.png">
+<meta property="article:published_time" content="2026-07-10T08:00:00Z">
+```
+
+### CSP via meta (header preferred)
+
+```html
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; img-src 'self' https: data:; script-src 'self'">
+```
+
+## ⚠️ Pitfalls
+
+- **Charset not first** — Place within the first 1024 bytes.
+- **Duplicate descriptions** — Keep one clear `name="description"`.
+- **Refresh redirects** — Confuse users and AT; break the back button.
+- **Keyword stuffing** — Ineffective and spammy.
+- **Disabling zoom** — Accessibility violation for low-vision users.
+- **Relative OG images** — Many crawlers need absolute HTTPS URLs.
+- **Conflicting robots** — Meta vs `X-Robots-Tag` vs `robots.txt`—align them.
+
+## 🔗 Related
+
+- [Head](head) — where meta belongs
+- [URL](url) — canonical URLs alongside meta
+- [Language](language) — prefer `lang` over `content-language`
+- [Media](media) — OG image assets
+- [Script](script) — CSP interaction with inline scripts
+- [XML](xml) — metadata in XML documents

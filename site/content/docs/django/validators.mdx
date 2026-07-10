@@ -1,0 +1,90 @@
+---
+title: Validators
+description: Django · Reference cheat sheet
+---
+
+# Validators
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Validators are callables that raise `ValidationError` when a value is invalid. Attach to model fields (`validators=[...]`), form fields, or call `full_clean()`. Built-ins cover email, URL, regex, min/max value/length, and file extensions.
+
+## 🔧 Core concepts
+
+| Validator | Checks |
+| --- | --- |
+| `EmailValidator` | Email shape |
+| `URLValidator` | URL |
+| `RegexValidator` | Pattern |
+| `MinValueValidator` / `MaxValueValidator` | Numeric bounds |
+| `MinLengthValidator` / `MaxLengthValidator` | Length |
+| `FileExtensionValidator` | Upload extensions |
+| `validate_slug` / `validate_ipv4_address` | Common formats |
+| `ProhibitNullCharactersValidator` | No `\0` |
+
+Model `clean()` / `clean_<field>()` for cross-field rules. Forms run field + form cleaning automatically; `Model.save()` does **not** call validators unless you `full_clean()`.
+
+## 💡 Examples
+
+**Field validators:**
+
+```python
+from django.core.validators import MinValueValidator, RegexValidator
+from django.db import models
+
+
+slug_re = RegexValidator(r"^[a-z0-9-]+$", "Lowercase letters, numbers, hyphens.")
+
+
+class Product(models.Model):
+    sku = models.CharField(max_length=32, validators=[slug_re])
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+    )
+```
+
+**Custom validator:**
+
+```python
+from django.core.exceptions import ValidationError
+
+
+def validate_even(value: int) -> None:
+    if value % 2 != 0:
+        raise ValidationError("%(value)s is not even", params={"value": value})
+```
+
+**Model.clean:**
+
+```python
+class Event(models.Model):
+    starts_at = models.DateTimeField()
+    ends_at = models.DateTimeField()
+
+    def clean(self):
+        super().clean()
+        if self.ends_at <= self.starts_at:
+            raise ValidationError({"ends_at": "Must be after start."})
+```
+
+## ⚠️ Pitfalls
+
+- Relying on DB constraints alone—validators are Python-level.
+- Skipping `full_clean()` on programmatic `save()`.
+- Regex DoS with pathological patterns on user input.
+- Duplicating the same rules on model and form inconsistently.
+- `blank=True` vs validators—empty values may skip some validators.
+
+## 🔗 Related
+
+- [Models](models)
+- [Forms](forms)
+- [File uploads](file_uploads)
+- [Serializers](serializers)
+- [Testing](testing)

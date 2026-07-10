@@ -1,0 +1,69 @@
+---
+title: Notification
+description: React Native · Reference cheat sheet
+---
+
+# Notification
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Local and push notifications need OS permission, device tokens, and a service (FCM / APNs). In Expo, use **`expo-notifications`** + EAS credentials; in bare RN, `@react-native-firebase/messaging` or Notifee are common.
+
+## 🔧 Core concepts
+
+- **Permission** — request before scheduling / registering.
+- **Channels (Android)** — create notification channels for importance.
+- **Handlers** — foreground presentation; response (tap) → navigate / deep link.
+- **Push tokens** — Expo push token or native FCM/APNs token → your backend.
+- **EAS** — credentials for FCM / APNs managed via `eas credentials`.
+
+## 💡 Examples
+
+```tsx
+import * as Notifications from "expo-notifications";
+import { useEffect } from "react";
+import { Platform } from "react-native";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export function useNotificationSetup() {
+  useEffect(() => {
+    (async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") return;
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.DEFAULT,
+        });
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      // send token to backend
+      console.log(token);
+    })();
+  }, []);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Testing push on simulators — limited; use physical devices.
+- Missing Android channels → silent / wrong importance.
+- Not handling notification taps when app is killed (use last response API).
+
+## 🔗 Related
+
+- [permissions.md](./permissions) — permission flow
+- [deeplinking.md](./deeplinking) — open screens from taps
+- [Expo/config.md](./Expo/config) — plugins / entitlements
+- [Expo/build.md](./Expo/build) — store builds with push

@@ -1,0 +1,91 @@
+---
+title: Router
+description: Expo · Reference cheat sheet
+---
+
+# Router
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**Expo Router** is a file-based router built on React Navigation. Files under `app/` become routes; layouts wrap segments; deep links match paths. Use typed routes and `Link` / `router` for navigation.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `app/_layout.tsx` | Root layout |
+| `app/index.tsx` | `/` |
+| `app/[id].tsx` | Dynamic segment |
+| `(groups)` | Organizational, no URL segment |
+| `Link` / `router.push` | Navigation |
+| `Stack` / `Tabs` | Navigators in layouts |
+| `+not-found` | 404 |
+
+Enable plugin `"expo-router"` in app config; entry via `expo-router/entry`.
+
+## 💡 Examples
+
+```tsx
+// app/_layout.tsx
+import { Stack } from "expo-router";
+
+export default function Layout() {
+  return (
+    <Stack>
+      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="post/[id]" options={{ title: "Post" }} />
+    </Stack>
+  );
+}
+```
+
+```tsx
+// app/index.tsx
+import { Link } from "expo-router";
+import { Text, View } from "react-native";
+
+export default function Home() {
+  return (
+    <View>
+      <Link href="/post/42">Open post</Link>
+    </View>
+  );
+}
+```
+
+```tsx
+// app/post/[id].tsx
+import { useLocalSearchParams, router } from "expo-router";
+import { Pressable, Text } from "react-native";
+
+export default function Post() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return (
+    <>
+      <Text>Post {id}</Text>
+      <Pressable onPress={() => router.back()}>
+        <Text>Back</Text>
+      </Pressable>
+    </>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Mixing React Navigation containers manually with Expo Router.
+- Wrong folder names → unexpected URLs.
+- Forgetting `scheme` in config for deep links.
+- Heavy work in root layout blocking all screens.
+
+## 🔗 Related
+
+- [config.md](./config) — scheme / plugins
+- [linking_expo.md](./linking_expo) — deep links
+- [filestructure.md](./filestructure) — app dir
+- [../navigation.md](../navigation) — React Navigation concepts
+- [../deeplinking.md](../deeplinking) — native linking

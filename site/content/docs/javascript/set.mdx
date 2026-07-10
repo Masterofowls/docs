@@ -1,0 +1,86 @@
+---
+title: Set
+description: JavaScript · Reference cheat sheet
+---
+
+# Set
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+`Set` stores unique values using SameValueZero equality. Insertion order is preserved. Use sets for membership tests, deduplication, and set-algebra helpers.
+
+## 🔧 Core concepts
+
+- **Create**: `new Set()`, `new Set(iterable)`.
+- **Mutate**: `add`, `delete`, `clear`, `has`.
+- **Size**: `set.size`.
+- **Iterate**: `keys()` / `values()` (same), `entries()` → `[v, v]`, `forEach`, `for...of`.
+- **Equality**: `NaN` equals `NaN`; objects by reference.
+
+```js
+const s = new Set([1, 2, 2, 3]);
+s.size; // 3
+s.has(2); // true
+```
+
+## 💡 Examples
+
+```js
+// Deduplicate array
+const unique = [...new Set(items)];
+
+// Membership
+const allowed = new Set(["read", "write", "admin"]);
+if (allowed.has(role)) { /* ... */ }
+
+// Union / intersection / difference (ES2025 methods where available)
+function union(a, b) {
+  return new Set([...a, ...b]);
+}
+function intersection(a, b) {
+  return new Set([...a].filter((x) => b.has(x)));
+}
+function difference(a, b) {
+  return new Set([...a].filter((x) => !b.has(x)));
+}
+
+// Native (modern engines)
+// a.union(b); a.intersection(b); a.difference(b); a.symmetricDifference(b);
+
+// Toggle membership
+function toggle(set, value) {
+  if (set.has(value)) set.delete(value);
+  else set.add(value);
+  return set;
+}
+
+// WeakSet — objects only, not iterable
+const seen = new WeakSet();
+function visit(node) {
+  if (seen.has(node)) return;
+  seen.add(node);
+}
+```
+
+```js
+for (const v of s) console.log(v);
+```
+
+## ⚠️ Pitfalls
+
+- Object uniqueness is by reference: `new Set([\{a:1\},\{a:1\}]).size === 2`.
+- `JSON.stringify(set)` → `"\{\}"` — convert with `[...set]` first.
+- `set[0]` does not work — use iteration or convert to array.
+- `WeakSet` cannot hold primitives and is not enumerable.
+- Mutating while iterating is allowed but can be confusing — prefer snapshots.
+
+## 🔗 Related
+
+- [map.md](./map) — Map collections
+- [arrays.md](./arrays) — dedupe patterns
+- [iteration.md](./iteration) — looping sets
+- [for_of.md](./for_of) — for...of
+- [objects.md](./objects) — reference equality
+- [json.md](./json) — serialization limits

@@ -1,0 +1,70 @@
+---
+title: Foreign keys
+description: SQL · Reference cheat sheet
+---
+
+# Foreign keys
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Foreign keys enforce that values in a child table reference an existing parent key. They document relationships and prevent orphans. Define `ON DELETE` / `ON UPDATE` actions explicitly. Index FK columns for join/delete performance.
+
+## 🔧 Core concepts
+
+- **References** — `FOREIGN KEY (child_col) REFERENCES parent (col)`.
+- **Actions** — `NO ACTION`/`RESTRICT`, `CASCADE`, `SET NULL`, `SET DEFAULT`.
+- **Composite FKs** — match multi-column parent unique/PK keys.
+- **Deferral** — Postgres `DEFERRABLE INITIALLY DEFERRED` checks at commit.
+- **Match** — usually `MATCH SIMPLE` (NULLs allowed in FK cols unless NOT NULL).
+
+## 💡 Examples
+
+```sql
+CREATE TABLE customers (
+  id BIGSERIAL PRIMARY KEY
+);
+
+CREATE TABLE orders (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL,
+  CONSTRAINT orders_customer_fk
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+);
+
+CREATE INDEX orders_customer_id_idx ON orders (customer_id);
+
+-- Cascade delete children
+ALTER TABLE order_items
+  ADD CONSTRAINT order_items_order_fk
+  FOREIGN KEY (order_id) REFERENCES orders(id)
+  ON DELETE CASCADE;
+
+-- Soft-friendly: SET NULL
+ALTER TABLE posts
+  ADD CONSTRAINT posts_author_fk
+  FOREIGN KEY (author_id) REFERENCES users(id)
+  ON DELETE SET NULL;
+```
+
+## ⚠️ Pitfalls
+
+- Missing indexes on FK columns make `ON DELETE` / joins slow (especially Postgres).
+- `ON DELETE CASCADE` can wipe large subgraphs — prefer explicit deletes in app code for critical data.
+- MySQL: FKs require InnoDB; type/signedness must match parent exactly.
+- Circular FKs need deferred checks or staged inserts.
+- Orphan prevention doesn’t replace soft-delete policies — decide deleted parent behavior.
+
+## 🔗 Related
+
+- [constraints.md](./constraints)
+- [normalization.md](./normalization)
+- [indexes.md](./indexes)
+- [create_alter_drop.md](./create_alter_drop)
+- [insert_update_delete.md](./insert_update_delete)
+- [joins.md](./joins)

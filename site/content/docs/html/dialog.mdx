@@ -1,0 +1,98 @@
+---
+title: Dialog
+description: HTML · Reference cheat sheet
+---
+
+# Dialog
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<dialog>` element provides native modal and non-modal dialogs with built-in focus management, backdrop, and Esc handling (for modal). Prefer it over custom `div` modals. Use `showModal()` for modals and `show()` for non-modals; `close()` or form `method="dialog"` to dismiss.
+
+## 🔧 Core concepts
+
+- **API**: `show()`, `showModal()`, `close(returnValue?)`, `open` property, `returnValue`.
+- **Events**: `close`, `cancel` (Esc).
+- **Backdrop**: `::backdrop` pseudo-element when modal.
+- **Forms**: `<form method="dialog">` closes and sets `returnValue` from submitter.
+- **Light dismiss**: click backdrop doesn’t close by default — listen if desired.
+- **Top layer**: modal dialogs render in the top layer above `z-index` wars.
+
+```html
+<dialog id="confirm">
+  <form method="dialog">
+    <p>Delete item?</p>
+    <button value="cancel">Cancel</button>
+    <button value="ok">Delete</button>
+  </form>
+</dialog>
+<script>
+  const d = document.getElementById("confirm");
+  openBtn.onclick = () => d.showModal();
+  d.addEventListener("close", () => console.log(d.returnValue));
+</script>
+```
+
+## 💡 Examples
+
+```html
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <header>
+    <h2 id="dlg-title">Settings</h2>
+    <button type="button" class="close" aria-label="Close">&times;</button>
+  </header>
+  <form id="settings">...</form>
+  <menu>
+    <button type="button" class="close">Close</button>
+    <button type="submit" form="settings">Save</button>
+  </menu>
+</dialog>
+
+<style>
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+  dialog[open] {
+    border: 0;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+</style>
+
+<script>
+  const dlg = document.getElementById("dlg");
+  dlg.querySelectorAll(".close").forEach((b) =>
+    b.addEventListener("click", () => dlg.close()),
+  );
+  // Optional: light dismiss
+  dlg.addEventListener("click", (e) => {
+    const rect = dlg.getBoundingClientRect();
+    const inDialog =
+      rect.top <= e.clientY &&
+      e.clientY <= rect.top + rect.height &&
+      rect.left <= e.clientX &&
+      e.clientX <= rect.left + rect.width;
+    if (!inDialog) dlg.close();
+  });
+</script>
+```
+
+## ⚠️ Pitfalls
+
+- `open` attribute shows non-modal; prefer `showModal()` for true modals.
+- Don’t forget an initial focusable control and a clear close action.
+- Nested dialogs are tricky — avoid when possible.
+- Polyfills still needed for very old browsers — know your baseline.
+- Removing `open` via JS isn’t the same as `close()` for return values/events.
+
+## 🔗 Related
+
+- [accessibility.md](./accessibility) — modal a11y
+- [button.md](./button) — triggers
+- [form.md](./form) — method=dialog
+- [../Javascript/DOM/focus_blur.md](../Javascript/DOM/focus_blur) — focus restore
+- [../CSS/pseudo_elements.md](../CSS/pseudo_elements) — ::backdrop

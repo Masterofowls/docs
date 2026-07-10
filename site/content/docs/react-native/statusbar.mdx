@@ -1,0 +1,63 @@
+---
+title: StatusBar
+description: React Native · Reference cheat sheet
+---
+
+# StatusBar
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`StatusBar` controls the system status bar style (light/dark content) and visibility. Combine with **safe area** insets so content isn’t under the bar or notch.
+
+## 🔧 Core concepts
+
+- **`barStyle`** — `"light-content"` | `"dark-content"`.
+- **`backgroundColor`** — Android; iOS is typically transparent over the scene.
+- **`translucent`** — Android draws under the bar.
+- **Per-screen** — React Navigation `options=\{\{ statusBarStyle \}\}` or `<StatusBar />` in screen.
+- **Expo** — `expo-status-bar` (`style="light"`).
+
+## 💡 Examples
+
+```tsx
+import { StatusBar, View, Text, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export function DarkHeader() {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.header, { paddingTop: insets.top, backgroundColor: "#111" }]}>
+      <StatusBar barStyle="light-content" />
+      <Text style={styles.title}>Inbox</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: { paddingHorizontal: 16, paddingBottom: 12 },
+  title: { color: "#fff", fontSize: 20, fontWeight: "600" },
+});
+```
+
+```tsx
+import { StatusBar } from "expo-status-bar";
+
+<StatusBar style="dark" />;
+```
+
+## ⚠️ Pitfalls
+
+- Setting bar style without matching background → unreadable icons.
+- Ignoring safe area → content under notch / Dynamic Island.
+- Multiple conflicting `StatusBar` mounts across stacked screens.
+
+## 🔗 Related
+
+- [layout.md](./layout) — padding / flex
+- [dimensions.md](./dimensions) — window metrics
+- [platform_specific.md](./platform_specific) — Android vs iOS
+- [transition.md](./transition) — screen changes

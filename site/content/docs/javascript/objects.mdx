@@ -1,0 +1,90 @@
+---
+title: Objects
+description: JavaScript · Reference cheat sheet
+---
+
+# Objects
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+Objects are key/value maps with a prototype chain. Prefer plain objects for records with known string keys; use `Map` for dynamic or non-string keys. Modern syntax covers shorthand, spread, optional chaining, and nullish assignment.
+
+## 🔧 Core concepts
+
+- **Create**: `\{\}`, `Object.create(proto)`, `Object.fromEntries`.
+- **Access**: `obj.key`, `obj["key"]`, `obj?.key`, `obj?.["key"]`.
+- **Mutate**: assignment, `Object.assign`, spread `\{ ...a, ...b \}`.
+- **Enumerate**: `Object.keys` / `values` / `entries` (own enumerable strings).
+- **Copy**: shallow spread / `assign`; deep needs structuredClone or libs.
+- **Nullish**: `??`, `??=`, `?.`.
+
+```js
+const user = { id: 1, name: "Ada" };
+const { name, ...rest } = user;
+```
+
+## 💡 Examples
+
+```js
+// Shorthand & methods
+const x = 1;
+const o = {
+  x,
+  greet() {
+    return "hi";
+  },
+  get label() {
+    return String(this.x);
+  },
+};
+
+// Merge (shallow)
+const merged = { ...defaults, ...overrides };
+
+// Optional chaining / nullish
+const city = user?.address?.city ?? "unknown";
+user.role ??= "guest";
+
+// fromEntries / entries round-trip
+const mapish = Object.fromEntries(
+  Object.entries(user).map(([k, v]) => [k.toUpperCase(), v]),
+);
+
+// Own property checks
+Object.hasOwn(user, "name"); // ES2022
+Object.prototype.hasOwnProperty.call(user, "name"); // legacy-safe
+
+// Freeze / seal
+const cfg = Object.freeze({ mode: "prod" });
+
+// structuredClone deep copy
+const copy = structuredClone({ nested: { a: 1 }, when: new Date() });
+
+// Prototype-free dict
+const dict = Object.create(null);
+dict.admin = true;
+```
+
+```js
+// GroupBy (ES2024)
+Object.groupBy(items, (i) => i.type);
+```
+
+## ⚠️ Pitfalls
+
+- Spread/assign are **shallow** — nested objects stay shared.
+- `__proto__` key in JSON can pollute prototypes — use `Object.create(null)` or `Map`.
+- `for...in` walks the prototype chain — prefer `Object.keys` / `hasOwn`.
+- Comparing objects with `===` is by reference, not deep equality.
+- `JSON.stringify` omits `undefined` values and functions.
+
+## 🔗 Related
+
+- [properties.md](./properties) — descriptors & getters
+- [oop.md](./oop) — classes / prototypes
+- [map.md](./map) — Map vs object
+- [json.md](./json) — serialization
+- [iteration.md](./iteration) — enumerating keys
+- [new.md](./new) — constructing instances

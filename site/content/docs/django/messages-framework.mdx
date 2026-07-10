@@ -1,0 +1,84 @@
+---
+title: Messages framework
+description: Django · Reference cheat sheet
+---
+
+# Messages framework
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`django.contrib.messages` stores one-time flash messages (success, error, …) for the next request, typically in the session (or cookie). Add message in a view; display in the base template. Requires `MessageMiddleware` and the messages context processor.
+
+## 🔧 Core concepts
+
+| Level | Constant / tag |
+| --- | --- |
+| Debug | `messages.DEBUG` |
+| Info | `messages.INFO` |
+| Success | `messages.SUCCESS` |
+| Warning | `messages.WARNING` |
+| Error | `messages.ERROR` |
+
+APIs: `messages.add_message`, shortcuts `success` / `error` / `warning` / `info` / `debug`. Storage backends: session (default), cookie, fallback.
+
+## 💡 Examples
+
+**View:**
+
+```python
+from django.contrib import messages
+from django.shortcuts import redirect
+
+
+def save_article(request):
+    form = ArticleForm(request.POST)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Article saved.")
+        return redirect("article-list")
+    messages.error(request, "Please fix the errors below.")
+    return render(request, "form.html", {"form": form})
+```
+
+**Template:**
+
+```html
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+```
+
+**Settings extras:**
+
+```python
+from django.contrib.messages import constants as message_constants
+
+MESSAGE_LEVEL = message_constants.INFO
+MESSAGE_TAGS = {
+    message_constants.ERROR: "danger",  # Bootstrap-friendly
+}
+```
+
+## ⚠️ Pitfalls
+
+- Missing middleware / context processor → messages never show.
+- Consuming messages twice (iterate in view and template).
+- Cookie storage size limits for long messages.
+- AJAX flows need JSON/toast handling—session flashes suit full page loads.
+- Setting messages then returning the same template without redirect can work, but PRG (Post/Redirect/Get) avoids resubmit issues.
+
+## 🔗 Related
+
+- [Sessions](sessions)
+- [Middleware](middleware)
+- [Context processors](context_processors)
+- [Views](views)
+- [Templates](templates)

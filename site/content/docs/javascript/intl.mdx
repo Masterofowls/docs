@@ -1,0 +1,102 @@
+---
+title: Intl
+description: JavaScript · Reference cheat sheet
+---
+
+# Intl
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `Intl` namespace provides locale-aware formatting and comparison: dates, numbers, lists, relative time, plurals, and collation. Prefer `Intl` over hand-rolled locale strings for i18n correctness and accessibility.
+
+## 🔧 Core concepts
+
+| Constructor | Use |
+| --- | --- |
+| `Intl.DateTimeFormat` | dates/times |
+| `Intl.NumberFormat` | numbers/currency/units |
+| `Intl.RelativeTimeFormat` | “3 days ago” |
+| `Intl.ListFormat` | “A, B, and C” |
+| `Intl.PluralRules` | plural categories |
+| `Intl.Collator` | sort / compare strings |
+| `Intl.DisplayNames` | language/region names |
+| `Intl.Segmenter` | grapheme/word segments |
+
+- **Locales**: BCP 47 tags — `"en"`, `"en-US"`, `"de-DE"`, `navigator.language`.
+- **Options**: style, currency, timeZone, numberingSystem, etc.
+- **`supportedLocalesOf`**: feature detection for locale lists.
+
+```js
+new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+}).format(1234.5); // "$1,234.50"
+```
+
+## 💡 Examples
+
+```js
+const locale = navigator.language || "en";
+
+// Dates
+new Intl.DateTimeFormat(locale, {
+  dateStyle: "medium",
+  timeStyle: "short",
+}).format(new Date());
+
+// Time zone
+new Intl.DateTimeFormat("en-GB", {
+  timeZone: "UTC",
+  timeStyle: "long",
+}).format(new Date());
+
+// Relative
+new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(-1, "day");
+// "yesterday" (en)
+
+// Lists
+new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format([
+  "red",
+  "green",
+  "blue",
+]);
+
+// Sort
+const collator = new Intl.Collator(locale, { sensitivity: "base" });
+["ä", "a", "z"].sort(collator.compare);
+
+// Plurals
+const pr = new Intl.PluralRules("ru");
+pr.select(3); // "few" etc.
+
+// Display names
+new Intl.DisplayNames("en", { type: "language" }).of("fr"); // "French"
+```
+
+```js
+// Compact notation
+new Intl.NumberFormat("en", {
+  notation: "compact",
+  compactDisplay: "short",
+}).format(1_200_000); // "1.2M"
+```
+
+## ⚠️ Pitfalls
+
+- Locale data availability varies by engine — test critical locales.
+- Don’t concatenate translated fragments — format whole messages (use ICU MessageFormat libs for complex cases).
+- `Date#toLocaleString` is convenient but less reusable than a shared `DateTimeFormat` instance.
+- Currency requires ISO codes (`USD`), not symbols alone.
+- Sorting without `Collator` breaks non-English languages.
+
+## 🔗 Related
+
+- [date.md](./date) — Date object
+- [number.md](./number) — numeric values
+- [strings.md](./strings) — string compare
+- [template_literals.md](./template_literals) — building messages
+- [performance.md](./performance) — reuse formatters

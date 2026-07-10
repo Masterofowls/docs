@@ -1,0 +1,139 @@
+---
+title: Footer
+description: HTML · Reference cheat sheet
+---
+
+# Footer
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<footer>` element represents a footer for its nearest ancestor **sectioning content** or **sectioning root** (`article`, `aside`, `nav`, `section`, `blockquote`, `body`, `fieldset`, `figure`, `td`). Typical content: authorship, copyright, related links, or document metadata.
+
+A footer is **not** limited to the bottom of the page. Nested footers belong to nested sections (e.g. an article’s byline). When `<footer>` is a direct descendant of `<body>`, browsers expose it as a `contentinfo` landmark—use **one** page-level footer for site-wide info.
+
+## 🔧 Core concepts
+
+### Sectioning relationship
+
+```html
+<body>
+  <main>
+    <article>
+      <h1>Title</h1>
+      <p>…</p>
+      <footer>Posted by Ada · 2026-07-10</footer>
+    </article>
+  </main>
+  <footer>
+    <p>© 2026 Example Co.</p>
+    <nav aria-label="Legal">…</nav>
+  </footer>
+</body>
+```
+
+- Article footer → scoped to that article (not `contentinfo`).
+- Body footer → site `contentinfo` landmark.
+
+### Allowed content
+
+Flow content, but **no** nested `<footer>` or `<header>` descendants that would confuse sectioning. Contact info often uses `<address>` inside the footer for the document or article contact.
+
+### Accessibility
+
+- Page footer: landmark `contentinfo` (implicit).
+- Do not duplicate with `role="contentinfo"` on another element.
+- Label multiple navs inside the footer (`aria-label="Legal"`, `aria-label="Social"`).
+- Keep landmark count low—avoid wrapping every widget in its own footer.
+
+### Common patterns
+
+| Pattern | Contents |
+|---------|----------|
+| Site chrome | Logo, legal, sitemap, social |
+| Article | Author, dates, tags, share |
+| Card / section | Secondary actions, meta |
+
+## 💡 Examples
+
+### Site-wide footer
+
+```html
+<footer>
+  <p>
+    <small>© <time datetime="2026">2026</time> Acme Inc.</small>
+  </p>
+  <nav aria-label="Legal">
+    <ul>
+      <li><a href="/privacy">Privacy</a></li>
+      <li><a href="/terms">Terms</a></li>
+    </ul>
+  </nav>
+  <address>
+    Contact: <a href="mailto:hello@acme.example">hello@acme.example</a>
+  </address>
+</footer>
+```
+
+### Article footer
+
+```html
+<article>
+  <header>
+    <h2>Semantic footers</h2>
+    <p><time datetime="2026-07-10">July 10, 2026</time></p>
+  </header>
+  <p>Body copy…</p>
+  <footer>
+    <p>By <a rel="author" href="/authors/ada">Ada</a></p>
+    <ul>
+      <li><a href="/tags/html">HTML</a></li>
+      <li><a href="/tags/a11y">a11y</a></li>
+    </ul>
+  </footer>
+</article>
+```
+
+### Footer with secondary navigation
+
+```html
+<footer class="site-footer">
+  <nav aria-label="Footer">
+    <a href="/docs">Docs</a>
+    <a href="/status">Status</a>
+    <a href="/support">Support</a>
+  </nav>
+  <p lang="en">Built with semantic HTML.</p>
+</footer>
+```
+
+### Figure / media credit
+
+```html
+<figure>
+  <img src="/photo.jpg" alt="Harbor at dawn">
+  <figcaption>Morning light over the harbor.</figcaption>
+  <footer><small>Photo © Jordan Lee</small></footer>
+</figure>
+```
+
+## ⚠️ Pitfalls
+
+- **Multiple `contentinfo` landmarks** — Extra body-level footers or redundant `role="contentinfo"` confuse navigation shortcuts.
+- **Footer as layout only** — Do not use `<footer>` merely to stick content to the bottom; use CSS on a non-landmark wrapper if it is not footer content.
+- **Nested header/footer rules** — Avoid putting `<header>` inside `<footer>` and vice versa in ways that break the outline.
+- **Missing labels on inner nav** — Several unlabeled `<nav>` elements in a footer are hard to distinguish.
+- **Copyright-only div** — A bare `<div class="footer">` loses the landmark; use the real element when appropriate.
+- **Forms in footers** — Newsletter forms are fine; ensure labels, `autocomplete`, and error messaging still meet a11y standards.
+
+## 🔗 Related
+
+- [Nav](nav) — footer link groups
+- [Section](section) — sectioning ancestors
+- [Div](div) — non-semantic layout
+- [Form](form) — newsletter signup patterns
+- [Meta](meta) — document-level metadata (not a substitute for visible footer)
+- [Language](language) — `lang` on footer snippets

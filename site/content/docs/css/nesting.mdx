@@ -1,0 +1,110 @@
+---
+title: Nesting
+description: CSS · Reference cheat sheet
+---
+
+# Nesting
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Native CSS nesting lets you write nested rules and at-rules like Sass, without a preprocessor. Use `&` for the parent selector. Keep nesting shallow for readability and specificity control.
+
+## 🔧 Core concepts
+
+- **Nested style rule**: a rule inside another; must usually start with `&` or a nesting selector when ambiguous.
+- **`&`**: parent reference — `.card \{ &:hover \{\} \}` → `.card:hover`.
+- **Combinators**: `& > .child`, `& + &`, `& .desc`.
+- **At-rules**: nest `@media`, `@supports`, `@layer`, `@container`.
+- **Specificity**: nested selectors concatenate — still counts as written.
+- **Declarations**: may mix with nested rules; modern parsers allow declarations first or interleaved (browser-dependent historically — prefer declarations then nests).
+
+```css
+.card {
+  padding: 1rem;
+  & h2 {
+    margin: 0;
+  }
+  &:hover {
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  }
+  @media (min-width: 40rem) {
+    padding: 1.5rem;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+.nav {
+  display: flex;
+  & ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+  }
+  & a {
+    color: inherit;
+    text-decoration: none;
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+    }
+  }
+}
+
+/* BEM-ish without repetition */
+.btn {
+  border: 0;
+  &--primary {
+    background: var(--accent);
+  }
+  &__icon {
+    margin-inline-end: 0.5rem;
+  }
+}
+
+/* :is wrapping */
+.prose {
+  & :is(h1, h2, h3) {
+    line-height: 1.2;
+  }
+}
+
+/* Nested container */
+.widget {
+  container-type: inline-size;
+  @container (min-width: 20rem) {
+    & .meta {
+      display: flex;
+    }
+  }
+}
+```
+
+```css
+/* Invalid without & in some cases for starting type selectors — use & */
+.card {
+  & table {
+  } /* good */
+}
+```
+
+## ⚠️ Pitfalls
+
+- Deep nesting (`& & & &`) recreates specificity hell — limit to 2–3 levels.
+- Forgetting `&` can make selectors mean something else or be invalid.
+- Output selector list can explode with `:is` — inspect DevTools.
+- Mixing preprocessors + native nesting can double-process — pick one pipeline.
+- Older browsers need PostCSS nesting plugin — know your baseline.
+
+## 🔗 Related
+
+- [selectors.md](./selectors) — selector grammar
+- [specificity.md](./specificity) — weights
+- [media_queries.md](./media_queries) — nested media
+- [container_queries.md](./container_queries) — nested @container
+- [cascade_layers.md](./cascade_layers) — @layer

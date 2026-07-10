@@ -1,0 +1,86 @@
+---
+title: Enums
+description: TypeScript · Reference cheat sheet
+---
+
+# Enums
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Enums name a fixed set of related constants. Prefer string enums or union literals for most APIs; numeric enums are useful for bit flags and interop with C-style APIs. Const enums inline members at compile time.
+
+## 🔧 Core concepts
+
+| Kind | Shape | Notes |
+| --- | --- | --- |
+| Numeric | `enum E \{ A, B = 2 \}` | Auto-increment; reverse mapping |
+| String | `enum E \{ A = "a" \}` | No reverse map; clearer logs |
+| Heterogeneous | mix number + string | Avoid — confusing |
+| `const enum` | erased to literals | Needs `preserveConstEnums` to keep |
+| Ambient | `declare enum` | Types only, no emit |
+
+- **Union alternative** — `type Status = "ok" | "err"` is often enough (TS 5.x).
+- **`as const` object** — `const Status = \{ Ok: "ok" \} as const` + `typeof` / `keyof`.
+
+## 💡 Examples
+
+```ts
+enum Direction {
+  Up,      // 0
+  Down,    // 1
+  Left = 10,
+  Right,   // 11
+}
+
+Direction.Up;       // 0
+Direction[0];       // "Up" (numeric reverse map)
+
+enum Color {
+  Red = "RED",
+  Blue = "BLUE",
+}
+
+function paint(c: Color) {
+  return c === Color.Red;
+}
+
+const enum Flag {
+  Read = 1 << 0,
+  Write = 1 << 1,
+}
+const mode = Flag.Read | Flag.Write; // inlined numbers
+
+// Prefer unions for public APIs
+type Role = "admin" | "user" | "guest";
+
+const Http = {
+  Ok: 200,
+  NotFound: 404,
+} as const;
+type HttpCode = (typeof Http)[keyof typeof Http]; // 200 | 404
+```
+
+```ts
+// IsolatedModules / erasableSyntaxOnly (TS 5.x): prefer
+// `const enum` carefully or use unions — classic enums emit JS.
+```
+
+## ⚠️ Pitfalls
+
+- Numeric enums are not a closed set at runtime — any `number` can be assigned unless you narrow.
+- Reverse mapping only exists for numeric enums; `Color["RED"]` is undefined for string enums.
+- `const enum` + `isolatedModules` / Babel can break if the enum isn’t preserved.
+- Prefer string unions over enums when you don’t need a runtime object.
+- Declaring members without initializers after a string member is an error.
+
+## 🔗 Related
+
+- [literal_types.md](./literal_types)
+- [const_assertions.md](./const_assertions)
+- [union_types.md](./union_types)
+- [keyof_typeof.md](./keyof_typeof)
+- [namespaces.md](./namespaces)

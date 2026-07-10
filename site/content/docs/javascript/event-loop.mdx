@@ -1,0 +1,89 @@
+---
+title: Event Loop
+description: JavaScript · Reference cheat sheet
+---
+
+# Event Loop
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+JavaScript runs on a single thread with an event loop that drains task queues. Understanding macrotasks vs microtasks explains Promise ordering, `setTimeout(0)`, UI updates, and why long sync work freezes the page.
+
+## 🔧 Core concepts
+
+- **Call stack**: runs synchronous code to completion.
+- **Macrotasks (tasks)**: `setTimeout`, `setInterval`, I/O, UI events, `MessageChannel`, `setImmediate` (Node).
+- **Microtasks**: Promise reactions, `queueMicrotask`, `MutationObserver` callbacks.
+- **Order**: after each task, the engine drains **all** microtasks before the next macrotask / render.
+- **Rendering**: browsers may paint between tasks (not between microtasks).
+- **Workers**: separate event loops / threads.
+
+```js
+console.log("a");
+setTimeout(() => console.log("c"), 0);
+Promise.resolve().then(() => console.log("b"));
+// a, b, c
+```
+
+## 💡 Examples
+
+```js
+queueMicrotask(() => console.log("micro"));
+Promise.resolve().then(() => console.log("then"));
+setTimeout(() => console.log("timeout"), 0);
+console.log("sync");
+// sync → micro → then → timeout
+
+// Microtask starvation risk
+function flood() {
+  Promise.resolve().then(flood);
+}
+// flood(); // never reaches next macrotask / paint
+
+// Yield to the event loop
+async function yieldToMain() {
+  await new Promise((r) => setTimeout(r, 0));
+}
+
+async function processChunks(items) {
+  for (const item of items) {
+    work(item);
+    await yieldToMain();
+  }
+}
+
+// async function scheduling
+async function demo() {
+  console.log(1);
+  await null; // microtask continuation
+  console.log(2);
+}
+demo();
+console.log(3);
+// 1, 3, 2
+```
+
+```js
+// Node: process.nextTick (microtask-like, before Promises historically)
+// Prefer queueMicrotask / Promises for portable code
+```
+
+## ⚠️ Pitfalls
+
+- `setTimeout(fn, 0)` is not “immediate” — it waits for the current task + microtasks + timer clamping.
+- Infinite microtask chains block rendering and timers.
+- Assuming Promise callbacks run in parallel — they are still sequential on one thread.
+- Heavy sync work (JSON.parse huge data, tight loops) blocks everything — chunk or move to workers.
+- Error in a microtask can surface differently than in a timer callback.
+
+## 🔗 Related
+
+- [promise.md](./promise) — microtask reactions
+- [async.md](./async) — async/await desugaring
+- [timers.md](./timers) — macrotask timers
+- [web_workers.md](./web_workers) — off-main-thread
+- [DOM/events.md](./DOM/events) — event tasks

@@ -1,0 +1,61 @@
+---
+title: worktree
+description: Git · Reference cheat sheet
+---
+
+# worktree
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`git worktree` adds extra working directories linked to the same repository. Use them for parallel branches (hotfix while feature WIP continues) without stashing or cloning again.
+
+## 🔧 Core concepts
+
+- **Main + linked** — one `.git` data store; each worktree has its own checkout.
+- **Add** — `git worktree add <path> <branch>` (creates branch with `-b`).
+- **List / remove** — `worktree list`, `worktree remove`, `prune`.
+- **Lock** — prevent accidental prune of portable drives.
+- **Constraint** — a branch can be checked out in only one worktree at a time.
+
+## 💡 Examples
+
+```shellscript
+git worktree list
+
+# New branch in sibling folder
+git worktree add -b hotfix/login ../app-hotfix main
+cd ../app-hotfix
+# … fix, commit, push …
+cd ../app
+git worktree remove ../app-hotfix
+
+# Existing branch
+git worktree add ../app-review review/pr-42
+
+# Detached
+git worktree add --detach ../app-bisect abcdef1
+
+git worktree prune
+git worktree lock ../app-hotfix --reason "on USB"
+```
+
+## ⚠️ Pitfalls
+
+- Can’t check out the same branch in two worktrees — use a new branch or detach.
+- Deleting folders manually leaves stale records — run `worktree prune` / `remove`.
+- IDE may open the wrong root — open the specific worktree path.
+- Shared `node_modules` isn’t automatic — install per worktree or use shared caches carefully.
+- Submodules need init/update inside each worktree.
+
+## 🔗 Related
+
+- [branch.md](./branch)
+- [stash.md](./stash)
+- [clone.md](./clone)
+- [status.md](./status)
+- [bisect.md](./bisect)
+- [submodule.md](./submodule)

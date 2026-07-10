@@ -1,0 +1,78 @@
+---
+title: AppState
+description: React Native · Reference cheat sheet
+---
+
+# AppState
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`AppState` reports whether the app is `active`, `background`, or (iOS) `inactive`. Subscribe to changes to pause video, sync data, or lock a secure screen when backgrounding.
+
+## 🔧 Core concepts
+
+| State | Meaning |
+| --- | --- |
+| `active` | Foreground, interactive |
+| `background` | Not visible |
+| `inactive` | iOS transition / multitasking |
+
+APIs: `AppState.currentState`, `addEventListener('change', handler)`.
+
+## 💡 Examples
+
+```tsx
+import { useEffect, useRef, useState } from "react";
+import { AppState, Text } from "react-native";
+
+export function useAppActive() {
+  const [active, setActive] = useState(AppState.currentState === "active");
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      setActive(next === "active");
+    });
+    return () => sub.remove();
+  }, []);
+  return active;
+}
+
+export function SecureGate({ children }: { children: React.ReactNode }) {
+  const appState = useRef(AppState.currentState);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      if (
+        appState.current === "active" &&
+        next.match(/inactive|background/)
+      ) {
+        setLocked(true);
+      }
+      appState.current = next;
+    });
+    return () => sub.remove();
+  }, []);
+
+  if (locked) return <Text>Unlock to continue</Text>;
+  return <>{children}</>;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Doing heavy work on every blur without debounce.
+- Forgetting to remove the subscription.
+- Assuming `inactive` exists on Android the same way.
+- Polling instead of listening.
+
+## 🔗 Related
+
+- [biometrics.md](./biometrics) — unlock
+- [player.md](./player) — pause media
+- [notification.md](./notification) — background
+- [storage.md](./storage) — persist on blur
+- [navigation.md](./navigation) — blur events

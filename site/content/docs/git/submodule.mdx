@@ -1,0 +1,65 @@
+---
+title: submodule
+description: Git · Reference cheat sheet
+---
+
+# submodule
+
+_Git · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Submodules embed another Git repo at a fixed commit inside a parent repo. The parent stores the submodule URL and pinned SHA. Prefer packages/monorepos when possible; use submodules for true multi-repo version pins.
+
+## 🔧 Core concepts
+
+- **Record** — `.gitmodules` + gitlink (mode 160000) at a commit SHA.
+- **Init/update** — after clone: `submodule update --init --recursive`.
+- **Move forward** — cd into submodule, pull/commit, then commit new SHA in parent.
+- **Remote clone** — `git clone --recurse-submodules`.
+- **Deinit / remove** — deinit, remove config + gitlink + `.gitmodules` entry.
+
+## 💡 Examples
+
+```shellscript
+git submodule add git@github.com:org/lib.git libs/lib
+git commit -m "chore: add lib submodule"
+
+git clone --recurse-submodules git@github.com:org/app.git
+# or later:
+git submodule update --init --recursive
+
+# Update submodule to latest remote tracking branch
+git submodule update --remote libs/lib
+git add libs/lib
+git commit -m "chore: bump lib submodule"
+
+# Status
+git submodule status
+git submodule foreach 'git status -sb'
+
+# Remove (high level)
+git submodule deinit -f libs/lib
+git rm -f libs/lib
+rm -rf .git/modules/libs/lib
+git commit -m "chore: remove lib submodule"
+```
+
+## ⚠️ Pitfalls
+
+- Fresh clones without `--recurse-submodules` leave empty directories.
+- Parent CI must init submodules or builds miss code.
+- Detached HEAD inside submodule is normal — create a branch before committing there.
+- Nested submodules need `--recursive`.
+- Mixing submodule edits with parent WIP confuses reviews — bump SHA in a dedicated commit.
+
+## 🔗 Related
+
+- [clone.md](./clone)
+- [remote.md](./remote)
+- [status.md](./status)
+- [commit.md](./commit)
+- [worktree.md](./worktree)
+- [sparse_checkout.md](./sparse_checkout)

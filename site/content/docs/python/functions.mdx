@@ -1,0 +1,94 @@
+---
+title: Functions
+description: Python · Reference cheat sheet
+---
+
+# Functions
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Functions are first-class callables defined with `def`. They encapsulate behavior, take parameters, and optionally return a value (`None` if omitted). Prefer small, typed functions with clear names over deep nesting.
+
+## 🔧 Core concepts
+
+| Topic | Notes |
+| --- | --- |
+| Definition | `def name(params) -> ReturnType:` |
+| Positional / keyword | `f(1, b=2)` |
+| Defaults | Evaluated once at definition time |
+| `*args` / `**kwargs` | Variable positional / keyword |
+| Keyword-only | After `*` : `def f(a, *, b)` |
+| Positional-only | Before `/` (3.8+): `def f(a, /, b)` |
+| Annotations | Hints for tools; not enforced at runtime |
+| Docstrings | First statement; see [docstrings](docstrings) |
+
+Callables include functions, methods, lambdas, and objects with `__call__`.
+
+## 💡 Examples
+
+**Typed function with keyword-only args:**
+
+```python
+def greet(name: str, /, *, shout: bool = False) -> str:
+    msg = f"Hello, {name}"
+    return msg.upper() if shout else msg
+
+print(greet("Ada"))
+print(greet("Ada", shout=True))
+```
+
+**Defaults and mutable trap fix:**
+
+```python
+def append_item(item: str, bucket: list[str] | None = None) -> list[str]:
+    if bucket is None:
+        bucket = []
+    bucket.append(item)
+    return bucket
+```
+
+**Early return and multiple values:**
+
+```python
+def parse_int(text: str) -> int | None:
+    if not text.strip():
+        return None
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+code, label = (200, "ok")  # tuple return pattern
+```
+
+**Higher-order:**
+
+```python
+from collections.abc import Callable
+
+def twice(fn: Callable[[int], int], x: int) -> int:
+    return fn(fn(x))
+
+print(twice(lambda n: n + 1, 3))  # 5
+```
+
+## ⚠️ Pitfalls
+
+- Mutable default arguments (`def f(xs=[])`) share one list across calls.
+- Forgetting `return` yields `None` — easy bug in conditionals.
+- Annotations are not runtime checks unless you add a validator.
+- Closures capture variables by name — see [closures](closures).
+- Excessive `*args/**kwargs` hides the real API; prefer explicit params.
+
+## 🔗 Related
+
+- [*args and **kwargs](kwags)
+- [Lambda](lambda)
+- [Decorators](decorators)
+- [Closures](closures)
+- [Typing hints](typing_hints)
+- [Scope / namespaces](scope_namespaces)

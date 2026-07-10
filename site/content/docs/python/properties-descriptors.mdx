@@ -1,0 +1,109 @@
+---
+title: Properties and Descriptors
+description: Python · Reference cheat sheet
+---
+
+# Properties and Descriptors
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Properties manage attribute access with getters/setters. Descriptors are the underlying protocol (`__get__` / `__set__` / `__delete__`) used by `property`, `classmethod`, and ORMs. Use properties for derived or validated fields; custom descriptors for reusable attribute behavior.
+
+## 🔧 Core concepts
+
+| Tool | Role |
+| --- | --- |
+| `@property` | Getter |
+| `@x.setter` / `@x.deleter` | Mutate / delete |
+| Data descriptor | Defines `__set__` and/or `__delete__` |
+| Non-data descriptor | Only `__get__` (e.g. functions) |
+| Lookup order | Data desc > instance dict > non-data desc |
+
+`property` is implemented as a data descriptor. Slotted classes still work with descriptors on the class.
+
+## 💡 Examples
+
+**Property with validation:**
+
+```python
+class Person:
+    def __init__(self, name: str, age: int) -> None:
+        self.name = name
+        self.age = age
+
+    @property
+    def age(self) -> int:
+        return self._age
+
+    @age.setter
+    def age(self, value: int) -> None:
+        if value < 0:
+            raise ValueError("age must be >= 0")
+        self._age = value
+
+    @property
+    def label(self) -> str:
+        return f"{self.name} ({self._age})"
+```
+
+**Simple descriptor:**
+
+```python
+from typing import Any
+
+class Positive:
+    def __set_name__(self, owner: type, name: str) -> None:
+        self.public_name = name
+        self.private_name = f"_{name}"
+
+    def __get__(self, obj: object | None, objtype: type | None = None) -> Any:
+        if obj is None:
+            return self
+        return getattr(obj, self.private_name)
+
+    def __set__(self, obj: object, value: int) -> None:
+        if value <= 0:
+            raise ValueError(f"{self.public_name} must be > 0")
+        setattr(obj, self.private_name, value)
+
+class Item:
+    qty = Positive()
+
+    def __init__(self, qty: int) -> None:
+        self.qty = qty
+```
+
+**cached_property:**
+
+```python
+from functools import cached_property
+
+class Report:
+    def __init__(self, rows: list[int]) -> None:
+        self.rows = rows
+
+    @cached_property
+    def total(self) -> int:
+        return sum(self.rows)
+```
+
+## ⚠️ Pitfalls
+
+- Infinite recursion: don't touch `self.age` inside its own getter — use `self._age`.
+- Data descriptors hide same-named instance attributes.
+- `cached_property` is not thread-lock-safe for all use cases; know the docs.
+- Overusing setters instead of immutable design can complicate state.
+- Descriptors must live on the **class**, not on instances.
+
+## 🔗 Related
+
+- [Classes](classes)
+- [Decorators](decorators)
+- [Magic methods](magic_methods)
+- [Dataclasses](dataclasses)
+- [ABC / protocols](abc_protocols)
+- [Typing hints](typing_hints)

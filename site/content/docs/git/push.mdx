@@ -1,0 +1,64 @@
+---
+title: Push
+description: _Git · Reference cheat sheet_ 
+---
+
+# Push
+
+*_Git · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+`git push` uploads local commits (and optionally tags) to a remote. Set an upstream once with `-u`, prefer `--force-with-lease` over `--force`, and push tags deliberately.
+
+## 🧩 Core concepts
+
+- **Upstream** — `-u` records remote/branch for future `push`/`pull`.
+- **Fast-forward** — remote tip must be ancestor unless forced.
+- **Force-with-lease** — refuses overwrite if remote moved unexpectedly.
+- **Refspecs** — `git push origin local:remote` maps branches explicitly.
+- **Tags** — `git push --tags` or push a single tag by name.
+- **Delete remote branch** — `git push origin --delete branch`.
+
+## 💡 Examples
+
+```shellscript
+# First push of a feature branch
+git push -u origin feature/checkout
+
+# Subsequent pushes
+git push
+
+# Push to explicit remote/branch
+git push origin main
+
+# Safe force after rebase (preferred)
+git push --force-with-lease origin feature/checkout
+
+# Push one tag / all tags
+git push origin v1.2.0
+git push --tags
+
+# Delete remote branch
+git push origin --delete feature/checkout
+
+# Dry run
+git push --dry-run
+```
+
+## ⚠️ Pitfalls
+
+- `--force` can destroy others’ commits — use `--force-with-lease` and branch protections.
+- Pushing to the wrong remote/branch is common with multiple remotes — check `git remote -v`.
+- Large binary blobs bloat history — use Git LFS before the first push.
+- CI/CD may reject unsigned commits or unprotected force pushes on `main`.
+
+## 🔗 Related
+
+- [Pull](./pull)
+- [Fetch](./fetch)
+- [Branch](./branch)
+- [Rebase](./rebase)
+- [Git LFS](./git_lfs)

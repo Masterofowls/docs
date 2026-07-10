@@ -1,0 +1,104 @@
+---
+title: Fetch Streaming
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Fetch Streaming
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Fetch responses expose a `ReadableStream` body for incremental processing — large files, SSE-like chunked text, and progressive JSON. Use readers, `TextDecoderStream`, and backpressure-aware transforms instead of buffering entire payloads with `res.text()` / `res.json()`.
+
+## 🔧 Core concepts
+
+- **Body**: `response.body` → `ReadableStream`.
+- **Read**: `const reader = body.getReader()` then `reader.read()` → `\{ value, done \}`.
+- **Cancel**: `reader.cancel()` / `AbortSignal` on fetch.
+- **Tee**: `body.tee()` for dual consumers.
+- **Pipes**: `pipeThrough(new TextDecoderStream())`, `pipeTo(writable)`.
+- **Request streams**: duplex upload where supported (`duplex: "half"`).
+
+```js
+const res = await fetch("/large.txt");
+const reader = res.body.getReader();
+const { value, done } = await reader.read();
+```
+
+## 💡 Examples
+
+```js
+// Byte loop
+async function readBytes(url, signal) {
+  const res = await fetch(url, { signal });
+  if (!res.ok) throw new Error(res.status);
+  const reader = res.body.getReader();
+  const chunks = [];
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return chunks;
+}
+
+// Text lines via streams
+async function* lines(url) {
+  const res = await fetch(url);
+  const text = res.body.pipeThrough(new TextDecoderStream());
+  const reader = text.getReader();
+  let buf = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += value;
+    let idx;
+    while ((idx = buf.indexOf("\n")) >= 0) {
+      yield buf.slice(0, idx);
+      buf = buf.slice(idx + 1);
+    }
+  }
+  if (buf) yield buf;
+}
+
+// Progress with Content-Length
+async function downloadWithProgress(url, onProgress) {
+  const res = await fetch(url);
+  const total = Number(res.headers.get("content-length")) || 0;
+  let loaded = 0;
+  const reader = res.body.getReader();
+  const chunks = [];
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    loaded += value.byteLength;
+    onProgress(loaded, total);
+  }
+  return new Blob(chunks);
+}
+
+// Abort mid-stream
+const c = new AbortController();
+fetch("/stream", { signal: c.signal });
+c.abort();
+```
+
+## ⚠️ Pitfalls
+
+- Calling `res.json()` after reading `body` fails — body can be consumed once (unless teed).
+- Not all servers send useful `Content-Length` (chunked) — progress may be indeterminate.
+- Backpressure: don’t buffer unbounded chunks in memory.
+- CORS and opaque responses limit body access.
+- Upload streaming support is uneven across browsers — feature-detect.
+
+## 🔗 Related
+
+- [../fetch.md](../fetch) — fetch basics
+- [../abort_controller.md](../abort_controller) — cancel
+- [../typed_arrays.md](../typed_arrays) — Uint8Array chunks
+- [../async.md](../async) — async iteration
+- [../encode.md](../encode) — TextDecoder

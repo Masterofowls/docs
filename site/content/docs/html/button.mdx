@@ -1,0 +1,86 @@
+---
+title: Button
+description: HTML · Reference cheat sheet
+---
+
+# Button
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `<button>` element performs actions. Prefer it over clickable `<div>`s. Inside forms, `type` defaults to `submit` — set `type="button"` for non-submit actions. Links navigate; buttons act.
+
+## 🔧 Core concepts
+
+| Attribute | Role |
+| --- | --- |
+| `type` | `submit` (default in forms) \| `button` \| `reset` |
+| `name` / `value` | submitted with form when type=submit |
+| `disabled` | non-interactive |
+| `autofocus` | focus on load (use sparingly) |
+| `form` | associate with a form by id |
+| `formaction` / `formmethod` / … | override form submit attrs |
+
+- Content: phrasing content; can include icons + text.
+- Keyboard: Enter/Space activate.
+- Don’t nest interactive elements inside buttons.
+
+```html
+<button type="button" onclick="doThing()">Do thing</button>
+<button type="submit">Save</button>
+```
+
+## 💡 Examples
+
+```html
+<form method="post" action="/save">
+  <button type="submit">Save</button>
+  <button type="submit" name="intent" value="draft">Save draft</button>
+  <button type="reset">Reset</button>
+  <button type="button" id="preview">Preview</button>
+</form>
+
+<!-- Icon + accessible name -->
+<button type="button" aria-label="Close">
+  <svg aria-hidden="true" focusable="false">...</svg>
+</button>
+
+<!-- Toggle -->
+<button type="button" aria-pressed="false" aria-expanded="false">
+  Menu
+</button>
+
+<!-- External form attribute -->
+<input id="q" name="q" form="search" />
+<button type="submit" form="search">Search</button>
+<form id="search" action="/search"></form>
+
+<!-- Disabled with explanation -->
+<button type="submit" disabled aria-describedby="why">Pay</button>
+<p id="why">Complete shipping first.</p>
+```
+
+```html
+<!-- Anti-pattern -->
+<div onclick="...">Click me</div>
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `type="button"` inside forms accidentally submits.
+- Disabled buttons are not focusable and may skip errors — explain why.
+- Styling `<a>` as a button is fine for navigation; don’t use `<button>` for in-app routes that should be shareable URLs without JS (prefer links).
+- `button` with only an icon needs an accessible name (`aria-label` or visually present text).
+- `reset` often harms UX — rare in modern apps.
+
+## 🔗 Related
+
+- [links.md](./links) — links vs buttons
+- [form.md](./form) — form submission
+- [input.md](./input) — inputs
+- [accessibility.md](./accessibility) — names/states
+- [aria.md](./aria) — aria-pressed/expanded
+- [../CSS/button.md](../CSS/button) — button CSS

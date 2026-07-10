@@ -1,0 +1,73 @@
+---
+title: "Insert, Update, Delete"
+description: _SQL · Reference cheat sheet_ 
+---
+
+# Insert, Update, Delete
+
+*_SQL · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Data-modification statements change table contents: `INSERT` adds rows, `UPDATE` changes existing values, `DELETE` removes rows. Always scope `UPDATE`/`DELETE` with a precise `WHERE` (or use transactions and `RETURNING` where supported).
+
+## 🧩 Core concepts
+
+- **INSERT** — single row, multi-row, or `INSERT … SELECT`.
+- **UPSERT** — `ON CONFLICT` (Postgres) / `ON DUPLICATE KEY` (MySQL) / `MERGE`.
+- **UPDATE** — set columns; optional `FROM`/`JOIN` in some dialects.
+- **DELETE** — remove matching rows; `TRUNCATE` is bulk and minimally logged (dialect-specific).
+- **RETURNING** — get affected rows back (Postgres, SQLite, …).
+- **Constraints** — PK/FK/UNIQUE/CHECK can reject writes.
+
+## 💡 Examples
+
+```sql
+-- Insert
+INSERT INTO users (email, name)
+VALUES ('ada@example.com', 'Ada');
+
+INSERT INTO users (email, name)
+VALUES
+  ('al@example.com', 'Al'),
+  ('bo@example.com', 'Bo');
+
+INSERT INTO users (email, name)
+SELECT email, full_name FROM staging_users
+WHERE email IS NOT NULL;
+
+-- Upsert (PostgreSQL)
+INSERT INTO settings (user_id, theme)
+VALUES (42, 'dark')
+ON CONFLICT (user_id)
+DO UPDATE SET theme = EXCLUDED.theme, updated_at = NOW();
+
+-- Update
+UPDATE orders
+SET status = 'shipped', shipped_at = NOW()
+WHERE id = 1001 AND status = 'paid'
+RETURNING id, status;
+
+-- Delete
+DELETE FROM sessions
+WHERE expires_at < NOW();
+
+-- Careful bulk clear (cannot easily undo)
+-- TRUNCATE TABLE sessions;
+```
+
+## ⚠️ Pitfalls
+
+- Missing `WHERE` on `UPDATE`/`DELETE` can wipe the whole table — run inside a transaction first.
+- Multi-row inserts may partially fail depending on constraints and dialect abort behavior.
+- Triggers and cascading FKs can delete/update far more than the statement text suggests.
+- `TRUNCATE` often cannot run inside the same transactional assumptions as `DELETE` (and may need privileges).
+
+## 🔗 Related
+
+- [Select](./select)
+- [Transactions](./transactions)
+- [Joins](./joins)
+- [Indexes](./indexes)

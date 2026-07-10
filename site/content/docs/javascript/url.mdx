@@ -1,0 +1,87 @@
+---
+title: "URL & URLSearchParams"
+description: JavaScript · Reference cheat sheet
+---
+
+# URL & URLSearchParams
+
+_JavaScript · Reference cheat sheet_
+
+## 📋 Overview
+
+The `URL` API parses and builds absolute URLs safely. `URLSearchParams` reads and writes the query string without manual encoding mistakes. Prefer these over string concatenation.
+
+## 🔧 Core concepts
+
+- **`new URL(url, base?)`**: parse; throws `TypeError` on invalid input.
+- **Parts**: `protocol`, `username`, `password`, `host`, `hostname`, `port`, `pathname`, `search`, `hash`, `href`, `origin`.
+- **`searchParams`**: live `URLSearchParams` view of the query.
+- **Params API**: `get`, `getAll`, `set`, `append`, `delete`, `has`, `sort`, iterate.
+- **Relative resolve**: `new URL("/x", "https://example.com/a/")`.
+
+```js
+const u = new URL("https://example.com:443/path?q=1#top");
+u.hostname; // example.com
+u.searchParams.get("q"); // "1"
+```
+
+## 💡 Examples
+
+```js
+// Build safely
+const url = new URL("https://api.example.com/v1/search");
+url.searchParams.set("q", "café & tea");
+url.searchParams.set("page", "2");
+console.log(url.href);
+
+// Resolve relative
+const abs = new URL("../img/a.png", "https://cdn.example.com/assets/css/");
+// https://cdn.example.com/assets/img/a.png
+
+// Read from location (browser)
+const page = new URL(location.href);
+const tab = page.searchParams.get("tab") ?? "home";
+
+// From form-urlencoded body
+const params = new URLSearchParams("a=1&a=2&b=3");
+params.getAll("a"); // ["1","2"]
+
+// Iterate
+for (const [k, v] of url.searchParams) {
+  console.log(k, v);
+}
+
+// Update path
+url.pathname = "/v2/search";
+
+// canParse (modern)
+URL.canParse?.("https://ok.test"); // true
+```
+
+```js
+await fetch(url, { method: "GET" });
+
+// POST as form body
+await fetch("/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: new URLSearchParams({ user: "ada", remember: "1" }),
+});
+```
+
+## ⚠️ Pitfalls
+
+- `new URL("/path")` without base throws in many environments — provide base or use absolute href.
+- `searchParams.set` replaces all values for a key; use `append` for multi-value keys.
+- Mutating `url.search` and `searchParams` stay in sync — pick one style.
+- `pathname` encoding differs from full component encoding — use `encodeURIComponent` for segments you insert.
+- `origin` is read-only; change via protocol/host/port pieces.
+
+## 🔗 Related
+
+- [encode.md](./encode) — encodeURIComponent
+- [fetch.md](./fetch) — requesting URLs
+- [strings.md](./strings) — string building
+- [api.md](./api) — related web APIs
+- [DOM/window.md](./DOM/window) — location
+- [DOM/navigation.md](./DOM/navigation) — history / location

@@ -1,0 +1,66 @@
+---
+title: Views
+description: SQL · Reference cheat sheet
+---
+
+# Views
+
+_SQL · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Views are stored queries that act like virtual tables. Use them for reusable projections, security (column/row hiding), and simplifying joins. Materialized views store results physically (Postgres); MySQL has views but not native materialized views.
+
+## 🔧 Core concepts
+
+- **CREATE VIEW** — non-materialized; runs underlying query on read.
+- **REPLACE / OR REPLACE** — update definition.
+- **Updatable views** — limited; simple views may allow `INSERT`/`UPDATE`.
+- **Materialized** — Postgres `MATERIALIZED VIEW` + `REFRESH`.
+- **Security** — grant on view without granting base tables (with caveats).
+
+## 💡 Examples
+
+```sql
+CREATE VIEW active_users AS
+SELECT id, email, created_at
+FROM users
+WHERE deleted_at IS NULL;
+
+CREATE OR REPLACE VIEW order_summaries AS
+SELECT o.id, u.email, o.total, o.status
+FROM orders o
+JOIN users u ON u.id = o.user_id;
+
+SELECT * FROM active_users WHERE created_at > CURRENT_DATE - INTERVAL '7 days';
+
+-- Postgres materialized
+CREATE MATERIALIZED VIEW daily_revenue AS
+SELECT DATE(created_at) AS day, SUM(total) AS revenue
+FROM orders
+GROUP BY DATE(created_at)
+WITH DATA;
+
+REFRESH MATERIALIZED VIEW CONCURRENTLY daily_revenue;  -- needs unique index
+
+DROP VIEW IF EXISTS active_users;
+```
+
+## ⚠️ Pitfalls
+
+- Views don’t automatically speed queries — they can hide expensive joins.
+- Nested views make `EXPLAIN` harder — flatten when debugging.
+- `OR REPLACE` can break consumers if column names/types change.
+- Materialized views go stale until refreshed — schedule carefully.
+- MySQL: no `MATERIALIZED VIEW`; emulate with tables + jobs.
+
+## 🔗 Related
+
+- [select.md](./select)
+- [cte.md](./cte)
+- [joins.md](./joins)
+- [schemas.md](./schemas)
+- [create_alter_drop.md](./create_alter_drop)
+- [explain_analyze.md](./explain_analyze)

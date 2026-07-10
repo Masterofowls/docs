@@ -1,0 +1,93 @@
+---
+title: Print and Input
+description: Python · Reference cheat sheet
+---
+
+# Print and Input
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`print` writes to stdout; `input` reads a line from stdin as `str`. Fine for CLIs and debugging; prefer `logging` for applications and `argparse` for structured CLIs.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `print(*objs, sep=' ', end='\n', file=..., flush=False)` | Output |
+| `input(prompt="")` | Read line (no trailing `\n`) |
+| `sys.stdout` / `stderr` | Streams |
+| `sys.stdin` | Input stream |
+
+`print` converts with `str()`. Soft space separation via `sep`. Use f-strings for formatting.
+
+## 💡 Examples
+
+**print options:**
+
+```python
+print("a", "b", "c", sep="-")
+print("loading", end="...", flush=True)
+print(" done")
+
+import sys
+print("error!", file=sys.stderr)
+```
+
+**input and parse:**
+
+```python
+name = input("Name: ").strip()
+raw = input("Count: ").strip()
+try:
+    count = int(raw)
+except ValueError:
+    print("Not an integer", file=sys.stderr)
+    raise SystemExit(1)
+print(f"Hello {name} x{count}")
+```
+
+**EOF-safe loop:**
+
+```python
+import sys
+
+def main() -> None:
+    for line in sys.stdin:
+        text = line.strip()
+        if not text:
+            continue
+        print(text.upper())
+
+if __name__ == "__main__":
+    main()
+```
+
+**Pretty debug:**
+
+```python
+from pprint import pprint
+
+data = {"users": [{"id": 1, "name": "Ada"}], "ok": True}
+pprint(data, width=40)
+```
+
+## ⚠️ Pitfalls
+
+- `input` always returns `str` — cast explicitly.
+- EOF (`Ctrl+D` / `Ctrl+Z`) raises `EOFError` on `input()`.
+- Password prompts: use `getpass.getpass` so input is not echoed.
+- Leaving debug `print`s in libraries pollutes consumer output — use logging.
+- Locale/encoding issues on redirected pipes — prefer UTF-8 aware environments.
+
+## 🔗 Related
+
+- [F-strings](f-string)
+- [Argparse](argparse)
+- [Logging](logging)
+- [Examples: cli tool](Examples/cli_tool)
+- [Strings](strings)
+- [Exceptions](exceptions)

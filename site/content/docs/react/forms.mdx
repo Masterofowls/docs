@@ -1,0 +1,90 @@
+---
+title: Forms
+description: React · Reference cheat sheet
+---
+
+# Forms
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+React forms are controlled (state drives inputs) or uncontrolled (refs / default values). Prefer controlled for validation and conditional UI; uncontrolled for simple or large native forms. Prevent default submit and handle async saves carefully.
+
+## 🔧 Core concepts
+
+- **Controlled** — `value` + `onChange` bound to state.
+- **Uncontrolled** — `defaultValue` + `ref` / `FormData`.
+- **Submit** — `onSubmit` on `<form>`; `preventDefault()`.
+- **Checkbox/radio** — `checked` / `selected`; groups share `name`.
+- **Files** — uncontrolled `type="file"`; read via `FormData`.
+- **a11y** — `label` + `useId`, error text with `aria-describedby`.
+
+## 💡 Examples
+
+**Controlled:**
+
+```tsx
+import { useState, FormEvent } from "react";
+
+export function LoginForm({ onLogin }: { onLogin: (email: string) => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    onLogin(email);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Email
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Password
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Sign in</button>
+    </form>
+  );
+}
+```
+
+**FormData (uncontrolled):**
+
+```tsx
+function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  const data = new FormData(e.currentTarget);
+  console.log(data.get("email"));
+}
+```
+
+## ⚠️ Pitfalls
+
+- Mixing `value` without `onChange` → read-only warning.
+- Using `value=\{undefined\}` then string → uncontrolled→controlled switch.
+- Mutating state in place for nested form objects.
+- Blocking submit button without keyboard/`Enter` considerations.
+
+## 🔗 Related
+
+- [useState.md](./useState) — field state
+- [useId.md](./useId) — label ids
+- [useRef.md](./useRef) — uncontrolled refs
+- [events.md](./events) — handlers
+- [testing.md](./testing) — user-event

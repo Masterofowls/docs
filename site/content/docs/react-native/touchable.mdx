@@ -1,0 +1,81 @@
+---
+title: Touchable
+description: React Native · Reference cheat sheet
+---
+
+# Touchable
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Handle presses with **`Pressable`** (recommended), or legacy `TouchableOpacity` / `TouchableHighlight` / `TouchableWithoutFeedback`. Inside Gesture Handler navigators, prefer RNGH touchables.
+
+## 🔧 Core concepts
+
+- **`Pressable`** — `onPress`, `onLongPress`, style as function of `\{ pressed \}`.
+- **Hit slop** — expand touch target without changing layout.
+- **Disabled** — `disabled` + a11y state.
+- **Feedback** — opacity, ripple (`android_ripple`), haptic via Expo Haptics.
+- **Legacy** — Touchable* still work; migrate to Pressable when touching code.
+
+## 💡 Examples
+
+```tsx
+import { Pressable, Text, StyleSheet } from "react-native";
+
+export function PrimaryButton({
+  label,
+  onPress,
+  disabled,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
+      android_ripple={{ color: "#ffffff55" }}
+      style={({ pressed }) => [
+        styles.btn,
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
+    >
+      <Text style={styles.label}>{label}</Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  btn: {
+    backgroundColor: "#111",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  pressed: { opacity: 0.85 },
+  disabled: { opacity: 0.4 },
+  label: { color: "#fff", fontWeight: "600", textAlign: "center" },
+});
+```
+
+## ⚠️ Pitfalls
+
+- Touch targets smaller than ~44×44 pt.
+- Wrapping `Text` alone without Pressable when you need a button role.
+- Nested pressables stealing taps — flatten or use `pointerEvents`.
+
+## 🔗 Related
+
+- [gesture.md](./gesture) — advanced gestures
+- [accesebility.md](./accesebility) — roles / labels
+- [basic_primitives.md](./basic_primitives) — Text / View
+- [animation.md](./animation) — press animations

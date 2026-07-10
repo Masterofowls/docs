@@ -1,0 +1,121 @@
+---
+title: Multi-column layout
+description: CSS · Reference cheat sheet
+---
+
+# Multi-column layout
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+CSS multi-column layout (`columns`, `column-count`, `column-width`, and related properties) flows content into newspaper-style columns. Use it for long prose, glossaries, or tag lists where vertical reading across balanced columns improves scanability. Prefer Flexbox or Grid when you need explicit item placement, equal card rows, or complex alignment—columns are for continuous flow, not component grids.
+
+Columns fragment content automatically; control breaks with `break-inside`, `break-before`, and `break-after`.
+
+## 🔧 Core concepts
+
+### Primary properties
+
+| Property | Role |
+| --- | --- |
+| `column-count` | Ideal number of columns |
+| `column-width` | Minimum comfortable column width; UA picks count |
+| `columns` | Shorthand: `columns: <count> \|\| <width>` |
+| `column-gap` | Gutters between columns (also `gap` in some contexts) |
+| `column-rule` | Vertical line between columns (`width style color`) |
+| `column-span` | `all` lets a child span the full width |
+| `column-fill` | `balance` (default in most UIs) \| `auto` |
+
+### Fragmentation controls
+
+| Property | Useful values |
+| --- | --- |
+| `break-inside` | `avoid` on headings, figures, cards |
+| `break-before` / `break-after` | `column`, `avoid-column` |
+| `orphans` / `widows` | Min lines left at bottom/top of a fragment |
+
+### When to choose what
+
+| Need | Prefer |
+| --- | --- |
+| Flowing article text | Multi-column |
+| Card / gallery layout | Grid / Flex |
+| Sidebar + main | Grid / Flex |
+| Masonry-like packing | Grid (`masonry` where supported) or JS |
+
+## 💡 Examples
+
+### Responsive columns by width
+
+```css
+.article-body {
+  column-width: 18rem;
+  column-gap: 2rem;
+  column-rule: 1px solid color-mix(in oklab, CanvasText 15%, transparent);
+  text-align: start;
+}
+```
+
+### Fixed count with spanning heading
+
+```html
+<section class="features">
+  <h2 class="features__title">Highlights</h2>
+  <p>…</p>
+  <p>…</p>
+</section>
+```
+
+```css
+.features {
+  columns: 3;
+  column-gap: 1.5rem;
+}
+
+.features__title {
+  column-span: all;
+  margin-block-end: 1rem;
+}
+```
+
+### Keep cards from splitting
+
+```css
+.card-list {
+  columns: 2;
+  column-gap: 1rem;
+}
+
+.card-list > .card {
+  break-inside: avoid;
+  margin-block-end: 1rem;
+}
+```
+
+### Balance short content
+
+```css
+.short-copy {
+  columns: 2;
+  column-fill: balance;
+  max-block-size: 12rem; /* height can affect balancing */
+}
+```
+
+## ⚠️ Pitfalls
+
+- Using multi-column for a grid of independent cards without `break-inside: avoid`, which splits cards awkwardly.
+- Setting both a high `column-count` and a large `column-width` so columns become unreadably narrow on small screens.
+- Expecting Flex/Grid-like alignment control—columns don’t offer `justify-content` per “cell.”
+- Forgetting that `column-span: all` only works for in-flow children of the multicol container.
+- Overusing vertical rules that clash with nested borders or dark themes—tint with `color-mix` and test contrast.
+
+## 🔗 Related
+
+- [CSS Grid](grid)
+- [Flexbox](flex)
+- [Text](text)
+- [Adaptive design](adaptive)

@@ -1,0 +1,103 @@
+---
+title: Prototypes
+description: JavaScript · Reference cheat sheet
+---
+
+# Prototypes
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+JavaScript inheritance is prototype-based. Every object has an internal `[[Prototype]]` link (exposed as `__proto__` / `Object.getPrototypeOf`). Property lookup walks the chain until found or `null`. Classes are syntax sugar over constructor functions and prototypes.
+
+## 🔧 Core concepts
+
+- **Prototype chain**: `obj` → `Object.getPrototypeOf(obj)` → … → `null`.
+- **Own vs inherited**: `hasOwnProperty` / `Object.hasOwn` vs chain lookup.
+- **Constructor**: `Fn.prototype` is assigned as `[[Prototype]]` of `new Fn()` instances.
+- **`Object.create(proto)`**: make an object with a chosen prototype.
+- **Class**: `class C extends B` wires `C.prototype` → `B.prototype`.
+- **`new.target`**: detects construct calls.
+
+```js
+const proto = { greet() { return "hi"; } };
+const obj = Object.create(proto);
+obj.greet(); // "hi"
+```
+
+## 💡 Examples
+
+```js
+function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function () {
+  return `${this.name} makes a noise`;
+};
+
+function Dog(name) {
+  Animal.call(this, name);
+}
+Dog.prototype = Object.create(Animal.prototype);
+Dog.prototype.constructor = Dog;
+Dog.prototype.speak = function () {
+  return `${this.name} barks`;
+};
+
+const d = new Dog("Rex");
+d.speak(); // "Rex barks"
+d instanceof Dog; // true
+d instanceof Animal; // true
+
+// Modern equivalent
+class Cat extends Animal {
+  speak() {
+    return `${this.name} meows`;
+  }
+}
+
+// Inspect
+Object.getPrototypeOf(d) === Dog.prototype;
+Object.hasOwn(d, "name"); // true
+Object.hasOwn(d, "speak"); // false
+
+// Null-prototype map (no inherited keys)
+const dict = Object.create(null);
+dict.admin = true;
+"toString" in dict; // false
+
+// Static vs instance
+class Mathy {
+  static dual(n) {
+    return n * 2;
+  }
+  half() {
+    return this.value / 2;
+  }
+}
+```
+
+```js
+// Shadowing
+const a = Object.create({ x: 1 });
+a.x = 2; // own property shadows prototype
+delete a.x; // reveals prototype x again
+```
+
+## ⚠️ Pitfalls
+
+- Mutating built-in prototypes (`Array.prototype`) breaks libraries — avoid in app code.
+- `for...in` enumerates enumerable inherited keys — prefer `Object.keys` / `hasOwn`.
+- Setting `__proto__` is legacy; use `Object.setPrototypeOf` sparingly (engine deopts).
+- `instanceof` can fail across realms/iframes with different globals.
+
+## 🔗 Related
+
+- [oop.md](./oop) — class syntax
+- [objects.md](./objects) — property model
+- [new.md](./new) — construction
+- [this_keyword.md](./this_keyword) — method receivers
+- [proxy_reflect.md](./proxy_reflect) — intercepting lookup

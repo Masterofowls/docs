@@ -1,0 +1,140 @@
+---
+title: Language
+description: HTML · Reference cheat sheet
+---
+
+# Language
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Language in HTML is declared primarily with the **`lang` attribute**. It tells browsers, search engines, and assistive technologies which natural language (and optionally dialect) the content uses. Correct language tags improve screen-reader pronunciation, hyphenation, spell-check, font selection, and SEO.
+
+Set `lang` on the root `<html>` element for the document default, then override on elements that switch language. Pair with `hreflang` on links and `<link rel="alternate">` for translated URLs.
+
+## 🔧 Core concepts
+
+### BCP 47 language tags
+
+Use standard tags, not free-form names:
+
+| Tag | Meaning |
+|-----|---------|
+| `en` | English |
+| `en-US` | English (United States) |
+| `en-GB` | English (United Kingdom) |
+| `es` | Spanish |
+| `zh-Hans` | Chinese, Simplified script |
+| `zh-Hant-TW` | Chinese, Traditional, Taiwan |
+| `und` | Undetermined (rare) |
+
+Primary language subtag is required; region and script are optional. Prefer the shortest tag that is still useful (`en` vs `en-US` when dialect matters for spelling/voice).
+
+### Document and fragment language
+
+```html
+<html lang="en">
+…
+<blockquote lang="fr">
+  <p>Liberté, égalité, fraternité.</p>
+</blockquote>
+```
+
+- Inheritance: children inherit language unless overridden.
+- Empty `lang=""` means unknown / no language (e.g. some proper nouns)—use sparingly.
+- `xml:lang` appears in XHTML; in HTML5, `lang` is preferred (both may match in polyglot docs).
+
+### Related attributes and elements
+
+- **`hreflang`** — language of the linked resource (`<a>`, `<link>`, `<area>`).
+- **`translate`** — `yes` / `no` hint for translation tools.
+- **`<title>` / meta description** — should match page language.
+- **CSS `hyphens` / `:lang()`** — style per language.
+
+```css
+:lang(de) { quotes: "„" "“" "‚" "‘"; }
+```
+
+### Accessibility
+
+Screen readers switch voice models based on `lang`. Wrong or missing `lang` causes mispronunciation. Mark inline phrases in another language; do not mark decorative icons or code as a human language unless appropriate (`lang` on `<code>` is often omitted or set to empty).
+
+## 💡 Examples
+
+### Root declaration
+
+```html
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <title>Colour systems</title>
+</head>
+<body>
+  <h1>Colour systems</h1>
+</body>
+</html>
+```
+
+### Inline language switch
+
+```html
+<p>
+  The French motto
+  <span lang="fr">Liberté, égalité, fraternité</span>
+  appears on many public buildings.
+</p>
+```
+
+### Multilingual navigation with hreflang
+
+```html
+<nav aria-label="Languages">
+  <ul>
+    <li><a href="/en/guide" hreflang="en" lang="en">English</a></li>
+    <li><a href="/es/guia" hreflang="es" lang="es">Español</a></li>
+    <li><a href="/ja/guide" hreflang="ja" lang="ja">日本語</a></li>
+  </ul>
+</nav>
+```
+
+### Alternate links in head
+
+```html
+<head>
+  <link rel="alternate" hreflang="en" href="https://example.com/en/docs">
+  <link rel="alternate" hreflang="fr" href="https://example.com/fr/docs">
+  <link rel="alternate" hreflang="x-default" href="https://example.com/docs">
+</head>
+```
+
+### Opt out of translation
+
+```html
+<p>
+  Product code
+  <span translate="no">XR-2040-B</span>
+  must stay unchanged.
+</p>
+```
+
+## ⚠️ Pitfalls
+
+- **Missing `lang` on `<html>`** — Validators flag it; AT guesses poorly.
+- **Wrong tag** — `eng` or `english` is invalid; use `en`.
+- **Over-tagging** — Do not set `lang` on every element when the root already applies.
+- **Machine-translated pages** — Keep `lang` accurate to the visible text, not the source CMS locale.
+- **`hreflang` mismatches** — Reciprocal alternates should form a consistent set; include `x-default` when appropriate.
+- **Direction vs language** — `dir="rtl"` is separate from `lang`; set both for Arabic/Hebrew content (`lang="ar" dir="rtl"`).
+
+## 🔗 Related
+
+- [Head](head) — document setup and alternate links
+- [Meta](meta) — content-language meta (legacy; prefer `lang`)
+- [XML](xml) — `xml:lang` in XML/XHTML
+- [Nav](nav) — language switchers
+- [Section](section) — scoping translated regions
+- [URL](url) — locale prefixes in paths

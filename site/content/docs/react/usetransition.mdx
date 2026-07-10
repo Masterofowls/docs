@@ -1,0 +1,75 @@
+---
+title: useTransition
+description: React · Reference cheat sheet
+---
+
+# useTransition
+
+_React · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`useTransition` marks state updates as non-urgent so React can keep the UI responsive. Returns `[isPending, startTransition]`. Use for heavy re-renders (filtering large lists, tab switches) while keeping input snappy.
+
+## 🔧 Core concepts
+
+- **Urgent vs transition** — typing stays urgent; list filter can be a transition.
+- **`startTransition(fn)`** — wrap the `setState` that triggers expensive UI.
+- **`isPending`** — true while the transition is in progress.
+- **`useDeferredValue`** — alternative when you defer a value instead of an update.
+- **Concurrent** — requires concurrent features (React 18+).
+
+## 💡 Examples
+
+```tsx
+import { useState, useTransition } from "react";
+
+export function Search({ items }: { items: string[] }) {
+  const [query, setQuery] = useState("");
+  const [list, setList] = useState(items);
+  const [isPending, startTransition] = useTransition();
+
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setQuery(value); // urgent: update input
+    startTransition(() => {
+      setList(items.filter((item) => item.includes(value)));
+    });
+  }
+
+  return (
+    <div>
+      <input value={query} onChange={onChange} />
+      {isPending ? <p>Updating…</p> : null}
+      <ul>
+        {list.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**Navigation-style:**
+
+```tsx
+startTransition(() => setTab("photos"));
+```
+
+## ⚠️ Pitfalls
+
+- Wrapping controlled input updates in `startTransition` → laggy typing.
+- Side effects inside transitions that assume immediate commit.
+- Expecting transitions to cancel fetches—pair with AbortController / effects carefully.
+- Nested transitions without understanding pending boundaries.
+
+## 🔗 Related
+
+- [useDeferredValue.md](./useDeferredValue) — defer a value
+- [concurrent.md](./concurrent) — concurrent model
+- [suspense.md](./suspense) — pending UI
+- [performance.md](./performance) — responsiveness
+- [hooks.md](./hooks) — rules

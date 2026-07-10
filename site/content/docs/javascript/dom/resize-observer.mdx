@@ -1,0 +1,92 @@
+---
+title: Resize Observer
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Resize Observer
+
+_JavaScript DOM · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`ResizeObserver` fires when an Element’s size changes — more precise than `window.resize` for component-level layouts, container queries polyfills, and chart reflows. Observe content box, border box, or device-pixel content box.
+
+## 🔧 Core concepts
+
+- **Create**: `new ResizeObserver(callback)`.
+- **`observe(el, \{ box \})`**: `content-box` (default), `border-box`, `device-pixel-content-box`.
+- **Entry**: `contentRect`, `borderBoxSize`, `contentBoxSize`, `devicePixelContentBoxSize`, `target`.
+- **`unobserve` / `disconnect`**: cleanup.
+- Fired before paint after layout; avoid layout loops.
+
+```js
+const ro = new ResizeObserver((entries) => {
+  for (const e of entries) {
+    const { width, height } = e.contentRect;
+    chart.resize(width, height);
+  }
+});
+ro.observe(container);
+```
+
+## 💡 Examples
+
+```js
+// Prefer box sizes arrays (newer)
+new ResizeObserver((entries) => {
+  const e = entries[0];
+  const [size] = e.contentBoxSize;
+  const w = size.inlineSize;
+  const h = size.blockSize;
+  render(w, h);
+}).observe(el, { box: "content-box" });
+
+// Border box for total footprint
+ro.observe(el, { box: "border-box" });
+
+// Responsive component without window listener
+function mount(el) {
+  const ro = new ResizeObserver(([e]) => {
+    el.dataset.wide = String(e.contentRect.width > 600);
+  });
+  ro.observe(el);
+  return () => ro.disconnect();
+}
+
+// Canvas backing store
+const canvas = document.querySelector("canvas");
+new ResizeObserver(() => {
+  const dpr = devicePixelRatio;
+  const { width, height } = canvas.getBoundingClientRect();
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  draw();
+}).observe(canvas);
+```
+
+```js
+// Guard infinite resize loops
+let frame;
+const ro = new ResizeObserver(() => {
+  cancelAnimationFrame(frame);
+  frame = requestAnimationFrame(update);
+});
+```
+
+## ⚠️ Pitfalls
+
+- Changing size inside the callback can cause observation loops — batch via rAF and check thresholds.
+- `contentRect` is legacy-ish; prefer `contentBoxSize` / `borderBoxSize` (arrays for fragmented boxes).
+- SVG / table quirks exist — verify in target browsers.
+- Not a substitute for CSS container queries when pure CSS suffices.
+- Disconnect on teardown.
+
+## 🔗 Related
+
+- [intersection_observer.md](./intersection_observer) — visibility
+- [mutation_observer.md](./mutation_observer) — DOM changes
+- [position.md](./position) — measurements
+- [../timers.md](../timers) — rAF
+- [cssom.md](./cssom) — computed sizes

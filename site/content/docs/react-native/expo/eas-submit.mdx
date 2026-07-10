@@ -1,0 +1,73 @@
+---
+title: EAS Submit
+description: Expo · Reference cheat sheet
+---
+
+# EAS Submit
+
+_Expo · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**`eas submit`** uploads a build to App Store Connect or Google Play. Pair with `eas build` artifacts (local path or latest build on EAS). Configure credentials once; automate with CI profiles in `eas.json`.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `eas submit -p ios` | ASC upload |
+| `eas submit -p android` | Play upload |
+| `eas.json` submit profile | Track, release status |
+| ASC API key / Apple ID | iOS auth |
+| Google service account | Play API JSON |
+| `--latest` | Use latest EAS build |
+
+Submit ≠ review: you still complete store listing / review in consoles.
+
+## 💡 Examples
+
+```json
+// eas.json (excerpt)
+{
+  "cli": { "version": ">= 12.0.0" },
+  "build": {
+    "production": { "channel": "production" }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "1234567890"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./play-service-account.json",
+        "track": "internal"
+      }
+    }
+  }
+}
+```
+
+```shellscript
+eas build -p ios --profile production
+eas submit -p ios --profile production --latest
+
+eas build -p android --profile production
+eas submit -p android --profile production --path ./app-release.aab
+```
+
+## ⚠️ Pitfalls
+
+- Submitting a build with wrong version/build number.
+- Committing Play/ASC private keys to git.
+- Using `production` track before internal testing.
+- Assuming submit publishes immediately—manual rollout/review may remain.
+
+## 🔗 Related
+
+- [build.md](./build) — EAS Build
+- [keystore_sign.md](./keystore_sign) — Android signing
+- [updates_ota.md](./updates_ota) — JS updates vs binaries
+- [commands.md](./commands) — CLI
+- [config.md](./config) — version / bundle ids

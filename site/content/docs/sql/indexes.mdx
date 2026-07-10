@@ -1,0 +1,65 @@
+---
+title: Indexes
+description: _SQL · Reference cheat sheet_ 
+---
+
+# Indexes
+
+*_SQL · Reference cheat sheet_*
+
+---
+
+## 📖 Overview
+
+Indexes speed lookups, joins, and sorts by maintaining ordered structures (commonly B-trees) over column values. They trade write overhead and storage for faster reads. Design indexes around real query predicates and join keys.
+
+## 🧩 Core concepts
+
+- **B-tree** — default for equality and range (`=`, `&lt;`, `BETWEEN`, `ORDER BY`).
+- **Unique / PK / FK** — uniqueness constraints create indexes; FKs often need supporting indexes on the child column.
+- **Composite indexes** — leftmost prefix rule: `(a, b)` helps `a` and `a,b`, not `b` alone.
+- **Covering / INCLUDE** — index-only scans when all needed columns are in the index.
+- **Partial / filtered** — index a subset (`WHERE deleted_at IS NULL`).
+- **Hash / GIN / GiST / columnstore** — engine-specific for equality-only, JSON, full-text, analytics.
+
+## 💡 Examples
+
+```sql
+-- Single-column
+CREATE INDEX idx_users_email ON users (email);
+
+-- Unique
+CREATE UNIQUE INDEX ux_users_email ON users (email);
+
+-- Composite (status filtered lists by created_at)
+CREATE INDEX idx_orders_status_created
+  ON orders (status, created_at DESC);
+
+-- Partial (PostgreSQL)
+CREATE INDEX idx_users_active_email
+  ON users (email)
+  WHERE active = TRUE;
+
+-- Covering-ish with INCLUDE (PostgreSQL)
+CREATE INDEX idx_orders_user_covering
+  ON orders (user_id)
+  INCLUDE (status, total);
+
+-- Inspect (examples)
+-- PostgreSQL: EXPLAIN ANALYZE SELECT …;
+-- MySQL:      EXPLAIN SELECT …;
+```
+
+## ⚠️ Pitfalls
+
+- Too many indexes slow `INSERT`/`UPDATE`/`DELETE` and bloat storage.
+- Functions on columns (`WHERE LOWER(email) = …`) need matching expression indexes.
+- Low-selectivity columns (`boolean`) rarely help alone — combine with selective columns.
+- Unused indexes still cost writes — review with engine stats (`pg_stat_user_indexes`, etc.).
+
+## 🔗 Related
+
+- [Select](./select)
+- [Joins](./joins)
+- [Transactions](./transactions)
+- [Insert / Update / Delete](./insert_update_delete)

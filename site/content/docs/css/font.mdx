@@ -1,0 +1,125 @@
+---
+title: Fonts
+description: CSS · Reference cheat sheet
+---
+
+# Fonts
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Font CSS controls typeface selection, weight, style, size, and loading behavior. Modern stacks combine system fonts, self-hosted files via `@font-face`, and variable fonts for continuous weight/width axes. Good typography sets a clear hierarchy, readable line length, and resilient fallbacks when webfonts are slow or blocked.
+
+Prefer `font-display` strategies that avoid invisible text, and use logical sizing (`rem`, `clamp`) for scalable UIs.
+
+## 🔧 Core concepts
+
+### Key properties
+
+| Property | Role |
+| --- | --- |
+| `font-family` | Ordered stack; last should be generic (`sans-serif`, `serif`, `monospace`) |
+| `font-size` | Absolute, relative, or fluid (`clamp`) |
+| `font-weight` | `100`–`900`, `normal`, `bold`, or variable axis |
+| `font-style` | `normal` \| `italic` \| `oblique` |
+| `font-stretch` | Width (`condensed` … `expanded`) |
+| `font-variant-*` | Caps, numeric figures, ligatures |
+| `line-height` | Unitless preferred for inheritance |
+| `font` | Shorthand (order-sensitive) |
+| `font-optical-sizing` | `auto` \| `none` for optical size axis |
+| `font-synthesis` | Control fake bold/italic |
+
+### @font-face essentials
+
+```css
+@font-face {
+  font-family: "InterVar";
+  src:
+    url("/fonts/InterVar.woff2") format("woff2-variations"),
+    url("/fonts/InterVar.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF; /* optional subset */
+}
+```
+
+| `font-display` | Behavior |
+| --- | --- |
+| `swap` | Show fallback immediately, swap in webfont |
+| `optional` | May skip webfont if not cached—great for performance |
+| `block` | Short block period, then swap |
+| `fallback` | Short block, short swap window |
+
+### Generic families
+
+`serif`, `sans-serif`, `monospace`, `cursive`, `fantasy`, `system-ui`, `ui-sans-serif`, `ui-serif`, `ui-monospace`, `ui-rounded`, `emoji`, `math`, `fangsong`.
+
+## 💡 Examples
+
+### System stack
+
+```css
+:root {
+  --font-sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+```
+
+### Fluid type scale
+
+```css
+h1 {
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+```
+
+### Variable font weight on hover
+
+```css
+.nav-link {
+  font-family: "InterVar", system-ui, sans-serif;
+  font-weight: 500;
+  transition: font-weight 120ms ease;
+}
+
+.nav-link:hover {
+  font-weight: 700;
+}
+```
+
+### Tabular numbers for data
+
+```css
+.numeric {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Listing a webfont without a robust system fallback causes FOUT/FOIT layout jumps—match metrics or reserve space.
+- Using `px` everywhere prevents user font-size preferences; prefer `rem` for UI text.
+- Applying unitful `line-height` on parents so children inherit unexpected computed values—prefer unitless.
+- Loading every weight/style file instead of one variable font increases bytes and requests.
+- Setting `font-display: block` on body text, which can leave content invisible too long.
+
+## 🔗 Related
+
+- [Text](text)
+- [Icons](icon)
+- [Buttons](button)
+- [Adaptive design](adaptive)

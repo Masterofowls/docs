@@ -1,0 +1,73 @@
+---
+title: Type assertions
+description: TypeScript · Reference cheat sheet
+---
+
+# Type assertions
+
+_TypeScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Assertions (`as T` / `<T>value`) tell the compiler to treat a value as a related type. They do **not** change runtime values or perform checks. Prefer narrowing, guards, and validators; assert only when you have external proof.
+
+## 🔧 Core concepts
+
+- **Syntax** — `value as T` (preferred in `.tsx`); `<T>value` (not in TSX).
+- **Relatedness** — assertion must be to a sufficiently overlapping type (or via `unknown`/`any`).
+- **Non-null** — `x!` asserts `x` is not `null` | `undefined`.
+- **Const assertion** — `as const` widens to literal/readonly (see const_assertions).
+- **Double assert** — `as unknown as T` forces any target (last resort).
+
+## 💡 Examples
+
+```ts
+const el = document.getElementById("app") as HTMLDivElement | null;
+el?.classList.add("ready");
+
+// From JSON / DOM when shape is known
+const cfg = JSON.parse(raw) as { port: number };
+
+// Non-null when you’ve just checked
+function len(s: string | null) {
+  if (s == null) return 0;
+  return s!.length; // usually unnecessary after narrowing
+}
+
+// Force through unknown (dangerous)
+const n = "42" as unknown as number; // still the string "42" at runtime!
+
+// Prefer type guard
+function isPort(x: unknown): x is { port: number } {
+  return (
+    typeof x === "object" &&
+    x !== null &&
+    "port" in x &&
+    typeof (x as { port: unknown }).port === "number"
+  );
+}
+```
+
+```tsx
+// In TSX, use `as` — angle brackets conflict with JSX
+const node = <div /> as React.ReactElement;
+```
+
+## ⚠️ Pitfalls
+
+- Assertions are compile-time only — invalid casts crash at runtime.
+- `as T` is not a cast like C++; no conversion of values.
+- Overusing `as unknown as T` hides real bugs — fix types instead.
+- `!` on possibly null values is a common source of production crashes.
+- Prefer Zod / schema parse for untrusted data over `as`.
+
+## 🔗 Related
+
+- [any_unknown_never.md](./any_unknown_never)
+- [type_guards.md](./type_guards)
+- [const_assertions.md](./const_assertions)
+- [satisfies.md](./satisfies)
+- [zod_integration.md](./zod_integration)
+- [tsx_react.md](./tsx_react)

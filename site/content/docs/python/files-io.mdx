@@ -1,0 +1,96 @@
+---
+title: Files I/O
+description: Python · Reference cheat sheet
+---
+
+# Files I/O
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+File I/O uses `open()` / `Path.open()` with modes for text or binary. Always use a context manager. Prefer `pathlib` helpers for simple whole-file reads/writes; use streaming for large files.
+
+## 🔧 Core concepts
+
+| Mode | Meaning |
+| --- | --- |
+| `"r"` / `"w"` / `"a"` | Read / write truncate / append (text) |
+| `"rb"` / `"wb"` | Binary |
+| `"x"` | Exclusive create |
+| `"r+"` | Read + write |
+| `encoding=` | Text mode charset (use `utf-8`) |
+| `newline=` | Universal newlines control |
+| `buffered` | Default buffering; `flush` / `fsync` |
+
+Text mode yields `str`; binary yields `bytes`. Line iteration is memory-friendly.
+
+## 💡 Examples
+
+**Text read/write:**
+
+```python
+from pathlib import Path
+
+path = Path("log.txt")
+with path.open("w", encoding="utf-8") as f:
+    f.write("hello\n")
+    f.writelines(["line2\n", "line3\n"])
+
+with path.open("r", encoding="utf-8") as f:
+    for line in f:
+        print(line.rstrip())
+```
+
+**Binary and buffered copy:**
+
+```python
+from pathlib import Path
+
+src, dst = Path("in.bin"), Path("out.bin")
+with src.open("rb") as r, dst.open("wb") as w:
+    while chunk := r.read(1024 * 64):
+        w.write(chunk)
+```
+
+**CSV-ish streaming:**
+
+```python
+from pathlib import Path
+
+def count_rows(path: Path) -> int:
+    with path.open(encoding="utf-8") as f:
+        return sum(1 for _ in f)
+
+print(count_rows(Path("data.csv")))
+```
+
+**Temporary files:**
+
+```python
+import tempfile
+from pathlib import Path
+
+with tempfile.TemporaryDirectory() as td:
+    p = Path(td) / "x.txt"
+    p.write_text("scratch", encoding="utf-8")
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `with` leaks file handles.
+- Writing text without `encoding` uses locale-dependent defaults.
+- `"w"` truncates immediately on open — easy data loss.
+- Mixing str/bytes in the wrong mode raises `TypeError`.
+- On Windows, text mode translates newlines — use binary for exact bytes.
+
+## 🔗 Related
+
+- [Pathlib](pathlib)
+- [Context managers](context_managers)
+- [Bytes / bytearray](bytes_bytearray)
+- [JSON](json)
+- [Examples: manage files](Examples/manage_files)
+- [Walrus](walrus)

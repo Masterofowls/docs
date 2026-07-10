@@ -1,0 +1,87 @@
+---
+title: Selectors
+description: JavaScript DOM · Reference cheat sheet
+---
+
+# Selectors
+
+_JavaScript DOM · Reference cheat sheet_
+
+## 📋 Overview
+
+Find nodes with CSS selectors via `querySelector` / `querySelectorAll`, or with id/class/tag helpers. Use `matches` and `closest` for event delegation. Escape dynamic values with `CSS.escape`.
+
+## 🔧 Core concepts
+
+- **Single**: `parent.querySelector(sel)` → first match or `null`.
+- **All**: `querySelectorAll` → static `NodeList`.
+- **Id**: `getElementById` (document only) — fastest for ids.
+- **Live collections**: `getElementsByClassName`, `getElementsByTagName`, `getElementsByName`.
+- **Test**: `el.matches(sel)`, `el.closest(sel)`.
+- **Scope**: query relative to any `Element` / `Document` / `DocumentFragment`.
+
+```js
+const item = document.querySelector(".list > li.active");
+const items = document.querySelectorAll("[data-id]");
+```
+
+## 💡 Examples
+
+```js
+const root = document.querySelector("#app");
+const btn = root.querySelector("button[type='submit']");
+const rows = root.querySelectorAll("tbody tr");
+
+// Convert to array
+const arr = [...rows];
+
+// Delegation helpers
+list.addEventListener("click", (e) => {
+  const row = e.target.closest("tr[data-id]");
+  if (!row || !list.contains(row)) return;
+  if (e.target.matches("button.delete")) {
+    row.remove();
+  }
+});
+
+// Dynamic id/class
+const id = "section.1";
+document.querySelector(`#${CSS.escape(id)}`);
+
+// Attribute selectors
+document.querySelectorAll('input[name="tags"]:checked');
+document.querySelectorAll("a[href^='https://']");
+
+// :scope in modern engines
+root.querySelectorAll(":scope > .child");
+```
+
+```js
+// Prefer getElementById for plain ids
+document.getElementById("app");
+
+// Live vs static
+const live = document.getElementsByClassName("item");
+const staticList = document.querySelectorAll(".item");
+const extra = document.createElement("div");
+extra.className = "item";
+document.body.append(extra);
+console.log(live.length, staticList.length); // live grew; static did not
+```
+
+## ⚠️ Pitfalls
+
+- Invalid selectors throw `DOMException` — escape user input.
+- `querySelectorAll` is a snapshot; live HTMLCollections update as the DOM changes.
+- `closest` goes upward including itself — check `matches` when you need only ancestors.
+- Descendant queries from a detached tree only search that subtree.
+- Over-specific selectors are brittle — prefer stable `data-*` hooks.
+
+## 🔗 Related
+
+- [document_methods.md](./document_methods) — document queries
+- [events.md](./events) — delegation
+- [attributes.md](./attributes) — data attributes
+- [class.md](./class) — class tokens
+- [create_add_remove.md](./create_add_remove) — building trees
+- [../strings.md](../strings) — building selector strings

@@ -1,0 +1,103 @@
+---
+title: Container Queries
+description: CSS · Reference cheat sheet
+---
+
+# Container Queries
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Container queries style descendants based on a **container’s** size (or style), not the viewport. Perfect for reusable components that adapt in sidebars vs main columns. Define a containment context with `container-type` / `container-name`, then `@container`.
+
+## 🔧 Core concepts
+
+- **Context**: `container-type: inline-size | size | normal` (plus `container-name`).
+- **Shorthand**: `container: name / inline-size;`.
+- **Query**: `@container (min-width: 400px) \{ ... \}` or `@container card (min-width: 400px)`.
+- **Units**: `cqw` `cqh` `cqi` `cqb` `cqmin` `cqmax` relative to container.
+- **Style queries**: `@container style(--variant: compact)` (support evolving).
+- **vs media**: media = viewport/device; container = parent component width.
+
+```css
+.card {
+  container-type: inline-size;
+  container-name: card;
+}
+@container card (min-width: 36rem) {
+  .card-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+```
+
+## 💡 Examples
+
+```css
+.sidebar,
+.main {
+  container: layout / inline-size;
+}
+
+.widget {
+  padding: 1rem;
+}
+@container layout (max-width: 300px) {
+  .widget {
+    font-size: 0.9rem;
+  }
+  .widget .meta {
+    display: none;
+  }
+}
+
+/* Fluid based on container */
+@container (min-width: 20rem) {
+  .title {
+    font-size: clamp(1rem, 4cqi, 1.5rem);
+  }
+}
+
+/* Named vs nearest */
+@container (min-width: 500px) {
+  /* nearest ancestor container */
+}
+
+/* Grid of cards each querying themselves */
+.grid > * {
+  container-type: inline-size;
+}
+```
+
+```css
+/* Need size queries for height */
+.panel {
+  container-type: size;
+  height: 200px;
+}
+@container (min-height: 180px) {
+  .panel .extra {
+    display: block;
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `container-type` means `@container` won’t match as expected.
+- `inline-size` is most common; `size` also applies block-size containment (may affect sizing).
+- Containment can influence layout — test overflow/sticky inside containers.
+- Nested containers: queries use the correct named/nearest context — name them when ambiguous.
+- Older browsers need fallbacks — progressive enhancement with default single-column layouts.
+
+## 🔗 Related
+
+- [media_queries.md](./media_queries) — viewport queries
+- [grid.md](./grid) — responsive grids
+- [adaptive.md](./adaptive) — responsive strategy
+- [calc_min_max_clamp.md](./calc_min_max_clamp) — cqi units
+- [nesting.md](./nesting) — nest @container

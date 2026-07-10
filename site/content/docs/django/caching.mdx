@@ -1,0 +1,88 @@
+---
+title: Caching
+description: Django · Reference cheat sheet
+---
+
+# Caching
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django’s cache framework stores expensive results (pages, fragments, query results) behind a pluggable backend: local memory, Memcached, Redis, database, or file. Configure `CACHES`, then use the low-level API, per-view decorators, or template fragment caching.
+
+## 🔧 Core concepts
+
+| Layer | API |
+| --- | --- |
+| Low-level | `cache.get` / `set` / `add` / `delete` / `get_or_set` |
+| Per-view | `@cache_page(timeout)` |
+| Template | `\{% cache timeout fragment_name %\}` |
+| Middleware | `UpdateCacheMiddleware` + `FetchFromCacheMiddleware` |
+| Keys | `make_template_fragment_key`, versioning via `KEY_PREFIX` / `VERSION` |
+
+Backends: `LocMemCache` (dev), `RedisCache` (Django 4.0+), Memcached, DB, file.
+
+## 💡 Examples
+
+**Settings (Redis):**
+
+```python
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "KEY_PREFIX": "myapp",
+        "TIMEOUT": 300,
+    }
+}
+```
+
+**Low-level:**
+
+```python
+from django.core.cache import cache
+
+def get_article(slug: str):
+    key = f"article:{slug}"
+    article = cache.get(key)
+    if article is None:
+        article = Article.objects.select_related("author").get(slug=slug)
+        cache.set(key, article, timeout=60 * 10)
+    return article
+```
+
+**View + template fragment:**
+
+```python
+from django.views.decorators.cache import cache_page
+
+@cache_page(60 * 15)
+def homepage(request):
+    ...
+```
+
+```html
+{% load cache %}
+{% cache 500 sidebar request.user.pk %}
+  ... expensive ...
+{% endcache %}
+```
+
+## ⚠️ Pitfalls
+
+- Caching personalized pages without varying on user/session → data leaks.
+- `LocMemCache` is per-process—wrong for multi-worker production.
+- Stale cache after writes—invalidate keys in signals/services.
+- Pickling large querysets—cache IDs or rendered HTML instead.
+- Forgetting `KEY_PREFIX` when sharing Redis across apps.
+
+## 🔗 Related
+
+- [Settings](settings)
+- [Signals](signals)
+- [Templates](templates)
+- [Sessions](sessions)
+- [Middleware](middleware)

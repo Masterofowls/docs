@@ -1,0 +1,98 @@
+---
+title: Authentication
+description: Django · Reference cheat sheet
+---
+
+# Authentication
+
+_Django · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Django’s auth system provides users, permissions, groups, password hashing, and session login. Use `django.contrib.auth` views/forms for classic sites, or packages like django-allauth for social login. Always authenticate against hashed passwords—never store plaintext.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `User` / custom user | `AUTH_USER_MODEL` |
+| `authenticate` / `login` / `logout` | Session auth helpers |
+| `login_required` / `PermissionRequiredMixin` | Protect views |
+| Permissions | `app_label.codename` (`add`/`change`/`delete`/`view`) |
+| Password validators | `AUTH_PASSWORD_VALIDATORS` |
+| Backends | `AUTHENTICATION_BACKENDS` (ModelBackend default) |
+
+Sessions middleware + `AuthenticationMiddleware` attach `request.user`.
+
+## 💡 Examples
+
+**Login view (function):**
+
+```python
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
+
+
+def login_view(request):
+    if request.method == "POST":
+        user = authenticate(
+            request,
+            username=request.POST["username"],
+            password=request.POST["password"],
+        )
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+    return render(request, "registration/login.html")
+```
+
+**Protect a view:**
+
+```python
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
+
+
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html")
+
+
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard.html"
+    login_url = "login"
+```
+
+**Custom user (recommended early):**
+
+```python
+# accounts/models.py
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class User(AbstractUser):
+    bio = models.TextField(blank=True)
+
+# settings.py
+AUTH_USER_MODEL = "accounts.User"
+```
+
+## ⚠️ Pitfalls
+
+- Changing `AUTH_USER_MODEL` after migrations is painful—set it at project start.
+- `authenticate` returns `None` on failure; do not leak whether username exists.
+- CSRF must stay enabled on login POSTs.
+- API token/JWT auth is separate—use DRF authentication classes for APIs.
+
+## 🔗 Related
+
+- [django-allauth](django_allauth)
+- [Admin](admin)
+- [Views](views)
+- [Built-in class-based views](buildin_views)
+- [Settings](settings)
+- [REST framework](rest_framework)
