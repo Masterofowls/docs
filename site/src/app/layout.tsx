@@ -1,7 +1,9 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { AppProviders } from '@/components/app-providers';
 import { PwaShell } from '@/components/pwa/pwa-shell';
+import { SEARCH_TOPIC_TAGS } from '@/lib/search/config';
 import { appName } from '@/lib/shared';
 import './global.css';
 
@@ -64,6 +66,8 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {
+  const searchApi = `${basePath}/api/search`;
+
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
@@ -71,11 +75,24 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           search={{
             options: {
               type: 'static',
+              api: searchApi,
+              allowClear: true,
+              tags: SEARCH_TOPIC_TAGS.map((t) => ({
+                name: t.name,
+                value: t.value,
+              })),
+              links: [
+                ['Open full search', `${basePath}/search/`],
+                ['Bookmarks', `${basePath}/bookmarks/`],
+                ['Docs home', `${basePath}/docs/`],
+              ],
             },
           }}
         >
-          {children}
-          <PwaShell />
+          <AppProviders>
+            {children}
+            <PwaShell />
+          </AppProviders>
         </RootProvider>
       </body>
     </html>

@@ -17,8 +17,12 @@ function url(path) {
 const PRECACHE = [
   url('/'),
   url('/docs/'),
+  url('/search/'),
+  url('/bookmarks/'),
+  url('/account/'),
   url('/offline/'),
   url('/manifest.webmanifest'),
+  url('/api/search'),
   url('/icons/icon-192.png'),
   url('/icons/icon-512.png'),
   url('/icons/maskable-512.png'),

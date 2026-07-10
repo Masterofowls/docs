@@ -37,9 +37,11 @@ site/
 └── package.json
 ```
 
-## Progressive Web App
+## Search, bookmarks & auth
 
-The site is installable:
+- **Search** — Ctrl+K dialog (static Orama) + `/search` page with topic filters
+- **Bookmarks** — per-page Bookmark button; list at `/bookmarks` (localStorage)
+- **Account** — `/account` sign-in with a GitHub personal access token (`read:user` only)
 
 - Web app manifest (`src/app/manifest.ts`)
 - Service worker (`public/sw.js`) — network-first pages, SWR assets, offline fallback

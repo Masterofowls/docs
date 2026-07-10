@@ -46,10 +46,16 @@ export default function HomePage() {
             Open docs
           </Link>
           <Link
-            href="/docs/python"
+            href="/search"
             className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
           >
-            Start with Python
+            Search
+          </Link>
+          <Link
+            href="/account"
+            className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
+          >
+            Sign in
           </Link>
         </div>
       </header>
