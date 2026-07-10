@@ -12,6 +12,9 @@ const staticExport = process.env.STATIC_EXPORT === 'true' || Boolean(basePath);
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   turbopack: {
     root,
   },

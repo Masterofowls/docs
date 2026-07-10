@@ -37,6 +37,13 @@ site/
 └── package.json
 ```
 
-## Topics (layout tabs)
+## Progressive Web App
 
-Python · JavaScript · TypeScript · React · React Native · CSS · HTML · Django · Git · SQL
+The site is installable:
+
+- Web app manifest (`src/app/manifest.ts`)
+- Service worker (`public/sw.js`) — network-first pages, SWR assets, offline fallback
+- Install prompt + offline banner (`src/components/pwa/`)
+- Icons via `npm run icons:pwa`
+
+Open `/offline` to preview the offline page. Service workers require HTTPS (or localhost).

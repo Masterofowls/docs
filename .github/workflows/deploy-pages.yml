@@ -39,6 +39,7 @@ jobs:
         env:
           STATIC_EXPORT: 'true'
           BASE_PATH: /docs
+          NEXT_PUBLIC_BASE_PATH: /docs
           NEXT_PUBLIC_SITE_URL: https://masterofowls.github.io/docs
           NEXT_TELEMETRY_DISABLED: '1'
 

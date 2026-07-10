@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "sync:content": "node scripts/sync-content.mjs",
-    "predev": "node scripts/sync-content.mjs && fumadocs-mdx",
-    "prebuild": "node scripts/sync-content.mjs && fumadocs-mdx",
+    "icons:pwa": "node scripts/generate-pwa-icons.mjs",
+    "predev": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
+    "prebuild": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
