@@ -1,5 +1,8 @@
 # Activity Log
 
+## 2026-07-11 13:10:00 -07:00
+- Expanded Global Glossary from 140 → **500** interview terms (security, testing, system design, K8s, React, SQL, patterns). Generator: `site/scripts/build-global-glossary.mjs` + `global-glossary-terms.mjs`.
+
 ## 2026-07-11 10:55:00 -07:00
 - Added **Global Glossary** section (`GlobalGlossary/global_glossary.md`): 140 cross-stack interview terms (TLS, JWT, ORM, CI/CD, black-box testing, etc.) in one table. Wired into `topics.json`, nav, search tags. Slimmed Orama search index (~5 MiB) for CF 25 MiB limit.
 
