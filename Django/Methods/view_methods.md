@@ -1,0 +1,55 @@
+# View & Shortcut Methods
+
+_Django · Methods reference_
+
+---
+
+## 📋 Overview
+
+Function/ class views and common django.shortcuts.
+
+## 🔧 Methods
+
+### Shortcuts
+
+| Function | Description |
+| --- | --- |
+| `render(request, template, context)` | HttpResponse with template |
+| `redirect(to, …)` | 302/301 redirect response |
+| `get_object_or_404(Model, …)` | get() or Http404 |
+| `get_list_or_404(qs, …)` | Non-empty list or Http404 |
+
+### Class-based views
+
+| Method / attribute | Description |
+| --- | --- |
+| `as_view()` | Class → callable for URLconf |
+| `dispatch(request, …)` | Route HTTP method to handler |
+| `get` / `post` / `put` / `delete` | HTTP verb handlers |
+| `get_context_data(**kwargs)` | Build template context |
+| `form_valid` / `form_invalid` | FormView hooks |
+
+### Decorators
+
+| Decorator | Description |
+| --- | --- |
+| `@login_required` | Redirect unauthenticated users |
+| `@permission_required(codename)` | 403 if missing perm |
+| `@require_http_methods([…])` | Allow only listed verbs |
+| `@csrf_exempt` | Disable CSRF check (use carefully) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Views](../views.md)
+- [Built-in class-based views](../buildin_views.md)

@@ -1,0 +1,80 @@
+---
+title: Array Methods
+description: JavaScript · Methods reference
+---
+
+_JavaScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+All common `Array` prototype methods (ES2024). Prefer non-mutating `toSorted`/`toReversed` when state is shared.
+
+## 🔧 Methods
+
+### Static
+
+| Method | Description |
+| --- | --- |
+| `Array.isArray(v)` | True for real arrays |
+| `Array.from(iter, mapFn?)` | From iterable/array-like |
+| `Array.fromAsync(asyncIter)` | Await async iterable (ES2024) |
+| `Array.of(...items)` | Create from items (not length trap) |
+
+### Mutating
+
+| Method | Description |
+| --- | --- |
+| `push(...items)` / `pop()` | End add/remove |
+| `unshift(...items)` / `shift()` | Start add/remove — O(n) |
+| `splice(start, deleteCount, ...items)` | Delete/insert; returns removed |
+| `sort(compareFn?)` | In-place sort — default string order |
+| `reverse()` | In-place reverse |
+| `fill(value, start?, end?)` | Fill range |
+| `copyWithin(target, start, end?)` | Copy slice within array |
+
+### Non-mutating (ES2023+)
+
+| Method | Description |
+| --- | --- |
+| `toSorted(compareFn?)` | Sorted copy |
+| `toReversed()` | Reversed copy |
+| `toSpliced(start, deleteCount, ...items)` | Spliced copy |
+| `with(index, value)` | Copy with one index replaced |
+| `slice(start?, end?)` | Shallow subarray copy |
+| `concat(...items)` | Concatenate into new array |
+
+### Search & iterate
+
+| Method | Description |
+| --- | --- |
+| `at(index)` | Element at index (supports negative) |
+| `includes(value, fromIndex?)` | SameValueZero membership |
+| `indexOf` / `lastIndexOf` | Strict index or -1 |
+| `find` / `findLast` | First/last match by predicate |
+| `findIndex` / `findLastIndex` | Index of match or -1 |
+| `some` / `every` | Any / all pass predicate |
+| `forEach(fn)` | Side-effect iteration |
+| `map` / `filter` | Transform / keep elements |
+| `flat(depth?)` / `flatMap(fn)` | Flatten nested arrays |
+| `reduce` / `reduceRight` | Fold left / right |
+| `keys` / `values` / `entries` | Iterator of indices/values/pairs |
+| `join(separator?)` | Join to string |
+| `Object.groupBy(arr, fn)` | Group into object of arrays (ES2024) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Arrays](/docs/javascript/arrays)
+- [Objects](/docs/javascript/objects)

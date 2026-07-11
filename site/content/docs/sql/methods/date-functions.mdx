@@ -1,0 +1,44 @@
+---
+title: "Date & Time Functions"
+description: SQL · Methods reference
+---
+
+_SQL · Methods reference_
+
+---
+
+## 📋 Overview
+
+Extract, truncate, and format dates/times.
+
+## 🔧 Methods
+
+### Common
+
+| Function | Description |
+| --- | --- |
+| `NOW()` / `CURRENT_TIMESTAMP` | Current transaction timestamp |
+| `CURRENT_DATE` / `CURRENT_TIME` | Date or time component |
+| `EXTRACT(field FROM ts)` | Year, month, day, hour, … |
+| `DATE_TRUNC(unit, ts)` (PG) | Truncate to unit bucket |
+| `AGE(ts1, ts2)` (PG) | Interval between timestamps |
+| `DATE_FORMAT(ts, fmt)` (MySQL) | Format as string |
+| `TO_CHAR(ts, fmt)` (PG) | Format timestamp to string |
+| `TO_DATE(str, fmt)` / `TO_TIMESTAMP` | Parse string to date/time |
+| `INTERVAL '1 day'` (PG) | Interval literals |
+| `AT TIME ZONE` (PG) | Convert timezone |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Built-in functions](/docs/sql/functions-builtin)

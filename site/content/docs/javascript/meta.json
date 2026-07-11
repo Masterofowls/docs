@@ -87,6 +87,7 @@
     "web-workers",
     "while",
     "...dom",
-    "...examples"
+    "...examples",
+    "...methods"
   ]
 }

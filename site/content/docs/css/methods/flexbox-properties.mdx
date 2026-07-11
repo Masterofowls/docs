@@ -1,0 +1,51 @@
+---
+title: Flexbox Properties
+description: CSS · Methods reference
+---
+
+_CSS · Methods reference_
+
+---
+
+## 📋 Overview
+
+All common flex container and flex item properties.
+
+## 🔧 Methods
+
+### Container
+
+| Property | Values / notes |
+| --- | --- |
+| `display: flex | inline-flex` | Enable flex formatting context |
+| `flex-direction` | row | row-reverse | column | column-reverse |
+| `flex-wrap` | nowrap | wrap | wrap-reverse |
+| `flex-flow` | Shorthand direction + wrap |
+| `justify-content` | main-axis: flex-start | center | space-between | … |
+| `align-items` | cross-axis per line |
+| `align-content` | cross-axis extra space between lines |
+| `gap` / `row-gap` / `column-gap` | Gutters between items |
+
+### Items
+
+| Property | Description |
+| --- | --- |
+| `flex-grow` / `flex-shrink` / `flex-basis` | Growth, shrink, base size |
+| `flex` | Shorthand: grow shrink basis |
+| `align-self` | Override align-items for one item |
+| `order` | Visual order (not a11y order) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Flex](/docs/css/flex)

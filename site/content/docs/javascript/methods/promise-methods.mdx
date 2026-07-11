@@ -1,0 +1,49 @@
+---
+title: Promise Methods
+description: JavaScript · Methods reference
+---
+
+_JavaScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+Promise constructor and static combinators for async control flow.
+
+## 🔧 Methods
+
+### Instance
+
+| Method | Description |
+| --- | --- |
+| `then(onFulfilled?, onRejected?)` | Chain on fulfillment/rejection |
+| `catch(onRejected)` | Handle rejection |
+| `finally(onFinally)` | Run on settle either way |
+
+### Static
+
+| Method | Description |
+| --- | --- |
+| `Promise.resolve(value)` | Fulfilled promise |
+| `Promise.reject(reason)` | Rejected promise |
+| `Promise.all(iterable)` | All fulfill or first reject |
+| `Promise.allSettled(iterable)` | Wait for all; never rejects |
+| `Promise.race(iterable)` | First settled wins |
+| `Promise.any(iterable)` | First fulfill; AggregateError if all reject |
+| `Promise.withResolvers()` | Deferred \{promise, resolve, reject\} (ES2024) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Async](/docs/javascript/async)

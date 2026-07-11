@@ -1,0 +1,11 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "field-lookups",
+    "form-methods",
+    "model-manager-methods",
+    "queryset-methods",
+    "view-methods"
+  ]
+}

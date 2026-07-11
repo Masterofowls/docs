@@ -1,0 +1,11 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "array-methods",
+    "map-set-methods",
+    "object-methods",
+    "promise-methods",
+    "string-methods"
+  ]
+}

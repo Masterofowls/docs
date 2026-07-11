@@ -1,0 +1,10 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "array-object-methods",
+    "class-methods",
+    "type-operators",
+    "utility-types-methods"
+  ]
+}

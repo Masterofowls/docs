@@ -1,0 +1,58 @@
+# String Methods
+
+_JavaScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+All common `String` prototype methods. Strings are immutable in JS.
+
+## 🔧 Methods
+
+### Search & extract
+
+| Method | Description |
+| --- | --- |
+| `at(index)` | Char at index (negative OK) |
+| `charAt(i)` / `charCodeAt(i)` | Character / UTF-16 code unit |
+| `codePointAt(i)` | Full Unicode code point |
+| `includes(search, position?)` | Substring test |
+| `startsWith` / `endsWith` | Prefix/suffix test |
+| `indexOf` / `lastIndexOf` | Index or -1 |
+| `match(regexp)` / `matchAll(regexp)` | RegExp matches |
+| `search(regexp)` | Index of first RegExp match |
+| `slice(start?, end?)` | Substring copy |
+| `substring(start, end)` | Like slice but swaps negative to 0 |
+| `substr(start, length)` | Legacy — avoid; use slice |
+
+### Transform
+
+| Method | Description |
+| --- | --- |
+| `toLowerCase()` / `toUpperCase()` | Case change |
+| `trim()` / `trimStart()` / `trimEnd()` | Whitespace trim |
+| `replace(search, replacement)` | First match or global with /g |
+| `replaceAll(search, replacement)` | Replace all occurrences |
+| `split(separator?, limit?)` | Split to array |
+| `concat(...strings)` | Concatenate strings |
+| `repeat(count)` | Repeat string n times |
+| `padStart(len, pad?)` / `padEnd` | Pad to length |
+| `normalize(form?)` | Unicode normalization |
+| `localeCompare(other)` | Locale-aware compare |
+| `toWellFormed()` | Fix lone surrogates (ES2024) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Strings](../strings.md)

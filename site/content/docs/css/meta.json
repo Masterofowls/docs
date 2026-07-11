@@ -60,6 +60,7 @@
     "transitions",
     "variables",
     "z-index",
-    "...examples"
+    "...examples",
+    "...methods"
   ]
 }

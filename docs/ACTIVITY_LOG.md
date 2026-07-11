@@ -1,5 +1,8 @@
 # Activity Log
 
+## 2026-07-11 13:55:00 -07:00
+- Added **Methods** reference cheat sheets for Python, JavaScript, TypeScript, CSS, SQL, React, and Django (`*/Methods/` — 34 pages + 7 index READMEs). Generator: `site/scripts/gen-methods-notes.mjs`. Synced 883 notes.
+
 ## 2026-07-11 13:10:00 -07:00
 - Expanded Global Glossary from 140 → **500** interview terms (security, testing, system design, K8s, React, SQL, patterns). Generator: `site/scripts/build-global-glossary.mjs` + `global-glossary-terms.mjs`.
 

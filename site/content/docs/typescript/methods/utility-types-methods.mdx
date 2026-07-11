@@ -1,0 +1,51 @@
+---
+title: Utility Type Methods
+description: TypeScript · Methods reference
+---
+
+_TypeScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+Built-in generic utility types — the “methods” of the type system for transforms.
+
+## 🔧 Methods
+
+### Object utilities
+
+| Utility | Description |
+| --- | --- |
+| `Partial<T>` | All properties optional |
+| `Required<T>` | All properties required |
+| `Readonly<T>` | All properties readonly |
+| `Pick<T, K>` | Subset of keys K |
+| `Omit<T, K>` | T without keys K |
+| `Record<K, V>` | Object type with keys K and values V |
+| `Exclude<T, U>` | Remove from T assignable to U |
+| `Extract<T, U>` | Keep in T assignable to U |
+| `NonNullable<T>` | Remove null and undefined |
+| `ReturnType<F>` | Function return type |
+| `Parameters<F>` | Function parameter tuple |
+| `ConstructorParameters<C>` | Constructor args tuple |
+| `InstanceType<C>` | Instance type of constructor |
+| `ThisParameterType<F>` | `this` type of function |
+| `OmitThisParameter<F>` | Function without this param |
+| `Awaited<T>` | Unwrap Promise nested type |
+| `Uppercase<S>` / `Lowercase<S>` / `Capitalize` / `Uncapitalize` | String type transforms |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Utility types](/docs/typescript/utility-types)

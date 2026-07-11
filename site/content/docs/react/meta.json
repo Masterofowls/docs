@@ -54,6 +54,7 @@
     "useref",
     "usestate",
     "usetransition",
-    "...examples"
+    "...examples",
+    "...methods"
   ]
 }

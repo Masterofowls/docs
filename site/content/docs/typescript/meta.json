@@ -48,6 +48,7 @@
     "why-typescript",
     "zod-integration",
     "zod-integration",
-    "...examples"
+    "...examples",
+    "...methods"
   ]
 }

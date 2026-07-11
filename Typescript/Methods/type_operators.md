@@ -1,0 +1,43 @@
+# Type Operators
+
+_TypeScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+Type-level operators and keywords for narrowing and composition.
+
+## 🔧 Methods
+
+### Operators
+
+| Operator | Description |
+| --- | --- |
+| `keyof T` | Union of keys of T |
+| `typeof x` | Type of value or typeof type query |
+| `T[K]` | Indexed access type |
+| `T & U` / `T | U` | Intersection / union |
+| `T extends U ? X : Y` | Conditional type |
+| `infer U` | Capture type in conditional |
+| `readonly T` / `readonly T[]` | Readonly modifier |
+| `+?` / `-?` / `+readonly` / `-readonly` | Mapped type modifiers |
+| `as const` | Literal/narrow readonly inference |
+| `satisfies T` | Check type without widening |
+| `asserts` / `is` predicates | Type guard return annotations |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Keyof typeof](../keyof_typeof.md)
+- [Conditional types](../conditional_types.md)

@@ -1,0 +1,44 @@
+# Object Static Methods
+
+_JavaScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+`Object` static methods for keys, assign, create, and property descriptors.
+
+## 🔧 Methods
+
+### Object static methods
+
+| Method | Description |
+| --- | --- |
+| `Object.assign(target, ...sources)` | Copy enumerable own props to target |
+| `Object.create(proto, descriptors?)` | New object with prototype |
+| `Object.defineProperty` / `defineProperties` | Define descriptors |
+| `Object.entries(obj)` / `values` / `keys` | Enumerable own props |
+| `Object.fromEntries(iterable)` | Build object from [k,v] pairs |
+| `Object.getOwnPropertyDescriptor(s)` | Read property metadata |
+| `Object.getOwnPropertyNames` / `getOwnPropertySymbols` | Own keys/symbols |
+| `Object.getPrototypeOf` / `setPrototypeOf` | Prototype chain |
+| `Object.is(value1, value2)` | SameValue equality (NaN, -0) |
+| `Object.freeze` / `seal` / `preventExtensions` | Immutability levels |
+| `Object.isFrozen` / `isSealed` / `isExtensible` | Test immutability |
+| `Object.hasOwn(obj, prop)` | Own property check (ES2022) |
+| `Object.groupBy(items, fn)` | Group iterable to object (ES2024) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Objects](../objects.md)

@@ -1,0 +1,11 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "bytes-methods",
+    "dict-methods",
+    "list-methods",
+    "set-methods",
+    "str-methods"
+  ]
+}

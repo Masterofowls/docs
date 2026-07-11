@@ -1,0 +1,10 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "class-component-methods",
+    "component-api",
+    "hooks-api",
+    "react-dom-methods"
+  ]
+}

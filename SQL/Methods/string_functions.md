@@ -1,0 +1,41 @@
+# String Functions
+
+_SQL · Methods reference_
+
+---
+
+## 📋 Overview
+
+String manipulation — names vary slightly by dialect.
+
+## 🔧 Methods
+
+### Standard / common
+
+| Function | Description |
+| --- | --- |
+| `CONCAT(a, b, …)` / `||` (PG) | Concatenate strings |
+| `LENGTH` / `CHAR_LENGTH` | Character length |
+| `LOWER` / `UPPER` | Case conversion |
+| `TRIM` / `LTRIM` / `RTRIM` | Remove whitespace/chars |
+| `SUBSTRING(str FROM start FOR len)` | Extract substring |
+| `REPLACE(str, from, to)` | Replace occurrences |
+| `POSITION(sub IN str)` / `INSTR` | Find substring index |
+| `LPAD` / `RPAD` | Pad to length |
+| `SPLIT_PART(str, delim, n)` (PG) | Nth split segment |
+| `REGEXP_REPLACE` / `REGEXP_MATCHES` (PG) | Regex ops |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Built-in functions](../functions_builtin.md)

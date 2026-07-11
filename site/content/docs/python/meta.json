@@ -90,6 +90,7 @@
     "venv",
     "walrus",
     "zip-enumerate-map-filter",
-    "...examples"
+    "...examples",
+    "...methods"
   ]
 }

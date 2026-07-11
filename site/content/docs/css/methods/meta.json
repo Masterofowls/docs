@@ -1,0 +1,12 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "color-background-properties",
+    "flexbox-properties",
+    "functions-reference",
+    "grid-properties",
+    "layout-properties",
+    "typography-properties"
+  ]
+}

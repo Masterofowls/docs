@@ -1,0 +1,52 @@
+---
+title: "Color & Background Properties"
+description: CSS · Methods reference
+---
+
+_CSS · Methods reference_
+
+---
+
+## 📋 Overview
+
+Color, gradients, and background layering.
+
+## 🔧 Methods
+
+### Color
+
+| Property / function | Description |
+| --- | --- |
+| `color` | Text color |
+| `opacity` | Element + descendants alpha |
+| `color-mix()` | Mix two colors in oklab/srgb |
+| `oklch()` / `hsl()` / `rgb()` | Modern color functions |
+| `currentColor` | Inherit text color keyword |
+
+### Background
+
+| Property | Description |
+| --- | --- |
+| `background-color` | Fill behind content |
+| `background-image` | url() or gradient |
+| `background-size` / `position` / `repeat` | Image layout |
+| `background-attachment` | scroll | fixed | local |
+| `background-clip` / `origin` | Border-box vs padding-box |
+| `background` | Shorthand |
+| `linear-gradient()` / `radial-gradient()` | Gradient functions |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Background](/docs/css/background)
+- [Gradient](/docs/css/gradient)

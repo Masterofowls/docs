@@ -1,0 +1,45 @@
+# Window Functions
+
+_SQL · Methods reference_
+
+---
+
+## 📋 Overview
+
+Analytics over a partition without collapsing rows — `OVER (PARTITION BY … ORDER BY …)`.
+
+## 🔧 Methods
+
+### Ranking
+
+| Function | Description |
+| --- | --- |
+| `ROW_NUMBER()` | Sequential 1..n in partition |
+| `RANK()` | Rank with gaps on ties |
+| `DENSE_RANK()` | Rank without gaps |
+| `NTILE(n)` | Split into n buckets |
+| `PERCENT_RANK()` / `CUME_DIST()` | Relative rank metrics |
+
+### Value & aggregate windows
+
+| Function | Description |
+| --- | --- |
+| `LAG(col, n)` / `LEAD(col, n)` | Previous / next row value |
+| `FIRST_VALUE` / `LAST_VALUE` / `NTH_VALUE` | Window frame extremes |
+| `SUM/AVG/COUNT(...) OVER (...)` | Running or partitioned aggregates |
+| `FRAME` clauses | ROWS BETWEEN / RANGE BETWEEN bounds |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Window functions](../window_functions.md)

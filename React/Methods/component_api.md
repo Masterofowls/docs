@@ -1,0 +1,44 @@
+# Component API
+
+_React · Methods reference_
+
+---
+
+## 📋 Overview
+
+React export APIs for elements, fragments, and memoization.
+
+## 🔧 Methods
+
+### React exports
+
+| API | Description |
+| --- | --- |
+| `createElement(type, props, ...children)` | Create element object |
+| `cloneElement(element, props, ...children)` | Clone with merged props |
+| `createContext(default)` | Context object with Provider/Consumer |
+| `forwardRef(render)` | Forward ref to child DOM/component |
+| `memo(Component, areEqual?)` | Skip re-render if props shallow-equal |
+| `lazy(() => import())` | Code-split component |
+| `Suspense` | Fallback while children suspend |
+| `Fragment` / `<>...</>` | Group without DOM node |
+| `StrictMode` | Dev double-render checks |
+| `startTransition(fn)` | Mark updates as transitions |
+| `cache(fn)` (RSC) | Dedupe server fetches |
+| `use()` (19) | Read promise/context in render |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Component](../component.md)
+- [Memo](../memo.md)

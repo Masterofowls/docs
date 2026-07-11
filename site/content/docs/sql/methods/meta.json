@@ -1,0 +1,11 @@
+{
+  "title": "Methods",
+  "pages": [
+    "index",
+    "aggregate-functions",
+    "conditional-cast-functions",
+    "date-functions",
+    "string-functions",
+    "window-functions-methods"
+  ]
+}

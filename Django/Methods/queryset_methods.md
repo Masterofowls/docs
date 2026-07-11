@@ -1,0 +1,57 @@
+# QuerySet Methods
+
+_Django · Methods reference_
+
+---
+
+## 📋 Overview
+
+Chainable `QuerySet` API — lazy until evaluated.
+
+## 🔧 Methods
+
+### Filter & slice
+
+| Method | Description |
+| --- | --- |
+| `filter(**kwargs)` | Narrow rows (AND lookups) |
+| `exclude(**kwargs)` | Negated filter |
+| `get(**kwargs)` | Exactly one row or exception |
+| `all()` | Copy of entire queryset |
+| `none()` | Empty queryset |
+| `distinct(*fields)` | SQL DISTINCT |
+| `order_by(*fields)` | Sort; prefix - for DESC |
+| `reverse()` | Reverse ordering |
+| `values(*fields)` / `values_list` | Dicts or tuples instead of models |
+| `only` / `defer` | Limit columns fetched |
+| `select_related(*fields)` | SQL JOIN for FK/O2O |
+| `prefetch_related(*lookups)` | Separate query for M2M/reverse FK |
+| `annotate(**kwargs)` | Add aggregate per row |
+| `aggregate(**kwargs)` | Whole-set aggregates |
+| `exists()` | True if any row matches |
+| `count()` | Number of rows |
+| `first()` / `last()` | First/last row or None |
+| `earliest` / `latest` | By date field |
+| `update(**kwargs)` | Bulk SQL UPDATE — no save() signals |
+| `delete()` | Bulk delete with cascade counts |
+| `create(**kwargs)` | INSERT one row |
+| `get_or_create` / `update_or_create` | Atomic get/create patterns |
+| `bulk_create` / `bulk_update` | Batch writes |
+| `iterator(chunk_size=…)` | Stream large results |
+| `explain()` | SQL plan (debug) |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [QuerySet](../queryset.md)
+- [Models](../models.md)

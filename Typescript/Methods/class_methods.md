@@ -1,0 +1,50 @@
+# Class & Interface Methods
+
+_TypeScript · Methods reference_
+
+---
+
+## 📋 Overview
+
+Class members, access modifiers, and interface method signatures.
+
+## 🔧 Methods
+
+### Class members
+
+| Member | Description |
+| --- | --- |
+| `constructor(...)` | Initialize instance |
+| `method()` / `get` / `set` | Instance methods and accessors |
+| `static method()` | On constructor function |
+| `#privateField` | True private (ES2022) |
+| `protected` / `private` / `public` | Visibility modifiers |
+| `readonly prop` | Assign-once property |
+| `abstract class` / `abstract method` | Must be implemented by subclass |
+| `implements I` | Class satisfies interface contract |
+| `override` | Explicit override of base method (4.3+) |
+
+### Interface / type shapes
+
+| Form | Description |
+| --- | --- |
+| `interface I { fn(): void }` | Callable method signature |
+| `type F = (x: T) => R` | Function type alias |
+| `Optional prop?: T` | May be undefined |
+| `Index signature [k: string]: T` | Dynamic keys |
+
+## 💡 Examples
+
+See parent topic notes for runnable snippets; this page is the **complete method index**.
+
+## ⚠️ Pitfalls
+
+- Mutating methods return `None` in Python — do not chain `sort()` / `reverse()` expecting a new list.
+- Default JS `sort()` compares strings — pass `(a,b) => a-b` for numbers.
+- SQL function names differ by dialect — verify Postgres vs MySQL docs.
+- Django `QuerySet.update()` skips `save()` signals and auto `auto_now` fields on models.
+
+## 🔗 Related
+
+- [Class](../class.md)
+- [Interfaces](../interfaces.md)
