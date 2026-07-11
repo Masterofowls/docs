@@ -2,7 +2,9 @@
   "title": "Examples",
   "pages": [
     "index",
+    "api-fetch-mock",
     "async-user-event",
+    "auth-guard-test",
     "mock-module"
   ]
 }

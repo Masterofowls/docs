@@ -1,0 +1,62 @@
+# Glossary
+
+_Node.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of Node.js runtime, modules, and server-framework terms.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Buffer | Fixed-size binary data type for bytes. |
+| CJS | CommonJS modules using `require` / `module.exports`. |
+| Event loop | Core scheduler for timers, I/O, and microtasks. |
+| ESM | ECMAScript modules using `import` / `export`. |
+| Express | Minimal, unopinionated HTTP framework. |
+| Fastify | Schema-oriented, high-performance HTTP framework. |
+| libuv | C library providing Node’s async I/O and threadpool. |
+| Middleware | Function in a pipeline that can handle or forward a request. |
+| npm | Default package manager and registry client. |
+| package.json | Manifest for deps, scripts, and package metadata. |
+| Plugin (Fastify) | Encapsulated unit of routes, hooks, and decorations. |
+| semver | Semantic versioning (`major.minor.patch`). |
+| Stream | Abstract interface for streaming data (readable/writable). |
+| Worker thread | Separate V8 isolate for CPU-heavy work. |
+| `node:` prefix | Built-in module import specifier (`node:fs`). |
+
+## 💡 Examples
+
+**Built-in import:**
+
+```js
+import fs from "node:fs/promises";
+import { createServer } from "node:http";
+```
+
+**Detect ESM vs CJS mentally:**
+
+```json
+{ "type": "module" }
+```
+
+```js
+// with "type": "module" → import works
+// without → require is default unless .mjs
+```
+
+## ⚠️ Pitfalls
+
+- “Node version” vs “framework version” — always note both when debugging.
+- Global installs hide which binary your shell resolves — prefer local tooling.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [http_server.md](./http_server.md)
+- [express_basics.md](./express_basics.md)
+- [fastify_basics.md](./fastify_basics.md)
+- [README.md](./README.md)

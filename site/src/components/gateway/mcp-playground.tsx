@@ -32,6 +32,7 @@ type McpManifest = {
 const DEFAULT_ARGS: Record<string, string> = {
   get_page_markdown: '{"slugs":"python/glossary"}',
   search_docs: '{"query":"async","tag":"python"}',
+  export_topic_markdown: '{"topic":"nextjs"}',
 };
 
 async function runWebTool(
@@ -60,6 +61,23 @@ async function runWebTool(
   if (name === 'list_glossaries') {
     const r = await fetch(withBase('/api/v1/glossaries'));
     return { ok: r.ok, status: r.status, body: await r.text() };
+  }
+  if (name === 'get_coverage') {
+    const r = await fetch(withBase('/api/v1/coverage'));
+    return { ok: r.ok, status: r.status, body: await r.text() };
+  }
+  if (name === 'export_topic_markdown') {
+    const topic = String(args.topic || '').trim();
+    if (!topic) {
+      return { ok: false, status: 0, body: 'Missing topic slug' };
+    }
+    const r = await fetch(withBase(`/api/v1/topic-export/${topic}`));
+    const text = await r.text();
+    return {
+      ok: r.ok,
+      status: r.status,
+      body: text.length > 8000 ? `${text.slice(0, 8000)}\n\n… truncated for UI …` : text,
+    };
   }
   if (name === 'export_all_markdown') {
     const r = await fetch(withBase('/api/v1/export'));

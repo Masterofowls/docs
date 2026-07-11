@@ -1,0 +1,52 @@
+# Statistics
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`statistics` is the stdlib module for basic descriptive stats on numeric data. For heavy analysis and DataFrames, prefer [pandas](pandas.md) / NumPy.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `mean` / `fmean` | Arithmetic mean (`fmean` faster for floats) |
+| `median` / `mode` | Middle value / most common |
+| `pstdev` / `stdev` | Population / sample stdev |
+| `pvariance` / `variance` | Variance |
+| `quantiles` | Cut points |
+| `correlation` | Pearson correlation (3.10+) |
+
+## 💡 Examples
+
+```python
+from statistics import mean, median, mode, stdev
+
+xs = [2, 4, 4, 4, 5, 5, 7, 9]
+print(mean(xs), median(xs), mode(xs))
+print(stdev(xs))
+```
+
+```python
+from statistics import quantiles, correlation
+
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+print(quantiles(data, n=4))  # quartiles
+print(correlation([1, 2, 3], [2, 4, 6]))
+```
+
+## ⚠️ Pitfalls
+
+- Empty sequences raise `StatisticsError`.
+- `mode` raises if no unique mode (use `multimode`).
+- Sample vs population (`stdev` vs `pstdev`) — know which you need.
+- Not a substitute for pandas groupby / NumPy vectorized ops on large data.
+
+## 🔗 Related
+
+- [pandas](pandas.md)
+- [random](random.md)
+- [lists](lists.md)
+- [functools](functools.md)

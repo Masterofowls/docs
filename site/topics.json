@@ -4,9 +4,17 @@
   { "src": "Typescript", "slug": "typescript", "title": "TypeScript", "description": "Types, generics, tooling", "icon": "FileType" },
   { "src": "React", "slug": "react", "title": "React", "description": "Components, hooks, patterns", "icon": "Component" },
   { "src": "React Native", "slug": "react-native", "title": "React Native", "description": "Mobile UI, APIs, Expo", "icon": "Smartphone" },
-  { "src": "CSS", "slug": "css", "title": "CSS", "description": "Layout, cascade, modern CSS", "icon": "Palette" },
+  { "src": "Next.js", "slug": "nextjs", "title": "Next.js", "description": "App Router, RSC, deployment", "icon": "Globe" },
+  { "src": "Node", "slug": "node", "title": "Node.js", "description": "Express, Fastify, HTTP servers", "icon": "Server" },
+  { "src": "Zod", "slug": "zod", "title": "Zod", "description": "Schema validation & TypeScript inference", "icon": "Shield" },
+  { "src": "Tailwind", "slug": "tailwind", "title": "Tailwind", "description": "Utility-first CSS", "icon": "Palette" },
+  { "src": "CSS", "slug": "css", "title": "CSS", "description": "Layout, cascade, modern CSS", "icon": "Paintbrush" },
   { "src": "Html", "slug": "html", "title": "HTML", "description": "Semantic markup, media, a11y", "icon": "FileCode" },
   { "src": "Django", "slug": "django", "title": "Django", "description": "ORM, views, auth, DRF", "icon": "Server" },
+  { "src": "Docker", "slug": "docker", "title": "Docker", "description": "Images, Compose, containers", "icon": "Box" },
+  { "src": "Redis", "slug": "redis", "title": "Redis", "description": "Cache, data structures, pub/sub", "icon": "Zap" },
+  { "src": "Postgres", "slug": "postgres", "title": "Postgres", "description": "Ops, indexes, backups, EXPLAIN", "icon": "Database" },
+  { "src": "SQL", "slug": "sql", "title": "SQL", "description": "Queries, schema, advanced SQL", "icon": "Table" },
   { "src": "Playwright", "slug": "playwright", "title": "Playwright", "description": "E2E browser testing", "icon": "Bug" },
   { "src": "Pytest", "slug": "pytest", "title": "Pytest", "description": "Python testing framework", "icon": "Beaker" },
   { "src": "Jest", "slug": "jest", "title": "Jest", "description": "JavaScript testing framework", "icon": "CircleCheck" },
@@ -14,5 +22,6 @@
   { "src": "Powershell", "slug": "powershell", "title": "PowerShell", "description": "Windows shell & automation", "icon": "Monitor" },
   { "src": "Github Actions", "slug": "github-actions", "title": "GitHub Actions", "description": "CI/CD workflows", "icon": "Rocket" },
   { "src": "Git", "slug": "git", "title": "Git", "description": "Everyday Git, recovery, GitHub CLI", "icon": "GitBranch" },
-  { "src": "SQL", "slug": "sql", "title": "SQL", "description": "Queries, schema, advanced SQL", "icon": "Database" }
+  { "src": "Comparisons", "slug": "comparisons", "title": "Comparisons", "description": "A vs B trade-offs", "icon": "GitCompare" },
+  { "src": "GlobalGlossary", "slug": "global-glossary", "title": "Global Glossary", "description": "Cross-stack interview terms", "icon": "BookOpen" }
 ]

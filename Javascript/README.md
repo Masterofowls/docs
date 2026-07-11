@@ -1,32 +1,45 @@
 # JavaScript
 
-_
+_Language core, browser APIs, and Node.js modules_
 
 ---
 
-## 📋 Notes
+## Notes
 
 - [abort_controller](./abort_controller.md)
 - [api](./api.md)
 - [arrays](./arrays.md)
+- [arrow_functions](./arrow_functions.md)
 - [async](./async.md)
 - [bigint](./bigint.md)
 - [boolean](./boolean.md)
+- [buffer](./buffer.md)
+- [child_process](./child_process.md)
 - [closures](./closures.md)
+- [comments](./comments.md)
 - [conditionals](./conditionals.md)
 - [console](./console.md)
+- [crypto_node](./crypto_node.md)
+- [csv](./csv.md)
 - [date](./date.md)
 - [destructuring](./destructuring.md)
+- [dotenv](./dotenv.md)
 - [encode](./encode.md)
 - [equality](./equality.md)
 - [error](./error.md)
 - [event_loop](./event_loop.md)
+- [events_node](./events_node.md)
 - [fetch](./fetch.md)
 - [for_of](./for_of.md)
 - [freeze_seal](./freeze_seal.md)
+- [fs](./fs.md)
 - [functions](./functions.md)
 - [generators](./generators.md)
+- [getting_started](./getting_started.md)
+- [glossary](./glossary.md)
+- [hello_world](./hello_world.md)
 - [history_api](./history_api.md)
+- [http_node](./http_node.md)
 - [import_export](./import_export.md)
 - [intl](./intl.md)
 - [iteration](./iteration.md)
@@ -36,12 +49,16 @@ _
 - [math](./math.md)
 - [modules_commonjs](./modules_commonjs.md)
 - [new](./new.md)
+- [node_os](./node_os.md)
+- [null_undefined](./null_undefined.md)
 - [nullish_coalescing](./nullish_coalescing.md)
 - [number](./number.md)
 - [objects](./objects.md)
 - [oop](./oop.md)
 - [optional_chaining](./optional_chaining.md)
+- [path](./path.md)
 - [performance](./performance.md)
+- [process](./process.md)
 - [promise](./promise.md)
 - [properties](./properties.md)
 - [prototypes](./prototypes.md)
@@ -49,21 +66,34 @@ _
 - [regex](./regex.md)
 - [set](./set.md)
 - [spread_rest](./spread_rest.md)
+- [stream](./stream.md)
 - [strict_mode](./strict_mode.md)
 - [strings](./strings.md)
 - [structured_clone](./structured_clone.md)
 - [switch_case](./switch_case.md)
 - [symbol](./symbol.md)
+- [template_basics](./template_basics.md)
 - [template_literals](./template_literals.md)
 - [ternary](./ternary.md)
 - [this_keyword](./this_keyword.md)
 - [timers](./timers.md)
 - [type_coercion](./type_coercion.md)
 - [typed_arrays](./typed_arrays.md)
+- [typeof_basics](./typeof_basics.md)
 - [url](./url.md)
+- [url_node](./url_node.md)
+- [util](./util.md)
+- [variables_let_const](./variables_let_const.md)
 - [weakmap_weakset](./weakmap_weakset.md)
 - [web_workers](./web_workers.md)
 - [while](./while.md)
+
+## Node.js modules (highlights)
+
+- [path](./path.md) · [fs](./fs.md) · [process](./process.md) · [node_os](./node_os.md) · [http_node](./http_node.md)
+- [dotenv](./dotenv.md) · [csv](./csv.md) · [buffer](./buffer.md) · [stream](./stream.md)
+- [child_process](./child_process.md) · [crypto_node](./crypto_node.md) · [events_node](./events_node.md)
+- [util](./util.md) · [url_node](./url_node.md) · [arrow_functions](./arrow_functions.md)
 
 ## DOM
 
@@ -100,6 +130,11 @@ _
 
 ## Examples
 
+- [array_pipeline](./Examples/array_pipeline.md)
+- [debounce_input](./Examples/debounce_input.md)
+- [dom_todo](./Examples/dom_todo.md)
+- [fetch_json](./Examples/fetch_json.md)
+- [localstorage_prefs](./Examples/localstorage_prefs.md)
 
 ---
 

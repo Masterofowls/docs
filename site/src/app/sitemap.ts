@@ -1,14 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { source } from '@/lib/source';
-
-const basePath = process.env.BASE_PATH || '';
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (basePath ? `https://masterofowls.github.io${basePath}` : 'http://localhost:3000');
+import { getSiteUrl } from '@/lib/seo';
 
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const siteUrl = getSiteUrl();
+
   const pages = source.getPages().map((page) => ({
     url: `${siteUrl}${page.url}${page.url.endsWith('/') ? '' : '/'}`,
     lastModified: new Date(),

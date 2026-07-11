@@ -1,0 +1,79 @@
+---
+title: Metadata
+description: Next.js · Reference cheat sheet
+---
+
+# Metadata
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+App Router metadata APIs set `<title>`, `<meta>`, Open Graph, icons, and more — statically via `metadata` export or dynamically via `generateMetadata`.
+
+## 🔧 Core concepts
+
+| API | When |
+| --- | --- |
+| `export const metadata` | Static, known at build |
+| `generateMetadata` | Dynamic per request/params |
+| `generateViewport` | Viewport / theme-color |
+| File conventions | `favicon.ico`, `opengraph-image.tsx`, `icon.tsx` |
+
+| Field | Purpose |
+| --- | --- |
+| `title` | Document title (supports `template`) |
+| `description` | Meta description |
+| `openGraph` / `twitter` | Social cards |
+| `robots` | Indexing directives |
+| `alternates.canonical` | Canonical URL |
+
+## 💡 Examples
+
+**Static metadata:**
+
+```tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: { default: "My App", template: "%s · My App" },
+  description: "Product docs and dashboard",
+};
+```
+
+**Dynamic metadata:**
+
+```tsx
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return { title: slug };
+}
+```
+
+**Root layout title template:**
+
+```tsx
+// app/layout.tsx
+export const metadata = {
+  title: { default: "Home", template: "%s | Acme" },
+};
+```
+
+## ⚠️ Pitfalls
+
+- Metadata in Client Components is ignored — keep it in Server layouts/pages.
+- Duplicate titles across nested layouts can fight; use `template` deliberately.
+- Social crawlers need absolute OG image URLs in production.
+
+## 🔗 Related
+
+- [app_router.md](/docs/nextjs/app-router)
+- [server_components.md](/docs/nextjs/server-components)
+- [image.md](/docs/nextjs/image)
+- [getting_started.md](/docs/nextjs/getting-started)

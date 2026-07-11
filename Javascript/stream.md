@@ -1,0 +1,91 @@
+# Stream
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node.js streams process data in chunks instead of loading everything into memory. Core types: **Readable**, **Writable**, **Duplex**, **Transform**. Prefer `pipeline` (or `stream/promises`) for error-safe piping.
+
+```js
+import { pipeline } from "node:stream/promises";
+import { createReadStream, createWriteStream } from "node:fs";
+```
+
+## 🔧 Core concepts
+
+- **Readable**: producers (`fs.createReadStream`, HTTP request body). Modes: flowing vs paused.
+- **Writable**: consumers (`fs.createWriteStream`, HTTP response). Backpressure via `write()` return value.
+- **`pipe` / `pipeline`**: connect readable → writable (and transforms). `pipeline` destroys streams on error and forwards errors.
+- **Transform**: duplex that modifies chunks (gzip, cipher, line splitters).
+- **Object mode**: streams of objects instead of Buffers/strings (`objectMode: true`).
+- **Events**: `data`, `end`, `error`, `finish`, `readable` (EventEmitter-based).
+
+## 💡 Examples
+
+```js
+import { createReadStream, createWriteStream } from "node:fs";
+import { pipeline } from "node:stream/promises";
+import { createGzip } from "node:zlib";
+
+await pipeline(
+  createReadStream("big.txt"),
+  createGzip(),
+  createWriteStream("big.txt.gz"),
+);
+
+// Manual consume (async iterator)
+import { createReadStream as rs } from "node:fs";
+for await (const chunk of rs("log.txt", { encoding: "utf8" })) {
+  process.stdout.write(chunk);
+}
+```
+
+```js
+import { Readable, Transform } from "node:stream";
+
+const src = Readable.from(["a\n", "b\n", "c\n"]);
+const upper = new Transform({
+  transform(chunk, enc, cb) {
+    cb(null, chunk.toString().toUpperCase());
+  },
+});
+
+await pipeline(src, upper, process.stdout);
+```
+
+```js
+// Backpressure sketch
+function writeAll(writable, chunks) {
+  let i = 0;
+  function write() {
+    for (; i < chunks.length; i++) {
+      const ok = writable.write(chunks[i]);
+      if (!ok) {
+        writable.once("drain", write);
+        return;
+      }
+    }
+    writable.end();
+  }
+  write();
+}
+```
+
+## ⚠️ Pitfalls
+
+- Classic `.pipe()` does not clean up well on errors — use `pipeline`.
+- Ignoring `error` events can crash the process.
+- Mixing `data` handlers and async iteration can conflict — pick one consumption style.
+- Forgetting `end()` on writables leaves pipelines hanging.
+- Buffering entire stream into a string defeats the purpose for large files.
+
+## 🔗 Related
+
+- [fs](fs.md) — file streams vs `readFile`
+- [Events](events_node.md) — EventEmitter under streams
+- [Buffer](buffer.md) — binary chunks
+- [Async](async.md) — `for await` of readables
+- [fetch](fetch.md) — web streams / response bodies
+- [child_process](child_process.md) — stdio streams

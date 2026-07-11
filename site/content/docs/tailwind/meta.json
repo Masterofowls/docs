@@ -1,0 +1,20 @@
+{
+  "title": "Tailwind",
+  "description": "Utility-first CSS",
+  "icon": "Palette",
+  "root": true,
+  "pages": [
+    "index",
+    "colors",
+    "custom-config",
+    "dark-mode",
+    "getting-started",
+    "glossary",
+    "layout-flex-grid",
+    "plugins",
+    "responsive",
+    "spacing-sizing",
+    "typography",
+    "utility-classes"
+  ]
+}

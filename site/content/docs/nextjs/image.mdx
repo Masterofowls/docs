@@ -1,0 +1,78 @@
+---
+title: next/image
+description: Next.js · Reference cheat sheet
+---
+
+# next/image
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`next/image` optimizes images: resizing, modern formats, lazy loading, and layout shift prevention via required dimensions or `fill`.
+
+## 🔧 Core concepts
+
+| Prop | Purpose |
+| --- | --- |
+| `src` | Path or remote URL |
+| `alt` | Required accessibility text |
+| `width` / `height` | Intrinsic size (static imports can infer) |
+| `fill` | Fill parent (parent needs `position: relative`) |
+| `sizes` | Hint for responsive `srcset` |
+| `priority` | Preload above-the-fold images |
+| `placeholder` | `"blur"` or `"empty"` |
+
+| Config (`next.config`) | Purpose |
+| --- | --- |
+| `images.remotePatterns` | Allow remote hosts |
+| `images.formats` | AVIF/WebP preferences |
+| `images.deviceSizes` / `imageSizes` | Generated widths |
+
+## 💡 Examples
+
+**Local image:**
+
+```tsx
+import Image from "next/image";
+import hero from "@/public/hero.jpg";
+
+export function Hero() {
+  return <Image src={hero} alt="Product hero" priority />;
+}
+```
+
+**Remote with sizes:**
+
+```tsx
+<Image
+  src="https://cdn.example.com/photo.jpg"
+  alt="Photo"
+  width={800}
+  height={600}
+  sizes="(max-width: 768px) 100vw, 800px"
+/>
+```
+
+**Fill layout:**
+
+```tsx
+<div style={{ position: "relative", width: "100%", height: 320 }}>
+  <Image src="/banner.jpg" alt="Banner" fill style={{ objectFit: "cover" }} />
+</div>
+```
+
+## ⚠️ Pitfalls
+
+- Remote images fail without `remotePatterns` (or legacy `domains`).
+- Missing `sizes` with `fill` can download oversized images on mobile.
+- Overusing `priority` defeats lazy loading and hurts LCP for other assets.
+
+## 🔗 Related
+
+- [link_navigation.md](/docs/nextjs/link-navigation)
+- [metadata.md](/docs/nextjs/metadata)
+- [caching.md](/docs/nextjs/caching)
+- [deployment.md](/docs/nextjs/deployment)

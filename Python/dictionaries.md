@@ -10,15 +10,57 @@ A `dict` maps hashable keys to values. Insertion order is preserved (3.7+). Use 
 
 ## 🔧 Core concepts
 
+**Create / access / mutate**
+
 | Operation | Example |
 | --- | --- |
-| Create | `{"a": 1}`, `dict(a=1)`, `dict([("a", 1)])` |
-| Get | `d["a"]`, `d.get("a", default)` |
+| Create | `{"a": 1}`, `dict(a=1)`, `dict([("a", 1)])`, `dict.fromkeys(keys, v=None)` |
+| Get | `d["a"]` (KeyError), `d.get("a", default)` |
 | Set | `d["a"] = 1`, `d.setdefault("a", 0)` |
-| Delete | `del d["a"]`, `d.pop("a", None)` |
-| Merge | `{**a, **b}`, `a | b` (3.9+), `a.update(b)` |
-| Views | `d.keys()`, `d.values()`, `d.items()` |
-| Comprehension | `{k: v for k, v in pairs}` |
+| Delete | `del d["a"]`, `d.pop("a", default)`, `d.popitem()` (LIFO 3.7+) |
+| Clear | `d.clear()` |
+| Membership | `k in d`, `k not in d` (keys only) |
+
+**Instance methods**
+
+| Method | Notes |
+| --- | --- |
+| `get(k[, default])` | Return value or default (`None`) |
+| `setdefault(k[, default])` | Get or insert default; return value |
+| `update([other], **kw)` | Merge mappings/pairs in place |
+| `pop(k[, default])` | Remove key; return value (or default / KeyError) |
+| `popitem()` | Remove and return `(k, v)` last inserted |
+| `clear()` | Remove all items |
+| `copy()` | Shallow copy |
+| `fromkeys(iterable, value=None)` | Classmethod: new dict with shared default |
+
+**Merge operators (3.9+)**
+
+| Op | Notes |
+| --- | --- |
+| `a \| b` | New dict; `b` wins on conflicts |
+| `a \|= b` | In-place update like `update` |
+| `{**a, **b}` | Unpack merge (literal) |
+
+**Views — `keys` / `values` / `items`**
+
+| View | Notes |
+| --- | --- |
+| `d.keys()` | Dynamic set-like view of keys |
+| `d.values()` | Dynamic view of values |
+| `d.items()` | Dynamic set-like view of `(k, v)` |
+| Set ops on keys/items | `&`, `\|`, `-`, `^` with other views/sets |
+| Live views | Reflect dict changes; do not mutate dict while iterating |
+| Materialize | `list(d)`, `list(d.items())` for a stable snapshot |
+
+**Comprehension / related helpers**
+
+| Pattern | Notes |
+| --- | --- |
+| `{k: v for k, v in pairs}` | Dict comprehension |
+| `collections.Counter` | Multiset / counts |
+| `collections.defaultdict` | Auto-create missing values |
+| `collections.OrderedDict` | Reorder helpers; plain `dict` keeps insert order |
 
 Keys must be hashable (`str`, `int`, `tuple` of hashables—not `list`/`dict`).
 

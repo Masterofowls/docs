@@ -1,0 +1,47 @@
+# Deep linking
+
+_React Native · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Deep links open a specific screen from a URL (`myapp://profile/42` or `https://…`). Use React Navigation linking config or Expo Router path maps.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Scheme | Custom URL scheme / universal links |
+| Linking API | `Linking.getInitialURL`, `addEventListener` |
+| Navigation config | Map path prefixes → screens |
+| Expo Router | File-based routes = URLs |
+
+## 💡 Examples
+
+```tsx
+import * as Linking from 'expo-linking';
+
+const url = Linking.createURL('profile/42');
+// e.g. myapp://profile/42
+```
+
+```tsx
+import { Linking } from 'react-native';
+
+Linking.addEventListener('url', ({ url }) => {
+  // navigate from url
+});
+```
+
+## ⚠️ Pitfalls
+
+- Test cold start (`getInitialURL`) and warm start (event) separately.
+- Universal links need platform domain association files.
+- Encode path params consistently.
+
+## 🔗 Related
+
+- [launcher_shortcut_menu](launcher_shortcut_menu.md)
+- [notifications](notifications.md)
+- [getting_started](getting_started.md)

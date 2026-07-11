@@ -1,0 +1,73 @@
+# Custom Config
+
+_Tailwind · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Customize Tailwind via `theme.extend` (preserve defaults) or replace theme keys. Content paths, plugins, and dark mode strategy live in the same config (v3) or CSS-first config (v4).
+
+## 🔧 Core concepts
+
+| Key | Purpose |
+| --- | --- |
+| `content` | Files to scan for classes |
+| `theme.extend` | Add tokens without wiping defaults |
+| `theme` (replace) | Override entire scales |
+| `plugins` | Register official/community plugins |
+| `prefix` | Namespace classes (`tw-`) |
+| `corePlugins` | Disable built-ins |
+
+| Extend examples | Adds |
+| --- | --- |
+| `colors.brand` | Brand palette |
+| `fontFamily.display` | Custom font stack |
+| `spacing['18']` | Extra spacing step |
+| `screens.3xl` | Extra breakpoint |
+
+## 💡 Examples
+
+**Extend theme (v3):**
+
+```js
+export default {
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        brand: { DEFAULT: "#0F766E", light: "#5EEAD4" },
+      },
+      fontFamily: {
+        display: ["\"Fraunces\"", "serif"],
+      },
+    },
+  },
+};
+```
+
+**Use tokens:**
+
+```html
+<h1 class="font-display text-brand">Hello</h1>
+```
+
+**Prefix:**
+
+```js
+export default { prefix: "tw-", content: ["./src/**/*.{html,js}"] };
+// classes become tw-flex, tw-p-4, ...
+```
+
+## ⚠️ Pitfalls
+
+- Replacing `theme.colors` entirely removes the default palette — use `extend`.
+- Wrong `content` globs silently drop utilities.
+- Arbitrary values don't need config — but shared brand tokens should be themed.
+
+## 🔗 Related
+
+- [plugins.md](./plugins.md)
+- [getting_started.md](./getting_started.md)
+- [colors.md](./colors.md)
+- [responsive.md](./responsive.md)

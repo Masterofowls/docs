@@ -1,0 +1,93 @@
+---
+title: Csv
+description: Python · Reference cheat sheet
+---
+
+# Csv
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The stdlib `csv` module reads and writes delimited text. Use `DictReader`/`DictWriter` when rows have named columns; plain `reader`/`writer` for positional fields. Prefer `newline=""` when opening files on Windows.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `csv.reader(f)` | Iterate rows as lists |
+| `csv.DictReader(f)` | Rows as `dict` (header → value) |
+| `csv.writer(f)` | Write list rows |
+| `csv.DictWriter(f, fieldnames)` | Write dict rows |
+| `writerow` / `writerows` | One / many rows |
+| `writeheader()` | Emit header for DictWriter |
+| `dialect` / `delimiter` | CSV flavor (excel, `;`, etc.) |
+| `csv.QUOTE_MINIMAL` | Quoting strategy |
+
+For large analytics, use [Pandas](/docs/python/pandas) `read_csv` instead.
+
+## 💡 Examples
+
+**DictReader:**
+
+```python
+import csv
+from pathlib import Path
+
+with Path("people.csv").open(newline="", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        print(row["name"], row["age"])
+```
+
+**reader (lists):**
+
+```python
+import csv
+
+with open("data.csv", newline="", encoding="utf-8") as f:
+    rows = list(csv.reader(f))
+header, *body = rows
+print(header, body[:2])
+```
+
+**DictWriter:**
+
+```python
+import csv
+from pathlib import Path
+
+fields = ["name", "age"]
+rows = [{"name": "Ada", "age": 36}, {"name": "Lin", "age": 41}]
+
+with Path("out.csv").open("w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=fields)
+    w.writeheader()
+    w.writerows(rows)
+```
+
+**Custom delimiter:**
+
+```python
+import csv
+
+with open("eu.csv", newline="", encoding="utf-8") as f:
+    for row in csv.reader(f, delimiter=";"):
+        print(row)
+```
+
+## ⚠️ Pitfalls
+
+- Always open with `newline=""` so the csv module owns line endings.
+- Pass `encoding="utf-8"` (or the real encoding) — never rely on locale default.
+- `DictWriter` needs `fieldnames`; missing keys become empty cells unless `extrasaction="raise"`.
+- Excel may expect BOM / `;` — test with the consumer.
+- Nested commas need quoting; let `csv` handle it — don’t hand-split lines.
+
+## 🔗 Related
+
+- [Pandas](/docs/python/pandas)
+- [Files I/O](/docs/python/files-io)
+- [Pathlib](/docs/python/pathlib)
+- [Json](/docs/python/json)

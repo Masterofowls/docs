@@ -1,0 +1,60 @@
+# Getting Started with Postgres Ops
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+PostgreSQL is a relational database used as a system of record. This folder focuses on operations and administration: connections, roles, indexes, vacuum, explain, backups, pooling, and JSONB — not basic SELECT tutorials.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Cluster | A Postgres data directory + running server |
+| Database | Named DB inside a cluster |
+| Role | User/group identity for authz |
+| WAL | Write-ahead log for durability/replication |
+| Extension | Packaged server plugin (`CREATE EXTENSION`) |
+
+| Tool | Purpose |
+| --- | --- |
+| `psql` | Interactive SQL + meta-commands |
+| `pg_dump` / `pg_restore` | Logical backup/restore |
+| `pg_basebackup` | Physical base backup |
+| Connection pooler | PgBouncer / cloud poolers |
+
+## 💡 Examples
+
+**Run Postgres (Docker):**
+
+```bash
+docker run --rm -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
+```
+
+**Connect:**
+
+```bash
+psql "postgres://postgres:postgres@127.0.0.1:5432/postgres"
+```
+
+**Version + basics:**
+
+```sql
+SELECT version();
+SELECT current_database(), current_user;
+```
+
+## ⚠️ Pitfalls
+
+- Exposing `5432` publicly without TLS/auth hardening is dangerous.
+- Superuser for app runtimes violates least privilege.
+- Skipping backups until first incident is not a strategy.
+
+## 🔗 Related
+
+- [connect_psql.md](./connect_psql.md)
+- [roles_privileges.md](./roles_privileges.md)
+- [backups_restore.md](./backups_restore.md)
+- [glossary.md](./glossary.md)

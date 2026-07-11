@@ -78,6 +78,27 @@ export function GET() {
       inputSchema: { type: 'object', properties: {} },
       http: { method: 'GET', path: absoluteApi('/api/v1/glossaries') },
     },
+    {
+      name: 'get_coverage',
+      description: 'Per-topic note counts and thin-page samples',
+      inputSchema: { type: 'object', properties: {} },
+      http: { method: 'GET', path: absoluteApi('/api/v1/coverage') },
+    },
+    {
+      name: 'export_topic_markdown',
+      description: 'Download one topic as Markdown (topic slug)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          topic: { type: 'string', description: 'e.g. python, nextjs, docker' },
+        },
+        required: ['topic'],
+      },
+      http: {
+        method: 'GET',
+        pathTemplate: absoluteApi('/api/v1/topic-export/{topic}'),
+      },
+    },
   ];
 
   return Response.json(

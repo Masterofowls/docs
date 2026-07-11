@@ -1,0 +1,69 @@
+---
+title: "EXPLAIN & ANALYZE"
+description: Postgres · Reference cheat sheet
+---
+
+# EXPLAIN & ANALYZE
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`EXPLAIN` shows the planner’s chosen plan; `EXPLAIN ANALYZE` executes the query and adds actual timings/rows. Essential for diagnosing slow queries and verifying indexes.
+
+## 🔧 Core concepts
+
+| Option | Adds |
+| --- | --- |
+| `ANALYZE` | Actual runtime stats |
+| `BUFFERS` | Shared/hit/read buffer counts |
+| `VERBOSE` | Extra detail |
+| `WAL` | WAL generation (newer versions) |
+| `SETTINGS` | Relevant GUCs |
+
+| Node tip | Meaning |
+| --- | --- |
+| Seq Scan | Full table read |
+| Index Scan / Only | Using index |
+| Nested Loop / Hash / Merge | Join strategies |
+| rows vs actual rows | Estimator accuracy |
+
+## 💡 Examples
+
+**Basic:**
+
+```sql
+EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 42;
+```
+
+**With buffers:**
+
+```sql
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT o.*
+FROM orders o
+JOIN users u ON u.id = o.user_id
+WHERE u.email = 'ada@example.com';
+```
+
+**Compare plans:**
+
+```sql
+SET enable_seqscan = off; -- diagnostic only
+EXPLAIN ANALYZE SELECT ...;
+```
+
+## ⚠️ Pitfalls
+
+- `EXPLAIN ANALYZE` runs the query — careful with writes (use a transaction + `ROLLBACK` when testing DML).
+- Stale statistics → bad plans — `ANALYZE` the tables.
+- Reading plans takes practice — start with the most expensive node (time).
+
+## 🔗 Related
+
+- [indexes.md](/docs/postgres/indexes)
+- [vacuum_analyze.md](/docs/postgres/vacuum-analyze)
+- [connect_psql.md](/docs/postgres/connect-psql)
+- [json_jsonb.md](/docs/postgres/json-jsonb)

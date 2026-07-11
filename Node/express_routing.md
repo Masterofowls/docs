@@ -1,0 +1,71 @@
+# Express Routing
+
+_Node.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Express matches HTTP method + path patterns to handlers. Use `Router` to split large apps into mountable modules.
+
+## 🔧 Core concepts
+
+| Pattern | Matches |
+| --- | --- |
+| `/users` | Exact path |
+| `/users/:id` | Param `req.params.id` |
+| `/files/*` | Wildcard (version-dependent syntax) |
+| `/` + `Router` mount | Prefixed paths |
+
+| API | Role |
+| --- | --- |
+| `app.METHOD(path, ...handlers)` | Method-specific |
+| `app.all` | Any method |
+| `router.route(path)` | Chain verbs for one path |
+| `req.params` / `req.query` | Path params / query string |
+
+## 💡 Examples
+
+**Params and query:**
+
+```js
+app.get("/users/:id", (req, res) => {
+  res.json({ id: req.params.id, q: req.query.q });
+});
+// GET /users/42?q=active
+```
+
+**Router module:**
+
+```js
+import { Router } from "express";
+
+const users = Router();
+users.get("/", (req, res) => res.json([]));
+users.get("/:id", (req, res) => res.json({ id: req.params.id }));
+
+app.use("/users", users);
+```
+
+**Route chaining:**
+
+```js
+router
+  .route("/items/:id")
+  .get((req, res) => res.send("get"))
+  .put((req, res) => res.send("put"))
+  .delete((req, res) => res.send("delete"));
+```
+
+## ⚠️ Pitfalls
+
+- More specific routes must be registered before generic `/:id` catchers.
+- `req.params` values are strings — coerce IDs explicitly.
+- Trailing-slash behavior depends on settings; be consistent in clients and routes.
+
+## 🔗 Related
+
+- [express_basics.md](./express_basics.md)
+- [express_middleware.md](./express_middleware.md)
+- [fastify_basics.md](./fastify_basics.md)
+- [http_server.md](./http_server.md)

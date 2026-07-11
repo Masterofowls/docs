@@ -1,0 +1,19 @@
+{
+  "title": "Zod",
+  "description": "Schema validation & TypeScript inference",
+  "icon": "Shield",
+  "root": true,
+  "pages": [
+    "index",
+    "arrays-tuples",
+    "coerce",
+    "getting-started",
+    "glossary",
+    "infer-types",
+    "objects",
+    "primitives",
+    "refinements",
+    "safeparse",
+    "transforms"
+  ]
+}

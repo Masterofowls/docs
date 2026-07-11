@@ -1,0 +1,61 @@
+# Tailwind vs hand-written CSS
+
+_Comparisons · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**Tailwind** accelerates UI via utility classes and a shared design scale. **Hand-written CSS** (or CSS Modules / plain stylesheets) offers full control and fewer markup classes. Many teams mix: Tailwind for app UI, custom CSS for complex animations or third-party overrides.
+
+## 🔧 Core concepts
+
+| Dimension | Tailwind | Hand-written CSS |
+| --- | --- | --- |
+| Speed of iteration | Very fast for common UI | Slower unless well-factored |
+| Bundle discipline | Scans used classes | Depends on your imports |
+| Readability | Busy class strings | Centralized selectors |
+| Design consistency | Theme tokens by default | You must enforce tokens |
+| Learning curve | Utility vocabulary | CSS cascade/specificity |
+| Dynamic theming | Variants + CSS vars | Full freedom |
+
+**When to use Tailwind:** product UIs, design systems with utility tokens, rapid component work.
+
+**When to use CSS:** intricate animations, unique marketing layouts, existing CSS architecture, or teams that dislike utilities-in-markup.
+
+## 💡 Examples
+
+**Tailwind:**
+
+```html
+<button class="rounded-md bg-zinc-900 px-3 py-2 text-sm text-white hover:bg-zinc-700">
+  Save
+</button>
+```
+
+**CSS:**
+
+```css
+.button {
+  border-radius: 0.375rem;
+  background: #18181b;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: white;
+}
+.button:hover {
+  background: #3f3f46;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Tailwind without content paths generates empty CSS.
+- Hand-written CSS without conventions recreates a one-off design system by accident.
+- `@apply` everywhere reintroduces the problems utilities were meant to solve.
+
+## 🔗 Related
+
+- [Tailwind/getting_started.md](../Tailwind/getting_started.md)
+- [CSS/](../CSS/)
+- [README.md](./README.md)

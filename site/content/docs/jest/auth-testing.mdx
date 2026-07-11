@@ -1,0 +1,79 @@
+---
+title: Auth Testing
+description: Jest · Reference cheat sheet
+---
+
+_Jest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Cover login helpers, token attachment, and guarded UI/API behavior. Mock auth modules at the boundary; integration-test the real login endpoint in CI.
+
+## 🔧 Core concepts
+
+| Case | Assert |
+| --- | --- |
+| Login OK | Token stored / returned |
+| Bad password | Error thrown / 401 |
+| Authed request | `Authorization` header set |
+| Logged out | Redirect or null user |
+
+## 💡 Examples
+
+**Unit: attach bearer:**
+
+```js
+function withAuth(headers, token) {
+  return { ...headers, Authorization: `Bearer ${token}` };
+}
+
+test('adds bearer', () => {
+  expect(withAuth({}, 'abc')).toEqual({ Authorization: 'Bearer abc' });
+});
+```
+
+**Login API:**
+
+```js
+const BASE = process.env.API_URL || 'http://127.0.0.1:8000';
+
+test('login returns access_token', async () => {
+  const res = await fetch(`${BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: process.env.TEST_EMAIL || 'ada@example.com',
+      password: process.env.TEST_PASS || 'secret',
+    }),
+  });
+  expect(res.ok).toBe(true);
+  const body = await res.json();
+  expect(body.access_token).toEqual(expect.any(String));
+});
+```
+
+**React Testing Library guard (sketch):**
+
+```jsx
+test('redirects when logged out', () => {
+  render(
+    <AuthProvider value={{ user: null }}>
+      <Protected />
+    </AuthProvider>,
+  );
+  expect(screen.getByText(/sign in/i)).toBeInTheDocument();
+});
+```
+
+## ⚠️ Pitfalls
+
+- Don't assert on wall-clock JWT expiry without fake timers.
+- Clear `localStorage` in `afterEach` when testing browser storage.
+
+## 🔗 Related
+
+- [API testing](/docs/jest/api-testing)
+- [React testing library](/docs/jest/react-testing-library)
+- [Mocks](/docs/jest/mocks)

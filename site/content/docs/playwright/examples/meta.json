@@ -3,6 +3,11 @@
   "pages": [
     "index",
     "api-mock",
-    "login-flow"
+    "api-test-javascript",
+    "api-test-python",
+    "auth-storage-js",
+    "auth-storage-python",
+    "login-flow",
+    "login-flow-python"
   ]
 }

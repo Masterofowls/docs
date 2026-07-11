@@ -1,0 +1,73 @@
+---
+title: API Test (Python)
+description: Playwright · Example / how-to
+---
+
+_Playwright · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Same API testing ideas with `pytest-playwright`: use the `request_context` / APIRequestContext helpers.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `playwright.request` | Create API context |
+| `get/post/patch/delete` | Verbs |
+| `response.ok` / `status` | Assert |
+| `response.json()` | Body |
+
+## 💡 Examples
+
+```python
+import pytest
+from playwright.sync_api import Playwright, APIRequestContext
+
+@pytest.fixture(scope="session")
+def api(playwright: Playwright) -> APIRequestContext:
+    ctx = playwright.request.new_context(base_url="http://127.0.0.1:8000")
+    yield ctx
+    ctx.dispose()
+
+def test_items_crud(api: APIRequestContext):
+    created = api.post("/api/items", data={"title": "From Playwright Py", "done": False})
+    assert created.ok
+    item_id = created.json()["id"]
+
+    got = api.get(f"/api/items/{item_id}")
+    assert got.status == 200
+    assert got.json()["title"] == "From Playwright Py"
+
+    patched = api.patch(f"/api/items/{item_id}", data={"done": True})
+    assert patched.ok
+    assert patched.json()["done"] is True
+
+    deleted = api.delete(f"/api/items/{item_id}")
+    assert deleted.status < 300
+
+def test_me_unauthorized(api: APIRequestContext):
+    res = api.get("/api/me")
+    assert res.status == 401
+```
+
+**With pytest-playwright `request` shortcut (if configured):**
+
+```python
+def test_health(request_context):
+    res = request_context.get("/health")
+    assert res.ok
+```
+
+## ⚠️ Pitfalls
+
+- `data=` vs `form=` vs JSON — match your API content-type.
+- Session-scoped API context must be disposed.
+
+## 🔗 Related
+
+- [API testing](/docs/playwright/api-testing)
+- [API test (JavaScript)](/docs/playwright/examples/api-test-javascript)
+- [Auth storage (Python)](/docs/playwright/examples/auth-storage-python)

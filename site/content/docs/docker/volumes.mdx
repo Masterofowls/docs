@@ -1,0 +1,69 @@
+---
+title: Volumes
+description: Docker · Reference cheat sheet
+---
+
+# Volumes
+
+_Docker · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Volumes persist data beyond a container’s lifecycle and share files between host and container. Prefer named volumes for databases; bind mounts for live code in development.
+
+## 🔧 Core concepts
+
+| Type | Behavior |
+| --- | --- |
+| Named volume | Docker-managed storage |
+| Bind mount | Host path mounted into container |
+| Anonymous volume | Unnamed; easy to lose track of |
+| tmpfs | In-memory mount |
+
+| Flag | Example |
+| --- | --- |
+| `-v name:/path` | Named volume |
+| `-v /host:/container` | Bind mount |
+| `--mount` | Explicit long form |
+
+## 💡 Examples
+
+**Named volume for Postgres:**
+
+```shellscript
+docker volume create pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+```
+
+**Compose volume:**
+
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+```
+
+**Dev bind mount:**
+
+```shellscript
+docker run --rm -v "${PWD}:/app" -w /app node:22 npm test
+```
+
+## ⚠️ Pitfalls
+
+- Bind-mounting over a path that had image data hides the image content.
+- Permissions (UID/GID) on Linux bind mounts often break writes — match users.
+- `docker compose down -v` deletes named volumes — destructive.
+
+## 🔗 Related
+
+- [compose.md](/docs/docker/compose)
+- [getting_started.md](/docs/docker/getting-started)
+- [env_secrets.md](/docs/docker/env-secrets)
+- [networks.md](/docs/docker/networks)

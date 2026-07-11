@@ -1,0 +1,60 @@
+# safeParse
+
+_Zod · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`safeParse` returns a discriminated result instead of throwing. Prefer it at HTTP/form boundaries where invalid input is expected.
+
+## 🔧 Core concepts
+
+| API | Behavior |
+| --- | --- |
+| `schema.parse(data)` | Returns value or throws `ZodError` |
+| `schema.safeParse(data)` | `{ success, data }` or `{ success, error }` |
+| `schema.parseAsync` / `safeParseAsync` | Async refinements/transforms |
+| `error.flatten()` | Field errors for forms |
+| `error.format()` | Nested error tree |
+
+## 💡 Examples
+
+**Branch on success:**
+
+```ts
+const result = User.safeParse(payload);
+if (!result.success) {
+  console.error(result.error.flatten());
+  return;
+}
+console.log(result.data.email);
+```
+
+**HTTP handler style:**
+
+```ts
+const parsed = Body.safeParse(await req.json());
+if (!parsed.success) {
+  return Response.json(parsed.error.flatten(), { status: 400 });
+}
+```
+
+**flatten for UI:**
+
+```ts
+const { fieldErrors, formErrors } = error.flatten();
+```
+
+## ⚠️ Pitfalls
+
+- After `success === true`, TypeScript narrows `data` — don't access `data` on the failure branch.
+- Swallowing `error` without logging loses diagnostics.
+- `parse` in a hot request path without try/catch can crash the process if unhandled.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [refinements.md](./refinements.md)
+- [objects.md](./objects.md)
+- [infer_types.md](./infer_types.md)

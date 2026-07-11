@@ -1,0 +1,63 @@
+---
+title: "Arrays & Tuples"
+description: Zod · Reference cheat sheet
+---
+
+# Arrays & Tuples
+
+_Zod · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Zod models homogeneous arrays with `z.array` and fixed-length positional collections with `z.tuple`. Useful for lists of DTOs and CSV-like rows.
+
+## 🔧 Core concepts
+
+| Schema | Meaning |
+| --- | --- |
+| `z.array(T)` | Array of T |
+| `z.tuple([A, B])` | Fixed positions |
+| `.nonempty()` | At least one element |
+| `.min` / `.max` / `.length` | Size constraints |
+| `z.record` | String-key map of values |
+| `z.map` / `z.set` | ES Map / Set |
+
+## 💡 Examples
+
+**Array of objects:**
+
+```ts
+const Tag = z.string().min(1);
+const Post = z.object({
+  title: z.string(),
+  tags: z.array(Tag).max(10),
+});
+```
+
+**Tuple:**
+
+```ts
+const Pair = z.tuple([z.string(), z.number()]);
+Pair.parse(["age", 30]);
+```
+
+**Nonempty:**
+
+```ts
+z.array(z.number()).nonempty().parse([1]);
+```
+
+## ⚠️ Pitfalls
+
+- Tuples reject extra elements unless you configure rest (version-dependent).
+- Sparse arrays and holes are unusual — prefer dense JSON arrays.
+- Very large arrays: validation is O(n); validate early at the boundary.
+
+## 🔗 Related
+
+- [objects.md](/docs/zod/objects)
+- [primitives.md](/docs/zod/primitives)
+- [refinements.md](/docs/zod/refinements)
+- [safeparse.md](/docs/zod/safeparse)

@@ -1,0 +1,17 @@
+{
+  "title": "Comparisons",
+  "description": "A vs B trade-offs",
+  "icon": "GitCompare",
+  "root": true,
+  "pages": [
+    "index",
+    "express-vs-fastify",
+    "fetch-vs-axios",
+    "pages-vs-app-router",
+    "pathlib-vs-os",
+    "pytest-vs-unittest",
+    "redis-vs-postgres",
+    "tailwind-vs-css",
+    "useeffect-vs-uselayouteffect"
+  ]
+}

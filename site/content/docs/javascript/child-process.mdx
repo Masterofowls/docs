@@ -1,0 +1,83 @@
+---
+title: child_process
+description: JavaScript · Reference cheat sheet
+---
+
+# child_process
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node.js `node:child_process` runs external programs. Prefer **`spawn`** / **`execFile`** with argument arrays over shell `exec` when you control the command. Shell mode invites injection if user input is interpolated.
+
+```js
+import { spawn, execFile, exec } from "node:child_process";
+```
+
+## 🔧 Core concepts
+
+- **`spawn(command, args[], options?)`**: streams stdio; best for long-running or large output.
+- **`execFile(file, args[], options?, cb)`**: runs executable directly (no shell); buffered stdout/stderr.
+- **`exec(command, options?, cb)`**: runs via shell — convenient, riskier.
+- **Promises**: `import \{ spawn \} from "node:child_process"` + manual wrappers, or `promisify(execFile)`.
+- **Options**: `cwd`, `env`, `timeout`, `maxBuffer`, `stdio` (`'pipe' | 'inherit' | 'ignore'`).
+- **Exit**: listen for `close` / `exit`; check `code` and `signal`.
+
+## 💡 Examples
+
+```js
+import { spawn, execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
+
+// Safe: args array, no shell
+const { stdout } = await execFileAsync("node", ["-v"]);
+console.log(stdout.trim());
+
+const child = spawn("node", ["script.js", "--port", "9000"], {
+  stdio: "inherit",
+  cwd: process.cwd(),
+  env: { ...process.env, NODE_ENV: "development" },
+});
+
+child.on("close", (code) => {
+  console.log("exit", code);
+});
+
+// Capture streamed output
+const p = spawn("git", ["status", "--porcelain"]);
+let out = "";
+p.stdout.setEncoding("utf8");
+p.stdout.on("data", (chunk) => {
+  out += chunk;
+});
+await new Promise((resolve, reject) => {
+  p.on("error", reject);
+  p.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`code ${code}`))));
+});
+```
+
+```js
+// Avoid: exec with untrusted input
+// exec(`ls ${userPath}`); // injection risk
+```
+
+## ⚠️ Pitfalls
+
+- **`exec` / `execSync` shell injection**: never concatenate untrusted strings into the command line.
+- **`maxBuffer`**: `exec`/`execFile` throw if output exceeds limit (default ~1MB) — use `spawn` for big output.
+- Windows: `.cmd` / `.bat` often need `shell: true` or `exec`; prefer explicit `.exe` when possible.
+- Forgotten listeners / open stdio can keep the parent process alive.
+- `spawn` does not reject on non-zero exit by default — check `code` yourself.
+
+## 🔗 Related
+
+- [process](/docs/javascript/process) — env, cwd, exit codes
+- [Stream](/docs/javascript/stream) — child stdio streams
+- [Events](/docs/javascript/events-node) — `close` / `error` events
+- [util](/docs/javascript/util) — `promisify(execFile)`
+- [Path](/docs/javascript/path) — resolve executable paths

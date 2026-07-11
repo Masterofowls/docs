@@ -1,0 +1,54 @@
+# Glossary
+
+_Redis · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of Redis data structures, durability, and client terms.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| AOF | Append-only file persistence log of write operations. |
+| Eviction | Removing keys under `maxmemory` per policy. |
+| Hash | Field-value map stored at a single key. |
+| Keyspace | The set of keys in a selected logical database. |
+| List | Ordered sequence supporting push/pop at ends. |
+| Pub/Sub | Fire-and-forget channel messaging. |
+| RDB | Snapshot persistence format. |
+| Replica | Read copy of a primary for HA/scale-out reads. |
+| Set | Unordered collection of unique members. |
+| Sorted set | Unique members ordered by score. |
+| Stream | Append-only log with consumer groups. |
+| TTL | Time-to-live before a key expires. |
+| `SCAN` | Cursor-based incremental iteration. |
+
+## 💡 Examples
+
+**Type check:**
+
+```bash
+TYPE session:abc
+TTL session:abc
+```
+
+**Logical DB:**
+
+```bash
+SELECT 0
+```
+
+## ⚠️ Pitfalls
+
+- “Persistent Redis” still needs backup/HA design — persistence ≠ full DR plan.
+- Mixing cache and primary data on one instance without key discipline causes pain.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [persistence.md](./persistence.md)
+- [expiry_ttl.md](./expiry_ttl.md)
+- [README.md](./README.md)

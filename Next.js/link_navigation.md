@@ -1,0 +1,73 @@
+# Link & Navigation
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Use `next/link` for client-side soft navigation and `next/navigation` hooks for programmatic routing in the App Router. Prefer Link over raw `<a>` for internal routes.
+
+## 🔧 Core concepts
+
+| API | Router | Purpose |
+| --- | --- | --- |
+| `Link` | Both | Prefetch + soft navigate |
+| `useRouter` (`next/navigation`) | App | `push`, `replace`, `refresh`, `back` |
+| `usePathname` / `useSearchParams` | App | Read location |
+| `useRouter` (`next/router`) | Pages | Legacy router |
+| `redirect` / `notFound` | App (Server) | Server-side navigation / 404 |
+
+| `Link` prop | Notes |
+| --- | --- |
+| `href` | String or URL object |
+| `prefetch` | Default true in many cases; disable for rare routes |
+| `replace` | Replace history entry |
+| `scroll` | Scroll to top (default true) |
+
+## 💡 Examples
+
+**Basic Link:**
+
+```tsx
+import Link from "next/link";
+
+export function Nav() {
+  return <Link href="/docs">Docs</Link>;
+}
+```
+
+**Programmatic navigation (Client):**
+
+```tsx
+"use client";
+import { useRouter } from "next/navigation";
+
+export function Go() {
+  const router = useRouter();
+  return <button onClick={() => router.push("/dashboard")}>Open</button>;
+}
+```
+
+**Server redirect:**
+
+```tsx
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  redirect("/login");
+}
+```
+
+## ⚠️ Pitfalls
+
+- `useRouter` from `next/router` vs `next/navigation` — wrong import breaks App Router pages.
+- `useSearchParams()` can force a client Suspense boundary — wrap accordingly.
+- External URLs should use `<a>` (or `Link` with absolute URL); don't treat them like soft navigations for SEO-critical exit links without care.
+
+## 🔗 Related
+
+- [app_router.md](./app_router.md)
+- [pages_router.md](./pages_router.md)
+- [middleware.md](./middleware.md)
+- [server_components.md](./server_components.md)

@@ -1,0 +1,98 @@
+# Functools
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`functools` provides higher-order helpers: freeze arguments with `partial`, memoize with `lru_cache`, fold with `reduce`, and preserve metadata with `wraps` when writing decorators.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `partial(fn, *a, **kw)` | Pre-fill args → new callable |
+| `lru_cache(maxsize=128)` | Memoize pure functions |
+| `cache` | Unbounded memoize (3.9+) |
+| `reduce(fn, iterable[, init])` | Fold sequence to one value |
+| `wraps(fn)` | Copy `__name__`/`__doc__` onto wrappers |
+| `singledispatch` | Function overloading by type |
+| `total_ordering` | Fill rich comparisons from a few |
+
+## 💡 Examples
+
+**partial:**
+
+```python
+from functools import partial
+
+def power(base, exp):
+    return base**exp
+
+square = partial(power, exp=2)
+cube = partial(power, exp=3)
+print(square(5), cube(3))  # 25 27
+```
+
+**lru_cache:**
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=256)
+def fib(n: int) -> int:
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(30), fib.cache_info())
+fib.cache_clear()
+```
+
+**reduce:**
+
+```python
+from functools import reduce
+import operator
+
+nums = [1, 2, 3, 4]
+print(reduce(operator.mul, nums, 1))  # 24
+print(reduce(lambda a, b: a + b, nums))  # 10
+```
+
+**wraps for decorators:**
+
+```python
+from functools import wraps
+
+def trace(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        print("call", fn.__name__)
+        return fn(*args, **kwargs)
+    return wrapper
+
+@trace
+def greet(name):
+    """Say hi."""
+    return f"hi {name}"
+
+print(greet.__name__, greet.__doc__)  # greet, Say hi.
+```
+
+## ⚠️ Pitfalls
+
+- Cache only pure functions: same args → same result; no hidden I/O/mutation.
+- Args to `@lru_cache` must be hashable (no lists/dicts).
+- Unbounded `@cache` can grow forever — prefer `lru_cache(maxsize=...)`.
+- Without `@wraps`, stack traces and docs point at `wrapper`.
+- Prefer comprehensions / explicit loops over `reduce` when clarity matters.
+
+## 🔗 Related
+
+- [Decorators](decorators.md)
+- [Lambda](lambda.md)
+- [Functions](functions.md)
+- [Closures](closures.md)
+- [Itertools](itertools.md)

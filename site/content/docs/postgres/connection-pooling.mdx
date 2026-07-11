@@ -1,0 +1,66 @@
+---
+title: Connection Pooling
+description: Postgres · Reference cheat sheet
+---
+
+# Connection Pooling
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Each Postgres connection is expensive (memory, process). Poolers like PgBouncer multiplex many client connections onto fewer server connections — essential for serverless and high-churn apps.
+
+## 🔧 Core concepts
+
+| Mode (PgBouncer) | Behavior |
+| --- | --- |
+| Session | One server conn per client session |
+| Transaction | Return conn after each transaction (common) |
+| Statement | Extreme multiplexing; breaks many features |
+
+| Concept | Detail |
+| --- | --- |
+| `max_connections` | Server hard limit |
+| Pool size | App + pooler sizing |
+| Idle timeouts | Reap abandoned clients |
+| Prepared statements | Need care in transaction pooling |
+
+## 💡 Examples
+
+**Check connections:**
+
+```sql
+SELECT count(*), state FROM pg_stat_activity GROUP BY state;
+SHOW max_connections;
+```
+
+**Terminate idle (careful):**
+
+```sql
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'idle in transaction'
+  AND state_change < now() - interval '10 minutes';
+```
+
+**App URL via pooler (sketch):**
+
+```
+postgres://user:pass@pgbouncer-host:6432/app
+```
+
+## ⚠️ Pitfalls
+
+- Opening a new DB connection per serverless invoke without a pooler exhausts `max_connections`.
+- Session-level features (temp tables, advisory locks, prepared statements) break under transaction pooling.
+- Pooler + ORM defaults can still stampede — size pools per instance deliberately.
+
+## 🔗 Related
+
+- [roles_privileges.md](/docs/postgres/roles-privileges)
+- [vacuum_analyze.md](/docs/postgres/vacuum-analyze)
+- [getting_started.md](/docs/postgres/getting-started)
+- [connect_psql.md](/docs/postgres/connect-psql)

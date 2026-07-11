@@ -1,0 +1,60 @@
+---
+title: Requests JSON API
+description: Python · Example / how-to
+---
+
+_Python · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Practical client pattern: Session + timeout + raise_for_status + JSON helpers.
+
+## 🔧 Core concepts
+
+| Helper | Role |
+| --- | --- |
+| `get_json` | GET → dict |
+| `post_json` | POST body |
+| Shared Session | Headers / auth |
+
+## 💡 Examples
+
+```python
+from typing import Any
+import requests
+
+class ApiClient:
+    def __init__(self, base: str, token: str | None = None):
+        self.base = base.rstrip("/")
+        self.s = requests.Session()
+        self.s.headers["Accept"] = "application/json"
+        if token:
+            self.s.headers["Authorization"] = f"Bearer {token}"
+
+    def get_json(self, path: str, **params: Any) -> Any:
+        r = self.s.get(f"{self.base}{path}", params=params, timeout=10)
+        r.raise_for_status()
+        return r.json()
+
+    def post_json(self, path: str, body: dict) -> Any:
+        r = self.s.post(f"{self.base}{path}", json=body, timeout=10)
+        r.raise_for_status()
+        return r.json()
+
+if __name__ == "__main__":
+    api = ApiClient("https://httpbin.org")
+    print(api.get_json("/get", q="demo")["args"])
+    print(api.post_json("/post", {"ok": True})["json"])
+```
+
+## ⚠️ Pitfalls
+
+- Close or use contextmanager if wrapping many short scripts.
+- Handle non-JSON error bodies separately from `raise_for_status`.
+
+## 🔗 Related
+
+- [Requests](/docs/python/requests-http)
+- [Requests auth & sessions](/docs/python/requests-auth-sessions)

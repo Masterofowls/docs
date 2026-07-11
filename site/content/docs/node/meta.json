@@ -1,0 +1,20 @@
+{
+  "title": "Node.js",
+  "description": "Express, Fastify, HTTP servers",
+  "icon": "Server",
+  "root": true,
+  "pages": [
+    "index",
+    "env-config",
+    "error-handling",
+    "express-basics",
+    "express-middleware",
+    "express-routing",
+    "fastify-basics",
+    "fastify-plugins",
+    "getting-started",
+    "glossary",
+    "http-server",
+    "packaging"
+  ]
+}

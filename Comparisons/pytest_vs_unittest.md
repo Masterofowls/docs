@@ -1,0 +1,65 @@
+# pytest vs unittest
+
+_Comparisons · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**pytest** is the common default for modern Python tests (fixtures, parametrize, assert rewriting). **unittest** is the stdlib xUnit-style framework — fine for stdlib-only environments and legacy suites.
+
+## 🔧 Core concepts
+
+| Dimension | pytest | unittest |
+| --- | --- | --- |
+| Install | Third-party | Stdlib |
+| Assertions | Plain `assert` | `self.assertEqual`… |
+| Fixtures | Elegant `@pytest.fixture` | `setUp` / `tearDown` |
+| Parametrize | `@pytest.mark.parametrize` | More boilerplate |
+| Plugins | Rich ecosystem | Limited |
+| Discovery | `test_*.py` conventions | `unittest` discovery |
+
+**When to use pytest:** almost all application and library projects.
+
+**When to use unittest:** zero-dependency constraints, teaching stdlib, or extending large existing unittest suites.
+
+## 💡 Examples
+
+**pytest:**
+
+```python
+import pytest
+
+@pytest.fixture
+def n():
+    return 2
+
+@pytest.mark.parametrize("x,y", [(1, 2), (2, 4)])
+def test_double(x, y, n):
+    assert x * n == y
+```
+
+**unittest:**
+
+```python
+import unittest
+
+class DoubleTest(unittest.TestCase):
+    def test_double(self):
+        self.assertEqual(2 * 2, 4)
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## ⚠️ Pitfalls
+
+- Mixing styles in one repo without guidance confuses contributors — pick a default.
+- pytest plugin overload can obscure failures — keep conftest lean.
+- unittest mock (`unittest.mock`) works great *with* pytest too.
+
+## 🔗 Related
+
+- [Pytest/](../Pytest/)
+- [Python/getting_started.md](../Python/getting_started.md)
+- [README.md](./README.md)

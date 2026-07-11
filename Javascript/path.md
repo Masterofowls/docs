@@ -1,0 +1,69 @@
+# Path
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node.js `node:path` builds and inspects filesystem paths. Prefer `path.join` / `path.resolve` over string concatenation so separators and `..` segments stay correct across platforms.
+
+```js
+import path from "node:path";
+```
+
+## 🔧 Core concepts
+
+- **`join(...parts)`**: concatenates segments; normalizes `.` / `..`; does not resolve against cwd.
+- **`resolve(...parts)`**: produces an absolute path from right to left; uses `process.cwd()` when needed.
+- **`dirname` / `basename` / `extname`**: parent dir, final segment, and extension (including the dot).
+- **`parse` / `format`**: object with `root`, `dir`, `base`, `name`, `ext`.
+- **`sep`**: `\` on Windows, `/` on POSIX.
+- **`path.posix` / `path.win32`**: force POSIX or Windows rules regardless of host OS (useful for URLs or cross-platform config).
+
+## 💡 Examples
+
+```js
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+path.join("logs", "app", "out.txt");
+// 'logs/app/out.txt' (POSIX) or 'logs\\app\\out.txt' (win32)
+
+path.resolve("data", "../config.json");
+// absolute path ending in config.json
+
+path.dirname("/var/app/index.js"); // '/var/app'
+path.basename("/var/app/index.js"); // 'index.js'
+path.basename("/var/app/index.js", ".js"); // 'index'
+path.extname("photo.tar.gz"); // '.gz'
+
+const p = path.parse("/home/ada/report.pdf");
+// { root: '/', dir: '/home/ada', base: 'report.pdf',
+//   ext: '.pdf', name: 'report' }
+
+path.format({ dir: "/tmp", base: "a.txt" }); // '/tmp/a.txt'
+
+// ESM __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Always forward slashes (e.g. virtual paths)
+path.posix.join("a", "b", "c"); // 'a/b/c'
+```
+
+## ⚠️ Pitfalls
+
+- `join` does not make a path absolute; use `resolve` when you need that.
+- `extname` returns only the last extension (`.gz` for `a.tar.gz`).
+- Mixing `path.win32` and `path.posix` incorrectly breaks joins; pick one style for a given string format.
+- Trailing separators are normalized away by `join` / `resolve` (except root).
+- Do not use `path` for URL paths — use `URL` / `url` helpers instead.
+
+## 🔗 Related
+
+- [Node URL helpers](url_node.md) — `pathToFileURL` / `fileURLToPath`
+- [URL](url.md) — WHATWG `URL` in JS
+- [CommonJS modules](modules_commonjs.md) — `__dirname` / `__filename`
+- [ESM import/export](import_export.md) — `import.meta.url`
+- [fs](fs.md) — reading/writing with resolved paths

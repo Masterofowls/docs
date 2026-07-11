@@ -1,0 +1,90 @@
+# Subprocess
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`subprocess` runs external programs. Prefer `subprocess.run(...)` over older `Popen`/`call` helpers for most scripts. Capture output when you need it; raise on failure with `check=True`.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `subprocess.run(args, ...)` | Run and wait; returns `CompletedProcess` |
+| `capture_output=True` | Capture stdout/stderr as bytes |
+| `text=True` / `encoding=` | Decode streams as str |
+| `check=True` | Raise `CalledProcessError` on non-zero |
+| `cwd=` / `env=` | Working dir / environment |
+| `timeout=` | Kill if too slow |
+| `shell=True` | Run via shell (usually avoid) |
+| `CompletedProcess.returncode` | Exit status |
+
+Pass args as a **list** unless you truly need shell features.
+
+## 💡 Examples
+
+**Basic run:**
+
+```python
+import subprocess
+
+r = subprocess.run(["python", "-c", "print(1+1)"], capture_output=True, text=True)
+print(r.returncode, r.stdout.strip())
+```
+
+**check + capture:**
+
+```python
+import subprocess
+
+try:
+    r = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    print(r.stdout.strip())
+except subprocess.CalledProcessError as e:
+    print("failed:", e.returncode, e.stderr)
+```
+
+**cwd and env:**
+
+```python
+import os
+import subprocess
+
+env = {**os.environ, "MY_FLAG": "1"}
+subprocess.run(["ls"], cwd="/tmp", env=env, check=True)
+```
+
+**Avoid shell when possible:**
+
+```python
+import subprocess
+
+# Good: list form, no shell
+subprocess.run(["echo", "hello"], check=True)
+
+# Risky: shell=True with untrusted input → injection
+# subprocess.run(f"echo {user}", shell=True)  # DON'T
+```
+
+## ⚠️ Pitfalls
+
+- `shell=True` + unsanitized input enables command injection — use argument lists.
+- Without `capture_output` / `stdout=PIPE`, output goes to the console.
+- Forgotten `text=True` leaves `bytes` in `.stdout`.
+- `check=False` (default) hides failures — set `check=True` or inspect `returncode`.
+- Deadlocks are rare with `run`; with raw `Popen` pipes, always drain or use `communicate`.
+
+## 🔗 Related
+
+- [Sys](sys.md)
+- [Os](os.md)
+- [Shutil](shutil.md)
+- [Argparse](argparse.md)
+- [Exceptions](exceptions.md)

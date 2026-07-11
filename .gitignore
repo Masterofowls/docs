@@ -1,6 +1,10 @@
 /ACTIVITY_LOG.md
 /README.md
 /.cursor
+/Agents
 /.cursor/hooks
 /.cursor/hooks/state
 /.cursor/hooks/state/continual-learning.json
+/AGENTS.md
+/.cursor/hooks/state/continual-learning-index.json
+/.cursor/mcp.json

@@ -5,8 +5,10 @@
   "root": true,
   "pages": [
     "index",
+    "api-testing",
     "asserts",
     "asyncio-pytest",
+    "auth-testing",
     "capsys-caplog",
     "cli",
     "configuration",
@@ -20,6 +22,7 @@
     "mocking",
     "parametrize",
     "plugins",
+    "testing-basics",
     "tmp-path",
     "xdist",
     "...examples"

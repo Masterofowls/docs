@@ -1,0 +1,47 @@
+# Forms Validation
+
+_HTML · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Native constraint validation: `required`, `type`, `min`/`max`, `pattern`, `minlength`/`maxlength`. Pair with clear labels and `aria-describedby` for errors.
+
+## 🔧 Core concepts
+
+| Attr | Effect |
+| --- | --- |
+| `required` | Must be non-empty |
+| `type="email|url|number"` | Format checks |
+| `pattern` | Regex |
+| `min` / `max` / `step` | Numbers/dates |
+| `novalidate` | Disable browser UI |
+
+## 💡 Examples
+
+```html
+<form>
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" required autocomplete="email" />
+
+  <label for="age">Age</label>
+  <input id="age" name="age" type="number" min="13" max="120" />
+
+  <label for="code">Code</label>
+  <input id="code" name="code" pattern="[A-Z]{3}-\d{3}" title="ABC-123" />
+
+  <button type="submit">Save</button>
+</form>
+```
+
+## ⚠️ Pitfalls
+
+- Client validation is UX — always validate on the server.
+- `pattern` is case-sensitive; document expected format in `title` / help text.
+
+## 🔗 Related
+
+- [Form](form.md)
+- [Input](input.md)
+- [Accessible form](Examples/accessible_form.md)

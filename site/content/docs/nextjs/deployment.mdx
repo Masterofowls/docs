@@ -1,0 +1,88 @@
+---
+title: Deployment
+description: Next.js · Reference cheat sheet
+---
+
+# Deployment
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Deploy Next.js with a Node server (`next start`), a Platform-as-a-Service (Vercel, etc.), or a static export when the app has no server-only features.
+
+## 🔧 Core concepts
+
+| Mode | Command / config | Fits |
+| --- | --- | --- |
+| Node server | `next build` → `next start` | SSR, Route Handlers, ISR |
+| Vercel | Git integration | Full Next.js feature set |
+| Docker | Multi-stage Node image | Self-hosted |
+| Static export | `output: 'export'` | Fully static sites only |
+
+| Checklist | Why |
+| --- | --- |
+| Set production env vars | Secrets and `NEXT_PUBLIC_*` |
+| `NODE_ENV=production` | Optimizations |
+| Health endpoint | Orchestrators / load balancers |
+| Match Node version | Avoid native module mismatches |
+
+## 💡 Examples
+
+**Build & start:**
+
+```shellscript
+npm run build
+npm run start
+```
+
+**Static export (`next.config.ts`):**
+
+```ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "export",
+};
+export default nextConfig;
+```
+
+**Docker (sketch):**
+
+```dockerfile
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## ⚠️ Pitfalls
+
+- Static export cannot use server features (SSR cookies, many Route Handlers, ISR the same way).
+- Forgetting to set env vars on the host causes runtime crashes that never appeared locally.
+- Binding only to `localhost` inside containers breaks external access — listen on `0.0.0.0` when required by the host.
+
+## 🔗 Related
+
+- [env.md](/docs/nextjs/env)
+- [caching.md](/docs/nextjs/caching)
+- [middleware.md](/docs/nextjs/middleware)
+- [getting_started.md](/docs/nextjs/getting-started)
+- [Docker/getting_started.md](/docs/nextjs/../docker/getting-started)

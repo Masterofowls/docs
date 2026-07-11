@@ -1,0 +1,61 @@
+# useEffect vs useLayoutEffect
+
+_Comparisons · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Both React hooks run after render from side-effect logic. **useLayoutEffect** fires synchronously after DOM mutations before paint; **useEffect** fires after paint. Prefer `useEffect` unless you must measure/mutate DOM before the user sees a frame.
+
+## 🔧 Core concepts
+
+| Dimension | useEffect | useLayoutEffect |
+| --- | --- | --- |
+| Timing | After paint | Before paint (sync) |
+| Blocking | Non-blocking paint | Can delay paint |
+| SSR | OK (warns if misused) | Warning on server — often gate |
+| Typical use | Fetch, subscriptions, logging | DOM measure, scroll lock, tooltip position |
+| Default choice | Yes | Only when needed |
+
+**When to use useEffect:** data loading, event listeners, integrating non-React libs that can wait a frame.
+
+**When to use useLayoutEffect:** avoid flicker when reading layout (`getBoundingClientRect`) and synchronously updating state/DOM.
+
+## 💡 Examples
+
+**useEffect (fetch):**
+
+```tsx
+useEffect(() => {
+  let cancelled = false;
+  fetch("/api").then(async (r) => {
+    const data = await r.json();
+    if (!cancelled) setData(data);
+  });
+  return () => {
+    cancelled = true;
+  };
+}, []);
+```
+
+**useLayoutEffect (measure):**
+
+```tsx
+useLayoutEffect(() => {
+  const rect = ref.current?.getBoundingClientRect();
+  if (rect) setWidth(rect.width);
+}, [deps]);
+```
+
+## ⚠️ Pitfalls
+
+- Putting heavy work in `useLayoutEffect` janks the UI.
+- `useLayoutEffect` on the server warns — use `useEffect` or client-only components.
+- Neither replaces data libraries (react-query) for complex fetching.
+
+## 🔗 Related
+
+- [React/](../React/)
+- [Next.js/server_components.md](../Next.js/server_components.md)
+- [README.md](./README.md)

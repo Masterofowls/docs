@@ -1,0 +1,82 @@
+# Auth Testing
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Auth tests cover login, tokens/cookies, protected routes, and permission failures. Prefer fixtures that mint a test user + token so each test stays focused.
+
+## 🔧 Core concepts
+
+| Concern | Assert |
+| --- | --- |
+| Login success | 200 + token/cookie |
+| Bad credentials | 401/400 |
+| Missing auth | 401 on protected |
+| Wrong role | 403 |
+| Logout / revoke | Subsequent calls fail |
+
+## 💡 Examples
+
+**Bearer token fixture:**
+
+```python
+import os
+import pytest
+import requests
+
+BASE = os.getenv("API_URL", "http://127.0.0.1:8000")
+
+@pytest.fixture
+def auth_headers():
+    r = requests.post(
+        f"{BASE}/api/auth/login",
+        json={
+            "email": "ada@example.com",
+            "password": os.getenv("TEST_PASS", "secret"),
+        },
+        timeout=5,
+    )
+    r.raise_for_status()
+    token = r.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+def test_me(auth_headers):
+    r = requests.get(f"{BASE}/api/me", headers=auth_headers, timeout=5)
+    assert r.status_code == 200
+    assert r.json()["email"] == "ada@example.com"
+
+def test_me_unauthorized():
+    r = requests.get(f"{BASE}/api/me", timeout=5)
+    assert r.status_code == 401
+```
+
+**Session cookie (Django-style):**
+
+```python
+import pytest
+
+@pytest.fixture
+def logged_in(client, django_user_model):
+    django_user_model.objects.create_user("ada", password="x")
+    client.login(username="ada", password="x")
+    return client
+
+def test_dashboard(logged_in):
+    r = logged_in.get("/dashboard/")
+    assert r.status_code == 200
+```
+
+## ⚠️ Pitfalls
+
+- Never commit real passwords — use env or factories.
+- Clock skew / expired JWT needs freezegun or short TTL fixtures.
+- Mixing cookie + bearer incorrectly causes flaky 401s.
+
+## 🔗 Related
+
+- [API testing](api_testing.md)
+- [Fixtures](fixtures.md)
+- [Django pytest](django_pytest.md)

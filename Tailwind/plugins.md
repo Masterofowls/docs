@@ -1,0 +1,76 @@
+# Plugins
+
+_Tailwind · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Plugins add new utilities, components, or variants. Official plugins cover typography, forms, and aspect-ratio (some now built-in depending on version).
+
+## 🔧 Core concepts
+
+| Plugin | Adds |
+| --- | --- |
+| `@tailwindcss/typography` | `prose` styles for rich text |
+| `@tailwindcss/forms` | Sensible form element base styles |
+| `@tailwindcss/container-queries` | `@min-*` / `@max-*` variants (v3 era) |
+| `@tailwindcss/aspect-ratio` | Legacy aspect utilities |
+
+| API | Role |
+| --- | --- |
+| `plugin(function({ addUtilities, addComponents, theme }))` | Author plugins |
+| `addVariant` | Custom variants |
+| `matchUtilities` | Dynamic utility generation |
+
+## 💡 Examples
+
+**Register plugins (v3):**
+
+```js
+import typography from "@tailwindcss/typography";
+import forms from "@tailwindcss/forms";
+
+export default {
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  plugins: [typography, forms],
+};
+```
+
+**Prose article:**
+
+```html
+<article class="prose dark:prose-invert max-w-none">
+  <h1>Doc title</h1>
+  <p>Markdown-rendered content…</p>
+</article>
+```
+
+**Tiny custom utility plugin:**
+
+```js
+import plugin from "tailwindcss/plugin";
+
+export default {
+  plugins: [
+    plugin(({ addUtilities }) => {
+      addUtilities({
+        ".content-auto": { "content-visibility": "auto" },
+      });
+    }),
+  ],
+};
+```
+
+## ⚠️ Pitfalls
+
+- Duplicate functionality between Tailwind core and old plugins wastes CSS.
+- Plugin order can matter when multiple plugins define the same utility.
+- Always install matching plugin majors for your Tailwind major.
+
+## 🔗 Related
+
+- [custom_config.md](./custom_config.md)
+- [typography.md](./typography.md)
+- [getting_started.md](./getting_started.md)
+- [dark_mode.md](./dark_mode.md)

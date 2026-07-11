@@ -1,0 +1,60 @@
+# Persistence
+
+_Redis · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Redis can persist in-memory data via RDB snapshots, AOF logs, or both. Persistence improves durability but is not a substitute for backups and replication strategy.
+
+## 🔧 Core concepts
+
+| Mode | How |
+| --- | --- |
+| RDB | Point-in-time `.rdb` snapshots |
+| AOF | Append-only log of write commands |
+| RDB+AOF | Common hybrid |
+| No persistence | Pure cache (accept data loss) |
+
+| Knob | Meaning |
+| --- | --- |
+| `save` | RDB schedule |
+| `appendonly` | Enable AOF |
+| `appendfsync` | `always` / `everysec` / `no` |
+| Replica | Continuity via replication |
+
+## 💡 Examples
+
+**Check persistence config:**
+
+```bash
+redis-cli CONFIG GET save
+redis-cli CONFIG GET appendonly
+```
+
+**Manual save:**
+
+```bash
+BGSAVE
+LASTSAVE
+```
+
+**AOF rewrite:**
+
+```bash
+BGREWRITEAOF
+```
+
+## ⚠️ Pitfalls
+
+- `appendfsync always` is safest and slowest — usually `everysec` is the compromise.
+- Forking for `BGSAVE` on large datasets needs free memory headroom.
+- Restoring from outdated RDB after a crash still loses recent writes if AOF is off.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [expiry_ttl.md](./expiry_ttl.md)
+- [cli_basics.md](./cli_basics.md)
+- [Comparisons/redis_vs_postgres.md](../Comparisons/redis_vs_postgres.md)

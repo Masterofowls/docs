@@ -1,0 +1,78 @@
+# Arrow functions
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Arrow functions (`=>`) are compact function expressions — JS’s common “lambda” style for callbacks. They differ from `function` in `this` binding, `arguments`, constructability, and prototype. Prefer arrows for short callbacks; use `function` when you need dynamic `this` or a method on a prototype.
+
+## 🔧 Core concepts
+
+- **Syntax**: `(a, b) => expr` or `(a, b) => { statements; return x; }`.
+- **Implicit return**: single expression body returns that value; object literals need `( { … } )`.
+- **Lexical `this`**: inherits `this` from the enclosing scope (no own `this`).
+- **No `arguments` object**: use rest params `(...args) =>`.
+- **Not constructors**: cannot `new` an arrow; no `prototype` property.
+- **Callbacks**: ideal for `map` / `filter` / `then` / event handlers that should keep outer `this`.
+
+## 💡 Examples
+
+```js
+const double = (n) => n * 2;
+const add = (a, b) => a + b;
+
+const nums = [1, 2, 3];
+nums.map((n) => n * 2);
+nums.filter((n) => n > 1);
+
+// Block body
+const sum = (arr) => {
+  let t = 0;
+  for (const n of arr) t += n;
+  return t;
+};
+
+// Return object literal
+const toPair = (k, v) => ({ [k]: v });
+
+// Lexical this
+class Timer {
+  delay = 100;
+  start() {
+    setTimeout(() => {
+      console.log(this.delay); // Timer instance
+    }, this.delay);
+  }
+}
+
+// vs function — own this (often wrong in callbacks)
+setTimeout(function () {
+  // this is not the Timer
+}, 0);
+
+// Rest instead of arguments
+const max = (...xs) => Math.max(...xs);
+```
+
+```js
+// Ascending sort comparator
+[3, 1, 2].sort((a, b) => a - b);
+```
+
+## ⚠️ Pitfalls
+
+- Object methods as arrows on the prototype lose per-instance `this` patterns you may want; class fields as arrows are fine but not shared on the prototype.
+- Implicit return of `{}` is a block, not an object — wrap in parentheses.
+- Cannot be used as constructors or with `yield` as generators.
+- `this` inside an arrow in a `function` callback still follows the outer scope — know which scope you mean.
+- Longer logic is often clearer as a named `function` declaration.
+
+## 🔗 Related
+
+- [Functions](functions.md) — declarations, expressions, params
+- [this keyword](this_keyword.md) — `this` binding rules
+- [Closures](closures.md) — lexical scope
+- [Async](async.md) — async arrows `async () => {}`
+- [Arrays](arrays.md) — `map` / `filter` / `reduce` callbacks

@@ -1,0 +1,61 @@
+# Getting Started with Docker
+
+_Docker · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Docker packages apps and dependencies into images and runs them as containers. Use it for reproducible environments, local stacks, and deployment units.
+
+## 🔧 Core concepts
+
+| Idea | Meaning |
+| --- | --- |
+| Image | Immutable filesystem + metadata template |
+| Container | Running (or stopped) instance of an image |
+| Dockerfile | Build recipe for an image |
+| Registry | Image store (Docker Hub, GHCR, …) |
+| Compose | Multi-container app definition |
+
+| Command | Purpose |
+| --- | --- |
+| `docker version` | Client/server versions |
+| `docker pull` | Download image |
+| `docker run` | Create + start container |
+| `docker ps` | List running containers |
+| `docker build` | Build from Dockerfile |
+
+## 💡 Examples
+
+**Run nginx:**
+
+```bash
+docker run --rm -p 8080:80 nginx:alpine
+```
+
+**Build and run:**
+
+```bash
+docker build -t myapp:dev .
+docker run --rm -p 9000:9000 myapp:dev
+```
+
+**Shell into a container:**
+
+```bash
+docker exec -it <container> sh
+```
+
+## ⚠️ Pitfalls
+
+- Binding only to container localhost is fine; publishing ports needs `-p host:container`.
+- Data in the writable container layer is lost when the container is removed — use volumes.
+- Running as root inside images increases risk — prefer non-root users in production images.
+
+## 🔗 Related
+
+- [dockerfile.md](./dockerfile.md)
+- [compose.md](./compose.md)
+- [images_tags.md](./images_tags.md)
+- [glossary.md](./glossary.md)

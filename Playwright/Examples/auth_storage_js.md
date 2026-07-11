@@ -1,0 +1,78 @@
+# Auth Storage (JavaScript)
+
+_Playwright · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Log in once via UI or API, save `storageState`, reuse across tests for authenticated browser sessions.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Setup project | Runs before dependent tests |
+| `storageState` path | Cookies + localStorage |
+| Env secrets | Test user credentials |
+
+## 💡 Examples
+
+**UI login setup:**
+
+```ts
+// auth.setup.ts
+import { test as setup, expect } from '@playwright/test';
+
+const authFile = 'playwright/.auth/user.json';
+
+setup('authenticate', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(process.env.TEST_EMAIL!);
+  await page.getByLabel('Password').fill(process.env.TEST_PASS!);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page).toHaveURL(/dashboard/);
+  await page.context().storageState({ path: authFile });
+});
+```
+
+**API login → inject into context:**
+
+```ts
+setup('api auth', async ({ request }) => {
+  const res = await request.post('/api/auth/login', {
+    data: {
+      email: process.env.TEST_EMAIL,
+      password: process.env.TEST_PASS,
+    },
+  });
+  expect(res.ok()).toBeTruthy();
+  // If API sets cookies, persist them:
+  await request.storageState({ path: 'playwright/.auth/user.json' });
+});
+```
+
+**Config:**
+
+```ts
+// playwright.config.ts (sketch)
+projects: [
+  { name: 'setup', testMatch: /.*\.setup\.ts/ },
+  {
+    name: 'chromium',
+    dependencies: ['setup'],
+    use: { storageState: 'playwright/.auth/user.json' },
+  },
+]
+```
+
+## ⚠️ Pitfalls
+
+- Gitignore auth JSON files.
+- Refresh state when sessions expire in long CI jobs.
+
+## 🔗 Related
+
+- [Authentication](../authentication.md)
+- [Auth storage (Python)](auth_storage_python.md)
+- [Login flow](login_flow.md)

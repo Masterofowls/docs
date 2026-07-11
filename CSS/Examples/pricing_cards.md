@@ -1,0 +1,53 @@
+# Pricing Cards
+
+_CSS · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Responsive pricing row with CSS grid, featured plan emphasis, and fluid type.
+
+## 🔧 Core concepts
+
+| Technique | Use |
+| --- | --- |
+| `auto-fit` + `minmax` | Responsive columns |
+| `scale` / border | Featured plan |
+| `clamp` | Title size |
+
+## 💡 Examples
+
+```css
+.plans {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  align-items: stretch;
+}
+
+.plan {
+  border: 1px solid color-mix(in oklab, CanvasText 20%, transparent);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.plan.is-featured {
+  border-width: 2px;
+  transform: translateY(-0.25rem);
+}
+
+.plan h2 {
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+```
+
+## ⚠️ Pitfalls
+
+- Don't rely on color alone for "best value" — include text.
+
+## 🔗 Related
+
+- [Grid](../grid.md)
+- [Fluid typography](../fluid_typography.md)
+- [Card layout](card_layout.md)

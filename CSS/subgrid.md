@@ -1,0 +1,47 @@
+# Subgrid
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`grid-template-rows: subgrid` lets a child align to the parent's grid tracks — useful for card rows with equal header/footer bands.
+
+## 🔧 Core concepts
+
+| Property | Role |
+| --- | --- |
+| `subgrid` | Inherit parent tracks |
+| `grid-row: span N` | Occupy parent lines |
+| Gap | Can inherit or override |
+
+## 💡 Examples
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.card {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+}
+
+.card h2 { grid-row: 1; }
+.card p { grid-row: 2; }
+.card footer { grid-row: 3; }
+```
+
+## ⚠️ Pitfalls
+
+- Browser support is modern — provide a simple stacked fallback if needed.
+- Child must span the same number of parent tracks it wants to share.
+
+## 🔗 Related
+
+- [Grid](grid.md)
+- [Card layout](Examples/card_layout.md)

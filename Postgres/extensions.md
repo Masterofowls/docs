@@ -1,0 +1,67 @@
+# Extensions
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Extensions add types, functions, and index methods packaged with Postgres or from contrib/third parties. Enable per database with `CREATE EXTENSION`.
+
+## 🔧 Core concepts
+
+| Extension | Common use |
+| --- | --- |
+| `pgcrypto` | Crypto helpers |
+| `uuid-ossp` / `pgcrypto` gen | UUID generation |
+| `pg_trgm` | Trigram fuzzy search / indexes |
+| `citext` | Case-insensitive text |
+| `btree_gin` / `btree_gist` | Combined index support |
+| `postgres_fdw` | Foreign data wrapper |
+| `vector` (pgvector) | Embeddings (external) |
+
+| Command | Role |
+| --- | --- |
+| `CREATE EXTENSION` | Install in current DB |
+| `DROP EXTENSION` | Remove |
+| `\dx` | List installed |
+| `pg_available_extensions` | What’s available on server |
+
+## 💡 Examples
+
+**Enable trigram:**
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX users_name_trgm ON users USING GIN (name gin_trgm_ops);
+```
+
+**List:**
+
+```
+\dx
+```
+
+```sql
+SELECT * FROM pg_available_extensions ORDER BY name;
+```
+
+**UUID:**
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+SELECT gen_random_uuid();
+```
+
+## ⚠️ Pitfalls
+
+- Extension availability differs on managed hosts — check provider allowlists.
+- Dump/restore may require extensions created before data load.
+- Superuser is often required to create extensions.
+
+## 🔗 Related
+
+- [indexes.md](./indexes.md)
+- [json_jsonb.md](./json_jsonb.md)
+- [roles_privileges.md](./roles_privileges.md)
+- [getting_started.md](./getting_started.md)

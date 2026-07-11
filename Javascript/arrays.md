@@ -8,13 +8,67 @@ Arrays are ordered, indexable lists. Prefer non-mutating methods (`map`, `filter
 
 ## 🔧 Core concepts
 
-- **Create**: `[]`, `Array.of()`, `Array.from(iterable, mapFn)`.
-- **Length**: writable; shrinking truncates; growing adds empty slots.
-- **Access**: `arr[i]`, `arr.at(-1)` for negative indices.
-- **Mutating**: `push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`.
-- **Non-mutating (ES2023+)**: `toSorted`, `toReversed`, `toSpliced`, `with`.
-- **Search**: `includes`, `indexOf`, `find`, `findIndex`, `findLast`, `findLastIndex`.
-- **Transform**: `map`, `filter`, `flat`, `flatMap`, `reduce`, `reduceRight`.
+**Create / static**
+
+| Method | Notes |
+| --- | --- |
+| `Array()`, `[]` | Prefer `[]`; `new Array(n)` makes length-n sparse |
+| `Array.of(...items)` | Items as elements (avoids single-number length trap) |
+| `Array.from(iter, mapFn?)` | From iterable/array-like; optional map |
+| `Array.isArray(x)` | True only for real arrays |
+| `Array.fromAsync(asyncIter)` | Await each yield (ES2024) |
+
+**Access / length**
+
+| API | Notes |
+| --- | --- |
+| `arr[i]`, `arr.at(i)` | `at` supports negatives |
+| `arr.length` | Writable; shrink truncates; grow adds holes |
+| `arr.with(i, v)` | Copy with index `i` set to `v` (non-mutating) |
+
+**Mutating**
+
+| Method | Notes |
+| --- | --- |
+| `push(...x)` / `pop()` | End insert / remove |
+| `unshift(...x)` / `shift()` | Start insert / remove (O(n)) |
+| `splice(i, n, ...x)` | Delete `n` from `i`, insert `x`; returns removed |
+| `sort(cmp?)` | In-place; default **string** order |
+| `reverse()` | In-place reverse |
+| `fill(v, start?, end?)` | Fill range with `v` |
+| `copyWithin(t, s, e?)` | Copy slice within same array |
+
+**Non-mutating (ES2023+)**
+
+| Method | Notes |
+| --- | --- |
+| `toSorted(cmp?)` | Sorted copy |
+| `toReversed()` | Reversed copy |
+| `toSpliced(i, n, ...x)` | Splice copy |
+| `slice(start?, end?)` | Subarray copy (end exclusive) |
+| `concat(...items)` | Flatten one level of arrays; new array |
+
+**Search**
+
+| Method | Notes |
+| --- | --- |
+| `includes(v, from?)` | SameValueZero (finds `NaN`) |
+| `indexOf` / `lastIndexOf` | Strict equality; no `NaN` |
+| `find` / `findLast` | First/last element matching predicate |
+| `findIndex` / `findLastIndex` | Index or `-1` |
+| `some` / `every` | Any / all pass predicate |
+
+**Iterate / transform / convert**
+
+| Method | Notes |
+| --- | --- |
+| `forEach(fn)` | Side effects; ignores return |
+| `map` / `filter` | Transform / keep |
+| `flat(depth?)` / `flatMap(fn)` | Flatten; map then flatten 1 |
+| `reduce` / `reduceRight` | Fold L→R / R→L |
+| `keys` / `values` / `entries` | Index / value / pair iterators |
+| `join(sep?)` | String; default `","` |
+| `Object.groupBy(arr, fn)` | Group into object of arrays (ES2024) |
 
 ```js
 const a = Array.from({ length: 3 }, (_, i) => i + 1); // [1, 2, 3]

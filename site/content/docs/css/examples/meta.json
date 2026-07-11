@@ -4,6 +4,8 @@
     "index",
     "card-layout",
     "dark-mode-toggle",
-    "responsive-nav"
+    "pricing-cards",
+    "responsive-nav",
+    "sticky-sidebar"
   ]
 }

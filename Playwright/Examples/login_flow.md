@@ -61,3 +61,6 @@ await page.context().storageState({ path: "playwright/.auth/user.json" });
 ## 🔗 Related
 
 - [API mock](api_mock.md)
+- [Login flow (Python)](login_flow_python.md)
+- [Auth storage (JS)](auth_storage_js.md)
+- [Getting started](../getting_started.md)

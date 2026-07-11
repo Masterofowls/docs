@@ -1,5 +1,5 @@
 import { getLLMText, source } from '@/lib/source';
-import { TOPICS } from './topics';
+import { TOPICS, topicBySlug } from './topics';
 
 export type PageSummary = {
   id: string;
@@ -51,6 +51,64 @@ export async function buildFullMarkdownExport(): Promise<string> {
   return `${header}${parts.join('\n\n---\n\n')}\n`;
 }
 
+export async function buildTopicMarkdownExport(topicSlug: string): Promise<string> {
+  const topic = topicBySlug(topicSlug);
+  const pages = source
+    .getPages()
+    .filter((p) => p.slugs[0] === topicSlug)
+    .sort((a, b) => a.url.localeCompare(b.url));
+
+  if (pages.length === 0) {
+    throw new Error(`Unknown or empty topic: ${topicSlug}`);
+  }
+
+  const header = [
+    `# Code Reference — ${topic?.title ?? topicSlug}`,
+    ``,
+    `_${pages.length} pages_`,
+    ``,
+    `---`,
+    ``,
+  ].join('\n');
+
+  const parts = await Promise.all(pages.map((p) => getLLMText(p)));
+  return `${header}${parts.join('\n\n---\n\n')}\n`;
+}
+
+export function coverageReport() {
+  const pages = listPageSummaries();
+  const byTopic = TOPICS.map((t) => {
+    const topicPages = pages.filter((p) => p.topic === t.slug || p.slugs[0] === t.slug);
+    const glossary = topicPages.some(
+      (p) => p.slugs[p.slugs.length - 1] === 'glossary',
+    );
+    const gettingStarted = topicPages.some((p) =>
+      p.slugs.includes('getting-started') || p.slugs.includes('getting_started'),
+    );
+    // Heuristic stubs: very short titles + missing description often indicate thin pages
+    const thin = topicPages.filter(
+      (p) => !p.description || p.description.length < 24,
+    );
+    return {
+      slug: t.slug,
+      title: t.title,
+      count: topicPages.length,
+      glossary,
+      gettingStarted,
+      thinCount: thin.length,
+      thinSamples: thin.slice(0, 5).map((p) => ({ title: p.title, url: p.url })),
+      url: absoluteApi(`/docs/${t.slug}/`),
+      exportUrl: absoluteApi(`/api/v1/topic-export/${t.slug}`),
+    };
+  });
+
+  return {
+    totalPages: pages.length,
+    topics: byTopic,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 export function gatewayDiscovery() {
   const base = basePath();
   return {
@@ -81,6 +139,22 @@ export function gatewayDiscovery() {
       },
       {
         method: 'GET',
+        path: `${base}/api/v1/topic-export/{topic}`,
+        description: 'Download one topic as Markdown',
+        contentType: 'text/markdown',
+      },
+      {
+        method: 'GET',
+        path: `${base}/api/v1/coverage`,
+        description: 'Per-topic note counts and thin-page samples',
+      },
+      {
+        method: 'GET',
+        path: `${base}/api/v1/openapi`,
+        description: 'OpenAPI 3.1 schema for the HTTP API',
+      },
+      {
+        method: 'GET',
         path: `${base}/api/v1/glossaries`,
         description: 'Glossary page URLs for every topic',
       },
@@ -108,6 +182,8 @@ export function gatewayDiscovery() {
     ui: {
       gateway: `${base}/gateway/`,
       export: `${base}/export/`,
+      coverage: `${base}/coverage/`,
+      preview: `${base}/preview/`,
       newNote: `${base}/notes/new/`,
       search: `${base}/search/`,
     },

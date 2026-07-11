@@ -1,0 +1,50 @@
+# Checkout Form
+
+_HTML · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Accessible checkout fields with autocomplete tokens and native validation.
+
+## 🔧 Core concepts
+
+| Field | autocomplete |
+| --- | --- |
+| Email | `email` |
+| Name | `name` |
+| Card name | `cc-name` |
+| Country | `country` |
+
+## 💡 Examples
+
+```html
+<form method="post" action="/checkout">
+  <fieldset>
+    <legend>Contact</legend>
+    <label>Email
+      <input name="email" type="email" required autocomplete="email" />
+    </label>
+  </fieldset>
+  <fieldset>
+    <legend>Shipping</legend>
+    <label>Full name
+      <input name="name" required autocomplete="name" />
+    </label>
+    <label>Country
+      <input name="country" required autocomplete="country-name" />
+    </label>
+  </fieldset>
+  <button type="submit">Pay</button>
+</form>
+```
+
+## ⚠️ Pitfalls
+
+- Never put raw card numbers in your own inputs unless PCI-compliant — use a processor iframe/widget.
+
+## 🔗 Related
+
+- [Forms validation](../forms_validation.md)
+- [Accessible form](accessible_form.md)

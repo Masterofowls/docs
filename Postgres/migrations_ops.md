@@ -1,0 +1,60 @@
+# Migrations Ops
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Schema changes in production need expand/contract discipline, lock awareness, and backwards-compatible deploys. Tooling (Flyway, Liquibase, Prisma, Alembic, golang-migrate) applies SQL — ops principles stay the same.
+
+## 🔧 Core concepts
+
+| Practice | Why |
+| --- | --- |
+| Expand/contract | Avoid dual-write downtime |
+| Backwards compatible migrations | Old app + new schema coexist |
+| Short transactions | Reduce lock duration |
+| `CONCURRENTLY` indexes | Avoid long write locks |
+| Migration history table | Idempotent applies |
+
+| Risky DDL | Safer approach |
+| --- | --- |
+| Rewrite huge table in place | Add column → backfill → switch |
+| `ALTER TYPE` recreates | Add new column/type carefully |
+| Long `ALTER TABLE` locks | Check `pg_locks` / schedule window |
+
+## 💡 Examples
+
+**Add nullable column (safe):**
+
+```sql
+ALTER TABLE users ADD COLUMN locale text;
+```
+
+**Backfill in batches (app job):**
+
+```sql
+UPDATE users SET locale = 'en' WHERE locale IS NULL AND id IN (
+  SELECT id FROM users WHERE locale IS NULL ORDER BY id LIMIT 1000
+);
+```
+
+**Online index:**
+
+```sql
+CREATE INDEX CONCURRENTLY users_locale_idx ON users (locale);
+```
+
+## ⚠️ Pitfalls
+
+- Running `CREATE INDEX` without `CONCURRENTLY` on large tables locks writes.
+- Multi-statement migrations without transactions (or with ones that can't run in a txn, like concurrent index) need clear tool support.
+- Ignoring failed mid-migration state leaves environments drifted.
+
+## 🔗 Related
+
+- [indexes.md](./indexes.md)
+- [roles_privileges.md](./roles_privileges.md)
+- [backups_restore.md](./backups_restore.md)
+- [explain_analyze.md](./explain_analyze.md)

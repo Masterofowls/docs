@@ -1,0 +1,72 @@
+# Buffer
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+In Node.js, `Buffer` is a fixed-length sequence of bytes (Uint8Array subclass). Use it for binary I/O, encodings, and crypto. Prefer `Buffer.from` / `Buffer.alloc` over the deprecated `new Buffer()`.
+
+```js
+import { Buffer } from "node:buffer";
+```
+
+## 🔧 Core concepts
+
+- **`Buffer.from(data, encoding?)`**: from string, array, ArrayBuffer, or another Buffer.
+- **`Buffer.alloc(size, fill?, encoding?)`**: zero-filled (safe) allocation.
+- **`Buffer.allocUnsafe(size)`**: faster, may contain old memory — overwrite before use.
+- **Encodings**: `'utf8'` (default for many APIs), `'utf16le'`, `'base64'`, `'base64url'`, `'hex'`, `'ascii'`, `'latin1'`.
+- **`buf.toString(encoding?)`**: bytes → string.
+- **`buf.length`**: byte length, not string character count for multi-byte UTF-8.
+- **Slice vs subarray**: `subarray` views the same memory; mutating affects the parent.
+
+## 💡 Examples
+
+```js
+const a = Buffer.from("hello", "utf8");
+const b = Buffer.from([0x68, 0x69]); // 'hi'
+const z = Buffer.alloc(8); // 8 zero bytes
+
+console.log(a.toString("utf8")); // 'hello'
+console.log(a.toString("hex")); // '68656c6c6f'
+console.log(Buffer.from("6869", "hex").toString()); // 'hi'
+
+const b64 = Buffer.from("hi").toString("base64");
+Buffer.from(b64, "base64").toString(); // 'hi'
+
+// Concat
+const all = Buffer.concat([a, b]);
+
+// Compare / copy
+Buffer.compare(a, b);
+a.copy(Buffer.alloc(a.length));
+
+// Binary file
+import { readFile } from "node:fs/promises";
+const buf = await readFile("image.png"); // Buffer
+```
+
+```js
+// UTF-8 byte length ≠ string length
+const s = "é";
+[...s].length; // 1
+Buffer.byteLength(s, "utf8"); // 2
+```
+
+## ⚠️ Pitfalls
+
+- `allocUnsafe` can leak old data if not filled — prefer `alloc` unless profiling demands otherwise.
+- Truncating multi-byte UTF-8 mid-character corrupts strings — decode carefully when slicing.
+- `buf.slice` is deprecated legacy alias; use `subarray` and remember shared memory.
+- Mixing encodings (e.g. treat base64 as utf8) produces garbage.
+- Large buffers: stream instead of loading entire files when possible.
+
+## 🔗 Related
+
+- [fs](fs.md) — readFile returns Buffer by default
+- [Typed arrays](typed_arrays.md) — Uint8Array / ArrayBuffer
+- [Crypto](crypto_node.md) — hashes over Buffers
+- [Stream](stream.md) — chunked Buffers
+- [encode](encode.md) — URL/text encoding related concepts

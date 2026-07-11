@@ -1,0 +1,52 @@
+# Auth Guard Test
+
+_Jest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Test a helper that decides whether a route is allowed given a user role.
+
+## 🔧 Core concepts
+
+| Input | Output |
+| --- | --- |
+| No user | deny |
+| user role | allow user routes |
+| admin role | allow admin |
+
+## 💡 Examples
+
+```js
+export function canAccess(user, route) {
+  if (!user) return false;
+  if (route.startsWith('/admin')) return user.role === 'admin';
+  return true;
+}
+
+test('anonymous denied', () => {
+  expect(canAccess(null, '/dashboard')).toBe(false);
+});
+
+test('user can open dashboard', () => {
+  expect(canAccess({ role: 'user' }, '/dashboard')).toBe(true);
+});
+
+test('user blocked from admin', () => {
+  expect(canAccess({ role: 'user' }, '/admin/users')).toBe(false);
+});
+
+test('admin allowed', () => {
+  expect(canAccess({ role: 'admin' }, '/admin/users')).toBe(true);
+});
+```
+
+## ⚠️ Pitfalls
+
+- Keep auth rules pure and unit-tested; E2E covers the UI wiring.
+
+## 🔗 Related
+
+- [Auth testing](../auth_testing.md)
+- [API fetch mock](api_fetch_mock.md)

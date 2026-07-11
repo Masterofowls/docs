@@ -1,0 +1,81 @@
+# Urllib.parse
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`urllib.parse` splits and builds URLs: parse components, encode query strings, and percent-encode path segments. Stdlib — no install. Pair with `urllib.request` or [Requests](requests_http.md) for HTTP.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `urlparse(url)` | Split into scheme/netloc/path/… |
+| `urlunparse(parts)` | Rebuild from parts |
+| `urlsplit` / `urlunsplit` | Similar; path keeps params differently |
+| `parse_qs` / `parse_qsl` | Query string → dict / list of pairs |
+| `urlencode(query)` | Dict/pairs → query string |
+| `quote(s)` / `quote_plus` | Percent-encode (path vs form) |
+| `unquote` / `unquote_plus` | Decode |
+| `urljoin(base, url)` | Resolve relative URLs |
+
+`ParseResult` fields: `scheme`, `netloc`, `path`, `params`, `query`, `fragment`.
+
+## 💡 Examples
+
+**urlparse:**
+
+```python
+from urllib.parse import urlparse
+
+u = urlparse("https://example.com:443/a/b?x=1#top")
+print(u.scheme, u.hostname, u.port, u.path, u.query, u.fragment)
+```
+
+**urlencode + quote:**
+
+```python
+from urllib.parse import urlencode, quote, urljoin
+
+qs = urlencode({"q": "hello world", "lang": "en"})
+print(qs)  # q=hello+world&lang=en
+
+path = "/docs/" + quote("C++ tips")
+print(urljoin("https://example.com", path))
+```
+
+**parse query:**
+
+```python
+from urllib.parse import parse_qs, urlsplit
+
+parts = urlsplit("https://x.test/search?q=a&q=b&page=2")
+print(parse_qs(parts.query))  # {'q': ['a', 'b'], 'page': ['2']}
+```
+
+**Rebuild URL:**
+
+```python
+from urllib.parse import urlparse, urlunparse, urlencode
+
+p = urlparse("https://api.example.com/v1/items")
+query = urlencode({"limit": 10, "tag": "py"})
+print(urlunparse(p._replace(query=query)))
+```
+
+## ⚠️ Pitfalls
+
+- `quote` vs `quote_plus`: `+` for form bodies; `%20` often for paths.
+- `parse_qs` returns **lists** of values — use `[0]` carefully.
+- Don’t assemble URLs with raw f-strings for user input — encode first.
+- `urljoin` replaces the path when the second arg starts with `/`.
+- IPv6 / unusual URLs: prefer `urlsplit` and inspect `netloc` carefully.
+
+## 🔗 Related
+
+- [Requests](requests_http.md)
+- [Json](json.md)
+- [Strings](strings.md)
+- [Regex](regex.md)

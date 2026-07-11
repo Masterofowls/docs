@@ -1,0 +1,19 @@
+{
+  "title": "Docker",
+  "description": "Images, Compose, containers",
+  "icon": "Box",
+  "root": true,
+  "pages": [
+    "index",
+    "compose",
+    "dockerfile",
+    "env-secrets",
+    "getting-started",
+    "glossary",
+    "healthchecks",
+    "images-tags",
+    "multi-stage",
+    "networks",
+    "volumes"
+  ]
+}

@@ -1,0 +1,126 @@
+# OS
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `os` module talks to the operating system: env vars, process info, and basic path helpers. Prefer `pathlib` for path work; keep `os` for env, cwd, and platform details.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `os.environ` | Mapping of environment variables |
+| `os.getenv(k, default)` | Safe read (returns `None` / default) |
+| `os.environ["KEY"]` | Read/set; `KeyError` if missing |
+| `os.getcwd()` / `os.chdir(path)` | Working directory |
+| `os.name` / `os.sep` | Platform hints |
+| `os.listdir(path)` | Directory entries (names only) |
+| `os.makedirs(path, exist_ok=True)` | Create dirs |
+| `os.remove` / `os.rename` | File ops |
+| `os.path.join` / `exists` / `splitext` | String path helpers |
+| `pathlib.Path` | Preferred OO paths |
+| `os.walk` | Recurse directories |
+| `os.environ.get` | Alias of mapping get |
+| `os.putenv` / `unsetenv` | Low-level; prefer `environ` |
+| `os.cpu_count()` | Scheduler hint |
+
+**Theory:** The process environment is a string→string map inherited by children. Path APIs either return strings (`os.path`) or objects (`pathlib`). File-system calls can raise `OSError` subclasses (`FileNotFoundError`, `PermissionError`) — catch the specific type you can recover from.
+
+**`os.path` vs `pathlib`:** `os.path` returns strings; `Path` objects support `/`, `.read_text()`, `.glob()`, and clearer APIs. Use `pathlib` for new code; `os.path` still appears in older APIs.
+
+## 💡 Examples
+
+**Environment variables:**
+
+```python
+import os
+
+home = os.getenv("HOME") or os.getenv("USERPROFILE")
+os.environ["APP_ENV"] = "dev"
+print(os.environ.get("APP_ENV", "prod"))
+# del os.environ["APP_ENV"]  # unset
+```
+
+**Cwd and listing:**
+
+```python
+import os
+from pathlib import Path
+
+print(os.getcwd())
+for name in os.listdir("."):
+    print(name, Path(name).is_file())
+```
+
+**`os.path` vs `pathlib`:**
+
+```python
+import os
+from pathlib import Path
+
+s = os.path.join("data", "a.csv")
+print(os.path.exists(s), os.path.splitext(s))
+
+p = Path("data") / "a.csv"
+print(p.exists(), p.suffix, p.read_text(encoding="utf-8") if p.exists() else "")
+```
+
+**Create dirs (os vs pathlib):**
+
+```python
+import os
+from pathlib import Path
+
+os.makedirs("out/logs", exist_ok=True)
+Path("out/cache").mkdir(parents=True, exist_ok=True)
+```
+
+**Expand user + join portably:**
+
+```python
+import os
+from pathlib import Path
+
+cfg = Path(os.path.expanduser("~")) / ".config" / "myapp" / "config.toml"
+print(cfg)
+```
+
+**Replace extension safely:**
+
+```python
+import os
+
+base, _ = os.path.splitext("report.CSV")
+print(base + ".parquet")
+```
+
+**Walk with prune:**
+
+```python
+import os
+
+for root, dirs, files in os.walk("."):
+    dirs[:] = [d for d in dirs if not d.startswith(".")]
+    print(root, len(files))
+```
+
+## ⚠️ Pitfalls
+
+- `os.environ["MISSING"]` raises `KeyError` — prefer `getenv` / `.get`.
+- Env values are always strings; cast (`int(os.getenv("PORT", "8000"))`).
+- `chdir` is process-global and surprises libraries — avoid in libraries.
+- Mixing `str` and `Path` is fine at the boundary; stick to one style inside a module.
+- `listdir` does not recurse; use `Path.rglob` or `os.walk` for trees.
+
+## 🔗 Related
+
+- [Pathlib](pathlib.md)
+- [Files I/O](files_io.md)
+- [Dotenv](dotenv.md)
+- [Shutil](shutil.md)
+- [Sys](sys.md)
+- [OS process & env](os_process_env.md)
+- [Venv](venv.md)

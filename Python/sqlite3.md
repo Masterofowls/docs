@@ -1,0 +1,92 @@
+# Sqlite3
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`sqlite3` is the stdlib binding to SQLite — a serverless SQL database in a single file (or `:memory:`). Use parameterized queries always. Prefer the connection as a context manager for transactions.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `sqlite3.connect(path)` | Open DB file / `:memory:` |
+| `conn.execute(sql, params)` | Run one statement |
+| `conn.executemany(sql, seq)` | Batch inserts/updates |
+| `conn.commit()` / `rollback()` | Transactions |
+| `conn.cursor()` | Explicit cursor (optional) |
+| `with conn:` | Commit on success, rollback on error |
+| `row_factory = sqlite3.Row` | Name-based row access |
+| `conn.close()` | Release file |
+
+Placeholders: `?` positional or `:name` named — never f-string SQL.
+
+## 💡 Examples
+
+**Connect + create + insert:**
+
+```python
+import sqlite3
+from pathlib import Path
+
+db = Path("app.db")
+with sqlite3.connect(db) as conn:
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)"
+    )
+    conn.execute("INSERT INTO users (name) VALUES (?)", ("Ada",))
+    # with-block commits on success
+```
+
+**Query rows:**
+
+```python
+import sqlite3
+
+conn = sqlite3.connect("app.db")
+conn.row_factory = sqlite3.Row
+try:
+    rows = conn.execute("SELECT id, name FROM users WHERE name = ?", ("Ada",)).fetchall()
+    for row in rows:
+        print(row["id"], row["name"])
+finally:
+    conn.close()
+```
+
+**executemany:**
+
+```python
+import sqlite3
+
+rows = [("Lin",), ("Grace",), ("Ken",)]
+with sqlite3.connect("app.db") as conn:
+    conn.executemany("INSERT INTO users (name) VALUES (?)", rows)
+```
+
+**In-memory + context manager:**
+
+```python
+import sqlite3
+
+with sqlite3.connect(":memory:") as conn:
+    conn.execute("CREATE TABLE t (x INTEGER)")
+    conn.execute("INSERT INTO t VALUES (1), (2)")
+    print(conn.execute("SELECT SUM(x) FROM t").fetchone()[0])
+```
+
+## ⚠️ Pitfalls
+
+- Never interpolate user input into SQL — use `?` / named params.
+- Outside `with conn:`, remember `commit()` or changes vanish.
+- SQLite locks the DB file; long writes block readers.
+- `Row` access needs `row_factory`; default rows are tuples.
+- Keep connections short-lived in web apps, or use a pool carefully.
+
+## 🔗 Related
+
+- [Context managers](context_managers.md)
+- [Pathlib](pathlib.md)
+- [Exceptions](exceptions.md)
+- [Json](json.md)

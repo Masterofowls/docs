@@ -1,0 +1,75 @@
+# Packaging
+
+_Node.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node projects are defined by `package.json`: dependencies, scripts, entry points, and module format. Publish libraries to npm or run apps via scripts.
+
+## 🔧 Core concepts
+
+| Field | Purpose |
+| --- | --- |
+| `name` / `version` | Package identity (semver) |
+| `type` | `"module"` for ESM default |
+| `main` / `exports` | Entry points |
+| `dependencies` | Runtime deps |
+| `devDependencies` | Build/test-only deps |
+| `scripts` | `npm run` commands |
+| `engines` | Supported Node versions |
+
+| Command | Effect |
+| --- | --- |
+| `npm install` | Install from lockfile |
+| `npm ci` | Clean CI install |
+| `npm outdated` | Check updates |
+| `npm pack` | Dry-run tarball |
+
+## 💡 Examples
+
+**Minimal library `exports`:**
+
+```json
+{
+  "name": "@acme/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"]
+}
+```
+
+**Useful scripts:**
+
+```json
+{
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "node --test"
+  }
+}
+```
+
+**Install exact tree in CI:**
+
+```bash
+npm ci
+```
+
+## ⚠️ Pitfalls
+
+- Committing without a lockfile leads to non-reproducible installs.
+- Publishing secrets or `.env` via bad `"files"` / missing `.npmignore` is catastrophic.
+- Dual CJS/ESM packages need careful `exports` — test both consumers.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [env_config.md](./env_config.md)
+- [glossary.md](./glossary.md)
+- [error_handling.md](./error_handling.md)

@@ -1,0 +1,62 @@
+---
+title: HTTP (Node)
+description: JavaScript · Reference cheat sheet
+---
+
+# HTTP (Node)
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node’s `node:http` / `node:https` build servers and clients. For most apps prefer frameworks (Express, Fastify) or `fetch` (Node 18+). This sheet covers the core APIs.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `http.createServer(handler)` | HTTP server |
+| `req` / `res` | IncomingMessage / ServerResponse |
+| `http.request` / `get` | Outgoing client |
+| `https` | TLS variants |
+| `fetch(url)` | Modern client (undici) |
+
+## 💡 Examples
+
+**Tiny server:**
+
+```js
+import http from 'node:http';
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ ok: true, url: req.url }));
+});
+
+server.listen(9000, () => console.log('http://127.0.0.1:9000'));
+```
+
+**fetch client (Node 18+):**
+
+```js
+const res = await fetch('https://httpbin.org/get');
+const data = await res.json();
+console.log(data.url);
+```
+
+## ⚠️ Pitfalls
+
+- Always handle `error` on sockets; unhandled errors crash the process.
+- Remember to `res.end()` or the request hangs.
+- Prefer `fetch` / undici over hand-rolled `http.request` for clients.
+- Binding `0.0.0.0` exposes the service on all interfaces.
+
+## 🔗 Related
+
+- [fetch](/docs/javascript/fetch)
+- [stream](/docs/javascript/stream)
+- [process](/docs/javascript/process)
+- [url_node](/docs/javascript/url-node)
+- [async](/docs/javascript/async)

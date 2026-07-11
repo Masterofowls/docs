@@ -1,0 +1,72 @@
+# process
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node.js exposes the current process as the global `process` object: environment, CLI args, working directory, exit codes, and stdio streams. Available without an import in most contexts; you can also `import process from "node:process"`.
+
+## 🔧 Core concepts
+
+- **`process.env`**: environment variables (strings or `undefined`).
+- **`process.argv`**: `[nodePath, scriptPath, ...args]`.
+- **`process.cwd()`**: current working directory (not the script’s folder).
+- **`process.exit(code?)`**: end process; `0` success, non-zero failure.
+- **`stdin` / `stdout` / `stderr`**: readable/writable streams for I/O.
+- **Signals / events**: `process.on("SIGINT", ...)`, `beforeExit`, `uncaughtException` (use sparingly).
+
+## 💡 Examples
+
+```js
+import process from "node:process";
+
+// CLI: node app.js --port 9000
+const args = process.argv.slice(2);
+console.log(process.execPath); // node binary
+console.log(process.cwd());
+
+const port = process.env.PORT ?? "9000";
+
+process.stdout.write("hello\n");
+console.error("to stderr"); // often process.stderr
+
+// Read stdin (piped input)
+async function readStdin() {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+process.on("SIGINT", () => {
+  console.log("shutting down…");
+  process.exit(0);
+});
+
+if (!process.env.REQUIRED) {
+  console.error("REQUIRED is missing");
+  process.exit(1);
+}
+```
+
+```js
+// Change cwd (affects relative fs paths)
+process.chdir("/tmp");
+```
+
+## ⚠️ Pitfalls
+
+- `process.exit()` skips pending I/O and `finally` cleanup; prefer letting the loop drain or use `exitCode = 1`.
+- `cwd()` is where you launched the process, not `__dirname` / `import.meta.url`.
+- `argv` includes node and script paths — slice from index `2` for user args.
+- Mutating `process.env` affects the current process only (not the parent shell).
+- Unhandled promise rejections may terminate Node depending on version/flags.
+
+## 🔗 Related
+
+- [dotenv](dotenv.md) — load `.env` into `process.env`
+- [Path](path.md) — resolve paths relative to cwd
+- [Stream](stream.md) — stdin/stdout as streams
+- [child_process](child_process.md) — spawn subprocesses
+- [Buffer](buffer.md) — binary stdin chunks

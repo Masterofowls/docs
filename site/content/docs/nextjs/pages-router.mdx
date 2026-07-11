@@ -1,0 +1,78 @@
+---
+title: Pages Router
+description: Next.js · Reference cheat sheet
+---
+
+# Pages Router
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The Pages Router is the original Next.js routing model: each file under `pages/` maps to a URL. Still supported and common in older codebases.
+
+## 🔧 Core concepts
+
+| File / pattern | URL |
+| --- | --- |
+| `pages/index.tsx` | `/` |
+| `pages/about.tsx` | `/about` |
+| `pages/blog/[id].tsx` | `/blog/:id` |
+| `pages/api/hello.ts` | `/api/hello` |
+| `pages/_app.tsx` | App wrapper |
+| `pages/_document.tsx` | Custom HTML document |
+| `pages/404.tsx` | Custom 404 |
+
+| Data API | When it runs |
+| --- | --- |
+| `getStaticProps` | Build time (SSG) |
+| `getStaticPaths` | Build time paths for dynamic SSG |
+| `getServerSideProps` | Every request (SSR) |
+
+## 💡 Examples
+
+**Static page with props:**
+
+```tsx
+export async function getStaticProps() {
+  return { props: { title: "Home" } };
+}
+
+export default function Home({ title }: { title: string }) {
+  return <h1>{title}</h1>;
+}
+```
+
+**Dynamic SSR:**
+
+```tsx
+export async function getServerSideProps(ctx: { params: { id: string } }) {
+  return { props: { id: ctx.params.id } };
+}
+```
+
+**API route:**
+
+```ts
+// pages/api/hello.ts
+import type { NextApiRequest, NextApiResponse } from "next";
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  res.status(200).json({ ok: true });
+}
+```
+
+## ⚠️ Pitfalls
+
+- Don't put secrets in `getStaticProps` props — they ship to the client HTML.
+- `_document.tsx` only runs on the server; no React context/hooks from `_app` there.
+- Prefer App Router for new projects unless you have a Pages-only constraint.
+
+## 🔗 Related
+
+- [app_router.md](/docs/nextjs/app-router)
+- [route_handlers.md](/docs/nextjs/route-handlers)
+- [link_navigation.md](/docs/nextjs/link-navigation)
+- [Comparisons/pages_vs_app_router.md](/docs/nextjs/../comparisons/pages-vs-app-router)

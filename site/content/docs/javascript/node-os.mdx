@@ -1,0 +1,73 @@
+---
+title: OS module
+description: JavaScript · Reference cheat sheet
+---
+
+# OS module
+
+_JavaScript · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Node.js `node:os` reports host operating system details: home/temp directories, platform, CPU info, memory, and network interfaces. Useful for tools, diagnostics, and default paths — not a substitute for feature detection in app logic.
+
+```js
+import os from "node:os";
+```
+
+## 🔧 Core concepts
+
+- **`homedir()`**: current user’s home directory.
+- **`tmpdir()`**: default directory for temporary files.
+- **`platform()`**: `'darwin' | 'linux' | 'win32' | …` (Node’s naming).
+- **`type()` / `release()` / `arch()`**: OS name, version string, CPU arch (`x64`, `arm64`).
+- **`cpus()`**: array of CPU core descriptors (`model`, `speed`, `times`).
+- **`totalmem()` / `freemem()`**: RAM in bytes.
+- **`hostname()` / `networkInterfaces()`**: machine name and NICs.
+- **`EOL`**: end-of-line sequence (`\n` or `\r\n`).
+
+## 💡 Examples
+
+```js
+import os from "node:os";
+import path from "node:path";
+
+const configDir = path.join(os.homedir(), ".myapp");
+const scratch = path.join(os.tmpdir(), "myapp-cache");
+
+console.log(os.platform(), os.arch(), os.release());
+console.log("cores:", os.cpus().length);
+console.log("free MB:", Math.round(os.freemem() / 1024 / 1024));
+
+const cpus = os.cpus();
+console.log(cpus[0]?.model);
+
+// Cross-platform line join
+const lines = ["a", "b", "c"].join(os.EOL);
+
+const ifaces = os.networkInterfaces();
+for (const [name, addrs] of Object.entries(ifaces)) {
+  for (const a of addrs ?? []) {
+    if (a.family === "IPv4" && !a.internal) {
+      console.log(name, a.address);
+    }
+  }
+}
+```
+
+## ⚠️ Pitfalls
+
+- `platform()` returns `'win32'` even on 64-bit Windows.
+- `cpus().length` is logical cores (HT), not necessarily physical packages.
+- `tmpdir()` / `homedir()` can throw or be unexpected in restricted containers.
+- `networkInterfaces()` shape varies; filter `internal` and family carefully (`IPv4` vs `4` in older Node).
+- Do not hardcode separators — combine with `path` and `os.EOL`.
+
+## 🔗 Related
+
+- [Path](/docs/javascript/path) — join home/tmp with filenames
+- [process](/docs/javascript/process) — env, cwd, platform via process
+- [fs](/docs/javascript/fs) — create dirs under homedir/tmpdir
+- [child_process](/docs/javascript/child-process) — OS-specific binaries

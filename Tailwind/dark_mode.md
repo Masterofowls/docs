@@ -1,0 +1,63 @@
+# Dark Mode
+
+_Tailwind · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Dark mode uses the `dark:` variant. Strategy is either media-based (`prefers-color-scheme`) or class-based (`class="dark"` on a root element).
+
+## 🔧 Core concepts
+
+| Strategy | Config | Toggle |
+| --- | --- | --- |
+| `media` | default in many setups | OS preference |
+| `class` | `darkMode: 'class'` | Add/remove `dark` on `<html>` |
+| `selector` (v4) | custom selector | Framework-specific |
+
+| Pair | Example |
+| --- | --- |
+| Surfaces | `bg-white dark:bg-zinc-900` |
+| Text | `text-zinc-900 dark:text-zinc-100` |
+| Borders | `border-zinc-200 dark:border-zinc-700` |
+
+## 💡 Examples
+
+**Class strategy config (v3):**
+
+```js
+export default {
+  darkMode: "class",
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+};
+```
+
+**Markup:**
+
+```html
+<html class="dark">
+  <body class="bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+    ...
+  </body>
+</html>
+```
+
+**Toggle sketch:**
+
+```js
+document.documentElement.classList.toggle("dark");
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting to set `darkMode: 'class'` while toggling a class does nothing.
+- Flash of wrong theme on first paint — set class early (inline script) before CSS paints.
+- Not all colors need inversion; keep brand accents consistent.
+
+## 🔗 Related
+
+- [colors.md](./colors.md)
+- [custom_config.md](./custom_config.md)
+- [typography.md](./typography.md)
+- [getting_started.md](./getting_started.md)

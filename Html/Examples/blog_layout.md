@@ -1,0 +1,54 @@
+# Blog Layout
+
+_HTML · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Semantic skeleton for an article page with header, article, aside TOC, and footer.
+
+## 🔧 Core concepts
+
+| Region | Element |
+| --- | --- |
+| Branding | `header` |
+| Content | `article` + headings |
+| TOC | `aside` / `nav` |
+| Meta | `time`, author |
+
+## 💡 Examples
+
+```html
+<main>
+  <article>
+    <header>
+      <h1>Understanding landmarks</h1>
+      <p>By <span rel="author">Ada</span> ·
+        <time datetime="2026-07-11">Jul 11, 2026</time>
+      </p>
+    </header>
+    <section>
+      <h2>Overview</h2>
+      <p>...</p>
+    </section>
+  </article>
+  <aside>
+    <nav aria-label="On this page">
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+      </ol>
+    </nav>
+  </aside>
+</main>
+```
+
+## ⚠️ Pitfalls
+
+- Don't skip heading levels (`h1` → `h3`).
+- One `h1` per page keeps outlines clean.
+
+## 🔗 Related
+
+- [Landmarks](../landmarks.md)
+- [Semantic article](semantic_article.md)

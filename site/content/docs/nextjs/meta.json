@@ -1,0 +1,22 @@
+{
+  "title": "Next.js",
+  "description": "App Router, RSC, deployment",
+  "icon": "Globe",
+  "root": true,
+  "pages": [
+    "index",
+    "app-router",
+    "caching",
+    "deployment",
+    "env",
+    "getting-started",
+    "glossary",
+    "image",
+    "link-navigation",
+    "metadata",
+    "middleware",
+    "pages-router",
+    "route-handlers",
+    "server-components"
+  ]
+}

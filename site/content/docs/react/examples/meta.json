@@ -5,6 +5,9 @@
     "controlled-input",
     "counter",
     "fetch-list",
+    "login-form",
+    "search-debounce",
+    "tabs-compound",
     "theme-context"
   ]
 }

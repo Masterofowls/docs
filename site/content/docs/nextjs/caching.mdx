@@ -1,0 +1,70 @@
+---
+title: Caching
+description: Next.js · Reference cheat sheet
+---
+
+# Caching
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+App Router caching spans the Request Memoization, Data Cache, Full Route Cache, and Router Cache. Defaults favor static where possible; opt into dynamic when data must be fresh.
+
+## 🔧 Core concepts
+
+| Cache | What it stores |
+| --- | --- |
+| Request Memoization | Dedupes identical `fetch` in one render pass |
+| Data Cache | Persistent server fetch cache across requests |
+| Full Route Cache | Pre-rendered HTML/RSC payload at build |
+| Router Cache | Client-side cache of visited segments |
+
+| Control | Effect |
+| --- | --- |
+| `fetch(url, \{ cache: 'no-store' \})` | Skip Data Cache |
+| `fetch(url, \{ next: \{ revalidate: N \} \})` | ISR-style revalidate every N seconds |
+| `revalidatePath` / `revalidateTag` | On-demand invalidation |
+| `export const dynamic = 'force-dynamic'` | Always dynamic route |
+| `export const revalidate = 60` | Segment revalidate window |
+
+## 💡 Examples
+
+**Time-based revalidation:**
+
+```ts
+const res = await fetch("https://api.example.com/items", {
+  next: { revalidate: 3600, tags: ["items"] },
+});
+```
+
+**On-demand revalidate (Server Action / Route Handler):**
+
+```ts
+import { revalidateTag } from "next/cache";
+
+export async function refreshItems() {
+  revalidateTag("items");
+}
+```
+
+**Force dynamic:**
+
+```ts
+export const dynamic = "force-dynamic";
+```
+
+## ⚠️ Pitfalls
+
+- Stale UI after mutations usually means missing `revalidatePath`/`revalidateTag`.
+- Caching behavior differs between local `next dev` and production builds.
+- Mixing `no-store` fetches inside otherwise static layouts can turn the whole route dynamic.
+
+## 🔗 Related
+
+- [server_components.md](/docs/nextjs/server-components)
+- [route_handlers.md](/docs/nextjs/route-handlers)
+- [deployment.md](/docs/nextjs/deployment)
+- [app_router.md](/docs/nextjs/app-router)

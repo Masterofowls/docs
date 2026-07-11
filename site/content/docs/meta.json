@@ -7,9 +7,17 @@
     "typescript",
     "react",
     "react-native",
+    "nextjs",
+    "node",
+    "zod",
+    "tailwind",
     "css",
     "html",
     "django",
+    "docker",
+    "redis",
+    "postgres",
+    "sql",
     "playwright",
     "pytest",
     "jest",
@@ -17,6 +25,7 @@
     "powershell",
     "github-actions",
     "git",
-    "sql"
+    "comparisons",
+    "global-glossary"
   ]
 }

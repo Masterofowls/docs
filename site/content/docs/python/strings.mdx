@@ -15,15 +15,47 @@ _Python · Reference cheat sheet_
 
 ## 🔧 Core concepts
 
+**Literals / access**
+
 | Area | Notes |
 | --- | --- |
 | Literals | `'...'`, `"..."`, `'''...'''`, `"""..."""`, raw `r"..."`, f-strings |
-| Immutability | Methods return new strings |
-| Indexing / slicing | `s[0]`, `s[-1]`, `s[1:4]`, `s[::-1]` |
-| Search | `in`, `find`, `index`, `startswith`, `endswith` |
-| Transform | `lower`, `upper`, `title`, `strip`, `replace`, `translate` |
-| Split / join | `split`, `rsplit`, `partition`, `",".join(parts)` |
+| Immutability | Methods return **new** strings |
+| Index / slice | `s[0]`, `s[-1]`, `s[1:4]`, `s[::-1]` |
 | Encode | `s.encode("utf-8")`, `b.decode("utf-8")` |
+
+**Search / test**
+
+| Method | Notes |
+| --- | --- |
+| `in` / `find` / `rfind` | Substring; `find` → −1 if missing |
+| `index` / `rindex` | Like find; raises `ValueError` |
+| `startswith` / `endswith` | Prefix/suffix; tuple of options ok |
+| `count(sub[, start[, end]])` | Non-overlapping count |
+| `isalnum` / `isalpha` / `isdigit` / `isdecimal` / `isnumeric` | Character class tests |
+| `islower` / `isupper` / `istitle` / `isspace` / `isidentifier` / `isprintable` | More predicates |
+
+**Case / strip / pad / align**
+
+| Method | Notes |
+| --- | --- |
+| `lower` / `upper` / `title` / `capitalize` / `swapcase` | Case transforms |
+| `casefold()` | Aggressive caseless matching |
+| `strip` / `lstrip` / `rstrip` | Trim chars (default whitespace) |
+| `removeprefix` / `removesuffix` | Exact affix remove (3.9+) |
+| `center` / `ljust` / `rjust` / `zfill` | Pad / zero-pad |
+
+**Split / join / partition / replace**
+
+| Method | Notes |
+| --- | --- |
+| `split(sep=None, maxsplit=-1)` | `None` collapses whitespace |
+| `rsplit` / `splitlines(keepends=False)` | From right; by line breaks |
+| `partition` / `rpartition` | → `(before, sep, after)` |
+| `",".join(parts)` | Join iterable of **str** |
+| `replace(old, new, count=-1)` | Replace occurrences |
+| `translate(table)` / `maketrans` | Char mapping (fast multi-replace) |
+| `format` / `format_map` / f-strings | Interpolation |
 
 Multiline strings keep newlines; use `textwrap.dedent` for indented source blocks.
 
@@ -74,9 +106,9 @@ print(data.decode("utf-8"))
 
 ## 🔗 Related
 
-- [F-strings](f-string)
-- [Types](types)
-- [Loops](loops)
-- [Docstrings](docstrings)
-- [Dictionaries](dictionaries)
-- [Examples: convert files](Examples/convert_files)
+- [F-strings](/docs/python/f-string)
+- [Types](/docs/python/types)
+- [Loops](/docs/python/loops)
+- [Docstrings](/docs/python/docstrings)
+- [Dictionaries](/docs/python/dictionaries)
+- [Examples: convert files](/docs/python/examples/convert-files)

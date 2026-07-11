@@ -1,0 +1,76 @@
+---
+title: Healthchecks
+description: Docker · Reference cheat sheet
+---
+
+# Healthchecks
+
+_Docker · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Healthchecks tell Docker/Compose whether a container is ready or healthy. Use them for restart policies and `depends_on` conditions.
+
+## 🔧 Core concepts
+
+| Field | Meaning |
+| --- | --- |
+| `test` | Command that exits 0 when healthy |
+| `interval` | Time between checks |
+| `timeout` | Max time for one check |
+| `retries` | Failures before unhealthy |
+| `start_period` | Grace period during boot |
+
+| Status | Meaning |
+| --- | --- |
+| `starting` | Within start_period |
+| `healthy` | Checks passing |
+| `unhealthy` | Checks failing |
+
+## 💡 Examples
+
+**Dockerfile HEALTHCHECK:**
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:9000/health || exit 1
+```
+
+**Compose healthcheck + depends_on:**
+
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+```
+
+**Inspect:**
+
+```shellscript
+docker inspect --format='{{.State.Health.Status}}' <container>
+```
+
+## ⚠️ Pitfalls
+
+- Checking TCP port open ≠ app ready — hit a real `/health` when possible.
+- Too-aggressive intervals spam logs and CPU.
+- Healthcheck tools must exist in the image (`curl`/`wget` often missing on alpine/distroless).
+
+## 🔗 Related
+
+- [compose.md](/docs/docker/compose)
+- [dockerfile.md](/docs/docker/dockerfile)
+- [networks.md](/docs/docker/networks)
+- [getting_started.md](/docs/docker/getting-started)

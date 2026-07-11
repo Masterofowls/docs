@@ -1,0 +1,190 @@
+---
+title: Global Glossary
+description: Cross-stack · Interview reference
+---
+
+# Global Glossary
+
+_Cross-stack · Interview reference_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of terms used across web development, DevOps, databases, testing, and security — useful for technical interviews and quick recall. One term, one line.
+
+## 🔧 Core concepts
+
+| # | Term | Definition |
+| --- | --- | --- |
+| 1 | ACID | Database transaction properties: Atomicity, Consistency, Isolation, Durability. |
+| 2 | Accessibility (a11y) | Designing UIs usable by keyboard, screen readers, and assistive tech. |
+| 3 | API | Application Programming Interface — contract for programs to talk to each other. |
+| 4 | API Gateway | Single entry point that routes, auth-checks, and rate-limits backend services. |
+| 5 | Artifact | Build output (binary, image, package) stored or deployed by CI/CD. |
+| 6 | Async / Await | Non-blocking style: work can pause until I/O completes without blocking the thread. |
+| 7 | Authentication | Proving who you are (login, token, certificate). |
+| 8 | Authorization | What you are allowed to do after identity is known (roles, permissions). |
+| 9 | BDD | Behavior-Driven Development — tests/specs written in human-readable scenarios. |
+| 10 | Bearer token | HTTP auth scheme: `Authorization: Bearer <token>`. |
+| 11 | Black-box testing | Testing behavior from the outside without knowing internal implementation. |
+| 12 | Blue-green deployment | Two identical envs; traffic switches from old (blue) to new (green) with quick rollback. |
+| 13 | Branch (Git) | Movable pointer to a line of commits; isolates feature work. |
+| 14 | Cache | Storing computed or fetched data closer to the consumer for faster repeat access. |
+| 15 | Callback | Function passed to another function to run later (often on async completion). |
+| 16 | Canary release | Roll out a change to a small % of users before full promotion. |
+| 17 | CAP theorem | Distributed systems trade off Consistency, Availability, and Partition tolerance. |
+| 18 | CDN | Content Delivery Network — edge caches for static assets and sometimes dynamic content. |
+| 19 | Certificate (TLS) | Cryptographic document binding a public key to a domain identity. |
+| 20 | CI/CD | Continuous Integration / Continuous Delivery (or Deployment) — automate build, test, ship. |
+| 21 | Client-side rendering (CSR) | Browser runs JS to render UI after loading a shell page. |
+| 22 | Closure | Function that captures variables from its surrounding lexical scope. |
+| 23 | CNI | Container Network Interface — standard for wiring containers into networks. |
+| 24 | Component (React) | Reusable UI unit that receives props and returns elements. |
+| 25 | Connection pool | Reuses open DB connections instead of opening one per request. |
+| 26 | Container | Lightweight isolated process with its own filesystem, sharing the host kernel. |
+| 27 | Content-Type | HTTP header declaring body format (e.g. `application/json`). |
+| 28 | Context (React) | Prop-drilling alternative — share value down the tree without every level passing it. |
+| 29 | Continuous Delivery | Every change is releasable; deploy to prod is a manual or gated step. |
+| 30 | Continuous Deployment | Every passing change auto-deploys to production. |
+| 31 | Continuous Integration | Merge often; each push runs automated build and tests on shared branch. |
+| 32 | Cookie | Small key-value stored by the browser and sent with requests to a domain. |
+| 33 | CORS | Cross-Origin Resource Sharing — browser rules for JS calling another origin. |
+| 34 | CRUD | Create, Read, Update, Delete — basic data operations. |
+| 35 | CSRF | Cross-Site Request Forgery — tricking a logged-in browser into unwanted actions. |
+| 36 | CSS | Cascading Style Sheets — language for layout, color, typography, and motion on the web. |
+| 37 | CSS Grid | Two-dimensional layout: rows and columns with explicit placement. |
+| 38 | CSS Specificity | Rules that decide which selector wins when declarations conflict. |
+| 39 | Data structure | Organized way to store data (array, hash map, tree, queue, etc.). |
+| 40 | Deadlock | Two or more tasks wait on each other forever and make no progress. |
+| 41 | Dependency injection | Supply dependencies from outside instead of hard-coding them inside a class. |
+| 42 | Deployment | Process of putting a built app onto servers users can reach. |
+| 43 | DevOps | Culture and tooling bridging development and operations (automation, observability). |
+| 44 | DNS | Domain Name System — maps human hostnames to IP addresses. |
+| 45 | DOM | Document Object Model — tree representation of HTML the browser can script. |
+| 46 | Docker | Platform to build, ship, and run apps in containers from images. |
+| 47 | Dockerfile | Recipe file describing how to build a container image. |
+| 48 | DRY | Don't Repeat Yourself — avoid duplicating logic; centralize shared behavior. |
+| 49 | E2E test | End-to-end test — full user flow through real UI and often real backends. |
+| 50 | Encryption | Scrambling data so only holders of the key can read it. |
+| 51 | Environment variable | Named config value injected at runtime (secrets, URLs, feature flags). |
+| 52 | Event loop | JS runtime mechanism scheduling callbacks, microtasks, and rendering. |
+| 53 | Event-driven architecture | Services react to messages/events instead of direct synchronous calls. |
+| 54 | EXPLAIN | SQL command showing how the database plans to execute a query. |
+| 55 | Fixture (testing) | Reusable setup/teardown object or data for tests. |
+| 56 | Flexbox | CSS one-dimensional layout along main/cross axis for alignment and distribution. |
+| 57 | Foreign key | Column referencing a primary key in another table to enforce relations. |
+| 58 | Functional programming | Style emphasizing pure functions, immutability, and composition. |
+| 59 | Garbage collection | Automatic reclaim of memory no longer reachable by the program. |
+| 60 | GraphQL | Query language/API style where clients request exact fields from one endpoint. |
+| 61 | gRPC | High-performance RPC framework using HTTP/2 and often Protocol Buffers. |
+| 62 | Hash / Hashing | One-way function mapping input to fixed-size digest (password storage, integrity). |
+| 63 | Hook (React) | Function like `useState` / `useEffect` that uses React features from function components. |
+| 64 | Horizontal scaling | Add more machines/nodes to handle load (scale out). |
+| 65 | HTML | HyperText Markup Language — semantic structure of web documents. |
+| 66 | HTTP | Hypertext Transfer Protocol — request/response application protocol for the web. |
+| 67 | HTTPS | HTTP over TLS — encrypted and authenticated web traffic. |
+| 68 | Hydration | Attaching client JS event handlers and state to server-rendered HTML. |
+| 69 | Idempotent | Repeating an operation yields the same result (safe retries for PUT/DELETE). |
+| 70 | Image (Docker) | Immutable template for containers; layers stacked and cached. |
+| 71 | Immutable | Value/object that cannot change after creation — new copy instead of in-place edit. |
+| 72 | Index (DB) | Data structure speeding lookups on columns at cost of write overhead and storage. |
+| 73 | Infrastructure as Code (IaC) | Define servers/networks in versioned files (Terraform, CloudFormation). |
+| 74 | Integration test | Tests several modules or services together (DB, API, queue). |
+| 75 | ISR | Incremental Static Regeneration — rebuild static pages on a schedule or on demand. |
+| 76 | JSON | JavaScript Object Notation — text format for structured data on APIs. |
+| 77 | JSON Web Token (JWT) | Compact signed token encoding claims (user id, expiry) for stateless auth. |
+| 78 | Kubernetes (K8s) | Orchestrator scheduling, scaling, and healing container workloads. |
+| 79 | Latency | Time delay between request and response. |
+| 80 | Load balancer | Distributes traffic across multiple servers for capacity and fault tolerance. |
+| 81 | Middleware | Code running between request and handler (logging, auth, parsing). |
+| 82 | Microservices | Architecture of small independently deployable services with bounded contexts. |
+| 83 | Migration (DB) | Versioned schema change applied in order across environments. |
+| 84 | Mock (testing) | Test double replacing a dependency with controlled behavior. |
+| 85 | Monolith | Single deployable application containing most business logic. |
+| 86 | MVC | Model–View–Controller — separates data, UI, and request handling. |
+| 87 | mTLS | Mutual TLS — both client and server present certificates. |
+| 88 | NoSQL | Non-relational databases (document, key-value, column, graph families). |
+| 89 | Normalization | Organizing relational tables to reduce redundancy and update anomalies. |
+| 90 | OAuth 2. | Authorization framework delegating access via tokens without sharing passwords. |
+| 91 | OIDC | OpenID Connect — identity layer on OAuth 2 issuing ID tokens about the user. |
+| 92 | ORM | Object-Relational Mapper — maps tables/rows to objects in application code. |
+| 93 | Pagination | Splitting large result sets into pages (offset/limit or cursor-based). |
+| 94 | Primary key | Column(s) uniquely identifying each row in a table. |
+| 95 | Promise | JS object representing eventual completion/failure of async work. |
+| 96 | Prop (React) | Read-only input passed from parent to child component. |
+| 97 | Protocol Buffer | Binary serialization format often used with gRPC. |
+| 98 | Pub/Sub | Publish–subscribe messaging — producers emit, subscribers receive by topic. |
+| 99 | Pull request (PR) | Proposal to merge a branch; triggers review and CI checks. |
+| 100 | Query string | URL parameters after `?` (`?q=python&page=2`). |
+| 101 | Queue | FIFO structure or message broker decoupling producers and consumers. |
+| 102 | Race condition | Outcome depends on unpredictable timing of concurrent operations. |
+| 103 | Rate limiting | Cap requests per client/time window to protect availability. |
+| 104 | React | Library for building UIs from components and declarative state. |
+| 105 | Redis | In-memory data store used for cache, sessions, pub/sub, and structures. |
+| 106 | Regression test | Ensures previously fixed bugs or features still work after changes. |
+| 107 | REST | Representational State Transfer — HTTP APIs using resources, verbs, and status codes. |
+| 108 | Reverse proxy | Server in front of apps terminating TLS and routing (nginx, Caddy). |
+| 109 | Rollback | Revert deployment to a known-good previous version. |
+| 110 | Server-side rendering (SSR) | HTML generated on the server per request then sent to the browser. |
+| 111 | Serverless | Run functions/containers on demand without managing servers (still servers exist). |
+| 112 | Session | Server-side (or signed client) state tracking a user across requests. |
+| 113 | Sharding | Splitting data across multiple DB instances by key range or hash. |
+| 114 | Smoke test | Quick sanity check that critical paths work after a deploy. |
+| 115 | Snapshot test | Compare rendered output to a saved baseline file. |
+| 116 | SOLID | OOP design principles (Single responsibility, Open-closed, Liskov, Interface segregation, Dependency inversion). |
+| 117 | SPA | Single Page Application — client router swaps views without full page reloads. |
+| 118 | SQL | Structured Query Language — declarative language for relational data. |
+| 119 | SQL injection | Attack embedding SQL in user input; prevented by parameterized queries. |
+| 120 | SSG | Static Site Generation — HTML built at build time, served as files. |
+| 121 | SSL/TLS | Transport Layer Security — encrypts traffic and verifies server (and optionally client) identity. |
+| 122 | State (React) | Data owned by a component that triggers re-render when updated. |
+| 123 | Stateless (HTTP) | Each request carries all context needed; server stores no session between calls. |
+| 124 | Stub (testing) | Fake implementation returning canned responses. |
+| 125 | TDD | Test-Driven Development — write failing test first, then minimal code to pass. |
+| 126 | Technical debt | Shortcuts that speed now but cost maintenance or velocity later. |
+| 127 | Throughput | Work completed per unit time (requests/sec, rows/sec). |
+| 128 | TLS | Transport Layer Security — modern successor to SSL for encrypted connections. |
+| 129 | Transaction | Group of DB operations that commit all together or roll back on failure. |
+| 130 | Tree-shaking | Bundler removing unused exports from the final JS bundle. |
+| 131 | TypeScript | Typed superset of JavaScript compiling to plain JS. |
+| 132 | Unit test | Tests one function/module in isolation with mocks for dependencies. |
+| 133 | Vertical scaling | Add CPU/RAM to one machine (scale up). |
+| 134 | Virtual DOM | Lightweight in-memory tree diffed to update real DOM efficiently. |
+| 135 | Webhook | HTTP callback: your server receives POST when an external event happens. |
+| 136 | WebSocket | Full-duplex persistent connection for real-time messaging. |
+| 137 | White-box testing | Testing with knowledge of internal code paths and structure. |
+| 138 | XSS | Cross-Site Scripting — injecting scripts into pages other users view. |
+| 139 | YAML | Human-readable data format common in CI and config files. |
+| 140 | Zero-downtime deploy | Ship new version without users seeing outage (rolling, blue-green, etc.). |
+
+## 💡 Examples
+
+**Quick recall drill — define in one sentence:**
+
+1. **JWT** — Signed token carrying claims so APIs can authenticate without server session storage.
+2. **ORM** — Maps DB tables to objects so you query with code instead of raw SQL everywhere.
+3. **Black-box testing** — Verify outputs for inputs without inspecting source implementation.
+4. **CI/CD** — Automate build/test on every change and promote passing artifacts to environments.
+5. **TLS** — Encrypts bytes in transit and proves you reached the intended server.
+
+**Interview follow-ups:**
+
+- TLS vs HTTPS vs mTLS
+- Unit vs integration vs E2E vs smoke
+- REST vs GraphQL trade-offs
+- SSR vs SSG vs CSR vs ISR
+- OAuth vs session cookie vs JWT
+
+## ⚠️ Pitfalls
+
+- Confusing **authentication** (who) with **authorization** (what they may do).
+- Saying JWT is “more secure” than sessions — depends on storage, expiry, and rotation.
+- Treating **CI** and **CD** as the same — integration vs delivery vs deployment differ.
+- **Black-box** does not mean “no tests of internals ever” — choose level by risk.
+
+## 🔗 Related
+
+- Per-topic glossaries under each stack (Python, Docker, React, etc.)
+- [Comparisons](/docs/global-glossary/../comparisons) — A vs B trade-off notes
+- [Coverage](/docs/coverage) — which topics have glossary pages

@@ -1,0 +1,69 @@
+---
+title: Express vs Fastify
+description: Comparisons · Reference cheat sheet
+---
+
+# Express vs Fastify
+
+_Comparisons · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+**Express** is the ubiquitous minimalist Node framework. **Fastify** emphasizes performance, schema validation, and plugin encapsulation. Both are excellent — pick based on team needs and ecosystem.
+
+## 🔧 Core concepts
+
+| Dimension | Express | Fastify |
+| --- | --- | --- |
+| Habit / hiring | Extremely common | Growing, strong for APIs |
+| Validation | DIY / middleware | JSON Schema first-class |
+| Plugin model | Middleware + routers | Encapsulated plugins |
+| Perf | Good | Typically faster out of box |
+| TypeScript | Manual/community | Strong schema → types workflows |
+| Ecosystem | Largest | Smaller but solid |
+
+**When to use Express:** existing Express apps, max middleware compatibility, simplest tutorials/hiring.
+
+**When to use Fastify:** new JSON APIs wanting schemas, logging, and encapsulation by default.
+
+## 💡 Examples
+
+**Express:**
+
+```js
+import express from "express";
+const app = express();
+app.use(express.json());
+app.post("/users", (req, res) => res.status(201).json(req.body));
+app.listen(9000);
+```
+
+**Fastify:**
+
+```js
+import Fastify from "fastify";
+const app = Fastify({ logger: true });
+app.post(
+  "/users",
+  { schema: { body: { type: "object", required: ["email"], properties: { email: { type: "string" } } } } },
+  async (req, reply) => {
+    reply.code(201);
+    return req.body;
+  },
+);
+await app.listen({ port: 9000, host: "0.0.0.0" });
+```
+
+## ⚠️ Pitfalls
+
+- Porting middleware 1:1 often fails — Fastify hooks ≠ Express middleware.
+- Express async errors need wrappers (v4); don't assume parity with Fastify's async handling.
+- “Faster” rarely matters until measured — schema safety often matters more.
+
+## 🔗 Related
+
+- [Node/express_basics.md](/docs/comparisons/../node/express-basics)
+- [Node/fastify_basics.md](/docs/comparisons/../node/fastify-basics)
+- [README.md](/docs/comparisons)

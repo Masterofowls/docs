@@ -1,0 +1,48 @@
+# Fluid Typography
+
+_CSS · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Scale type with viewport using `clamp(min, preferred, max)` so headings grow smoothly between breakpoints without many media queries.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `clamp()` | Bound fluid value |
+| `vw` | Viewport width unit |
+| `rem` | Root-relative floor/ceiling |
+| Container queries | Fluid vs parent, not viewport |
+
+## 💡 Examples
+
+```css
+:root {
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-2: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+}
+
+h1 {
+  font-size: var(--step-2);
+  line-height: 1.15;
+}
+
+p {
+  font-size: var(--step-0);
+  max-width: 65ch;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Extremely large `vw` without clamp becomes unreadable on ultra-wide screens.
+- Respect user zoom — prefer `rem` floors over `px`.
+
+## 🔗 Related
+
+- [Calc min max clamp](calc_min_max_clamp.md)
+- [Font](font.md)
+- [Text](text.md)

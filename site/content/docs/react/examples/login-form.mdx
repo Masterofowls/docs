@@ -1,0 +1,88 @@
+---
+title: Login Form
+description: React · Example / how-to
+---
+
+_React · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Controlled login form with pending state, client validation, and error banner.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| Controlled inputs | `value` + `onChange` |
+| `pending` | Disable submit |
+| Error UI | `role="alert"` |
+
+## 💡 Examples
+
+```tsx
+import { useState, FormEvent } from 'react';
+
+export function LoginForm({ onSubmit }: {
+  onSubmit: (email: string, password: string) => Promise<void>;
+}) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+    try {
+      await onSubmit(email, password);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Email
+        <input
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Password
+        <input
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </label>
+      {error ? <p role="alert">{error}</p> : null}
+      <button type="submit" disabled={pending}>
+        {pending ? 'Signing in…' : 'Sign in'}
+      </button>
+    </form>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Don't clear password on every keystroke error.
+- Prefer server error messages that aren't user-enumerating.
+
+## 🔗 Related
+
+- [Forms](/docs/react/forms)
+- [Controlled input](/docs/react/examples/controlled-input)
+- [Data fetching](/docs/react/data-fetching)

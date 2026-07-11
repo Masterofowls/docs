@@ -1,0 +1,61 @@
+# CLI Basics
+
+_Redis · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`redis-cli` is the standard admin and debugging client: run commands, monitor traffic, check latency, and inspect keys safely with `SCAN`.
+
+## 🔧 Core concepts
+
+| Command / flag | Purpose |
+| --- | --- |
+| `redis-cli` | Interactive REPL |
+| `redis-cli -u redis://host:6379` | URL connect |
+| `redis-cli CMD …` | One-shot command |
+| `INFO` | Sections of server info |
+| `MONITOR` | Stream commands (prod caution) |
+| `SCAN` | Iterate keys safely |
+| `--latency` | Latency sampler |
+
+| Key inspection | Notes |
+| --- | --- |
+| `TYPE key` | Data structure |
+| `EXISTS key` | 0/1 |
+| `MEMORY USAGE key` | Bytes (if available) |
+| `OBJECT ENCODING` | Internal encoding |
+
+## 💡 Examples
+
+**Connect and ping:**
+
+```bash
+redis-cli -h 127.0.0.1 -p 6379 PING
+```
+
+**Scan keys by prefix:**
+
+```bash
+redis-cli --scan --pattern 'user:*'
+```
+
+**Info memory:**
+
+```bash
+redis-cli INFO memory
+```
+
+## ⚠️ Pitfalls
+
+- `KEYS *` blocks — never on busy production instances.
+- `MONITOR` is expensive and leaks command data (including values).
+- Auth: use `AUTH` / ACL users — don't put passwords in shell history casually.
+
+## 🔗 Related
+
+- [getting_started.md](./getting_started.md)
+- [strings.md](./strings.md)
+- [expiry_ttl.md](./expiry_ttl.md)
+- [persistence.md](./persistence.md)

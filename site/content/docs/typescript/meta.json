@@ -47,6 +47,7 @@
     "utility-types",
     "why-typescript",
     "zod-integration",
+    "zod-integration",
     "...examples"
   ]
 }

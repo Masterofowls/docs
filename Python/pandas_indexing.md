@@ -1,0 +1,62 @@
+# Pandas Indexing
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Selection rules: boolean masks, `.loc` (labels), `.iloc` (positions), and `query`. Avoid chained assignment; assign with `.loc`.
+
+## 🔧 Core concepts
+
+| Tool | Meaning |
+| --- | --- |
+| `df["col"]` | Series |
+| `df[["a","b"]]` | Sub-frame |
+| `df.loc[rows, cols]` | Label-based |
+| `df.iloc[r, c]` | Position-based |
+| `df.query("a > 1")` | String expr |
+| `.isin` / `.between` | Set / range filters |
+
+## 💡 Examples
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "name": ["Ada", "Lin", "Grace"],
+    "score": [91, 85, 99],
+    "team": ["A", "B", "A"],
+})
+
+# boolean mask
+print(df[df["score"] >= 90])
+
+# loc: rows + columns
+print(df.loc[df["team"] == "A", ["name", "score"]])
+
+# iloc: first two rows, first two cols
+print(df.iloc[:2, :2])
+
+# assign safely
+df.loc[df["score"] < 90, "flag"] = "review"
+```
+
+**query:**
+
+```python
+print(df.query("team == 'A' and score > 90"))
+```
+
+## ⚠️ Pitfalls
+
+- `df[df.x > 1]["y"] = 0` may not write — use `.loc`.
+- Integer labels vs positions confuse `.loc` / `.iloc` — know your index.
+- SettingWithCopyWarning means you likely sliced a view.
+
+## 🔗 Related
+
+- [Pandas](pandas.md)
+- [Pandas cleaning](pandas_cleaning.md)
+- [Pandas ETL example](Examples/pandas_etl.md)

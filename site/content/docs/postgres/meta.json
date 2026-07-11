@@ -1,0 +1,21 @@
+{
+  "title": "Postgres",
+  "description": "Ops, indexes, backups, EXPLAIN",
+  "icon": "Database",
+  "root": true,
+  "pages": [
+    "index",
+    "backups-restore",
+    "connect-psql",
+    "connection-pooling",
+    "explain-analyze",
+    "extensions",
+    "getting-started",
+    "glossary",
+    "indexes",
+    "json-jsonb",
+    "migrations-ops",
+    "roles-privileges",
+    "vacuum-analyze"
+  ]
+}

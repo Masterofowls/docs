@@ -1,0 +1,68 @@
+---
+title: "JSON & JSONB"
+description: Postgres · Reference cheat sheet
+---
+
+# JSON & JSONB
+
+_Postgres · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`json` stores text as-is; `jsonb` stores a binary decomposed form — better for indexing and containment queries. Prefer `jsonb` for operational query patterns.
+
+## 🔧 Core concepts
+
+| Type | Trait |
+| --- | --- |
+| `json` | Preserves whitespace/key order; reparsed |
+| `jsonb` | Dedupes keys; indexable; usually preferred |
+
+| Operator / fn | Role |
+| --- | --- |
+| `->` / `->>` | Get object field (json / text) |
+| `#>` / `#>>` | Path extract |
+| `@>` | Contains |
+| `?` / `?|` / `?&` | Key exists |
+| `jsonb_set` | Modify |
+| GIN index | Accelerate `@>` / path ops |
+
+## 💡 Examples
+
+**Query fields:**
+
+```sql
+SELECT payload->>'event'
+FROM events
+WHERE payload @> '{"type":"signup"}';
+```
+
+**GIN index:**
+
+```sql
+CREATE INDEX CONCURRENTLY events_payload_gin
+  ON events USING GIN (payload jsonb_path_ops);
+```
+
+**Update key:**
+
+```sql
+UPDATE users
+SET prefs = jsonb_set(prefs, '{theme}', '"dark"', true)
+WHERE id = 42;
+```
+
+## ⚠️ Pitfalls
+
+- Unindexed `payload->>'x' =` on large tables seq-scans — express as jsonb ops + GIN when possible.
+- Turning everything into JSONB abandons relational constraints — hybrid carefully.
+- `json` vs `jsonb` equality and duplicate-key behavior differ.
+
+## 🔗 Related
+
+- [indexes.md](/docs/postgres/indexes)
+- [explain_analyze.md](/docs/postgres/explain-analyze)
+- [extensions.md](/docs/postgres/extensions)
+- [migrations_ops.md](/docs/postgres/migrations-ops)

@@ -111,18 +111,45 @@ function escapeMdxText(body) {
   return out.join('\n');
 }
 
-function rewriteLinks(body) {
-  // [text](file.md) -> [text](file) for Fumadocs relative links
-  return body
-    .replace(/\]\(([^)#]+\.mdx?)(#[^)]+)?\)/g, (_, p, hash = '') => {
-      const cleaned = p.replace(/\\/g, '/').replace(/\.mdx?$/i, '');
-      if (/\/README$/i.test(cleaned) || cleaned === 'README') {
-        return `](.${hash || ''})`;
-      }
-      return `](${cleaned}${hash || ''})`;
-    })
-    .replace(/\]\(\.\/README\.md\)/gi, '](./)')
-    .replace(/\]\(\.\.\/README\.md\)/gi, '](/docs)');
+/**
+ * Turn sibling/relative .md links into absolute /docs/{topic}/… URLs.
+ * Bare relatives like (models) break under trailing-slash routes
+ * (/docs/django/settings/ + models → /docs/django/settings/models).
+ */
+function rewriteLinks(body, { topicSlug, fromDir = '' }) {
+  const baseDir = fromDir.replace(/\\/g, '/') || '.';
+
+  return body.replace(/\]\(([^)#]+\.mdx?)(#[^)]+)?\)/g, (_, p, hash = '') => {
+    const pathPart = p.replace(/\\/g, '/');
+    const resolved = path.posix.normalize(path.posix.join(baseDir, pathPart));
+    let withoutExt = resolved.replace(/\.mdx?$/i, '');
+
+    if (/\/README$/i.test(withoutExt) || withoutExt === 'README' || withoutExt === '.') {
+      const folder =
+        withoutExt === 'README' || withoutExt === '.'
+          ? ''
+          : withoutExt.replace(/\/README$/i, '');
+      const segments = folder
+        .split('/')
+        .filter((s) => s && s !== '.')
+        .map((s) => slugifySegment(s));
+      const url = segments.length
+        ? `/docs/${topicSlug}/${segments.join('/')}`
+        : `/docs/${topicSlug}`;
+      return `](${url}${hash || ''})`;
+    }
+
+    const segments = withoutExt
+      .split('/')
+      .filter((s) => s && s !== '.')
+      .map((s) => slugifySegment(s));
+
+    if (!segments.length) {
+      return `](/docs/${topicSlug}${hash || ''})`;
+    }
+
+    return `](/docs/${topicSlug}/${segments.join('/')}${hash || ''})`;
+  });
 }
 
 function yamlEscape(s) {
@@ -132,12 +159,12 @@ function yamlEscape(s) {
   return s;
 }
 
-function toMdx(raw, fallbackTitle) {
+function toMdx(raw, fallbackTitle, linkCtx) {
   const title = extractTitle(raw, fallbackTitle);
   const description = extractDescription(raw);
   let body = stripLeadingH1(raw.trimStart());
   body = rewriteFenceLangs(body);
-  body = rewriteLinks(body);
+  body = rewriteLinks(body, linkCtx);
   body = escapeMdxText(body);
   // Drop folder index-style "Back to library" footers that point outside
   body = body.replace(/\n---\n\n\[← Back to library\]\([^)]+\)\s*$/i, '\n');
@@ -206,7 +233,11 @@ function processTopic(topic) {
     ensureDir(destDir);
 
     const raw = fs.readFileSync(file.abs, 'utf8');
-    const mdx = toMdx(raw, titleFromName(base));
+    const fromDir = relDir === '.' ? '' : relDir.split(/[/\\]/).join('/');
+    const mdx = toMdx(raw, titleFromName(base), {
+      topicSlug: topic.slug,
+      fromDir,
+    });
     const destFile = path.join(destDir, `${pageId}.mdx`);
     fs.writeFileSync(destFile, mdx, 'utf8');
 

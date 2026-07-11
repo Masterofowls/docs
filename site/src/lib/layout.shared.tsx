@@ -15,8 +15,16 @@ export function baseOptions(): BaseLayoutProps {
         active: 'nested-url',
       },
       {
+        text: 'Glossary',
+        url: '/docs/global-glossary/global-glossary',
+      },
+      {
         text: 'Search',
         url: '/search',
+      },
+      {
+        text: 'Coverage',
+        url: '/coverage',
       },
       {
         text: 'Gateway',
@@ -25,18 +33,6 @@ export function baseOptions(): BaseLayoutProps {
       {
         text: 'Export',
         url: '/export',
-      },
-      {
-        text: 'New note',
-        url: '/notes/new',
-      },
-      {
-        text: 'Bookmarks',
-        url: '/bookmarks',
-      },
-      {
-        text: 'Account',
-        url: '/account',
       },
     ],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,

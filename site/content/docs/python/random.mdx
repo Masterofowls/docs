@@ -1,0 +1,69 @@
+---
+title: Random
+description: Python · Reference cheat sheet
+---
+
+# Random
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+The `random` module provides pseudo-random numbers for simulations, sampling, and shuffling. Do **not** use it for security (passwords, tokens) — use `secrets` instead.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `random()` | Float in `[0.0, 1.0)` |
+| `randrange(stop)` / `randint(a, b)` | Integers |
+| `choice(seq)` / `choices` / `sample` | Pick items |
+| `shuffle(list)` | In-place shuffle |
+| `uniform(a, b)` / `gauss` | Distributions |
+| `seed(n)` | Reproducible sequences |
+| `Random()` | Isolated RNG instance |
+
+## 💡 Examples
+
+```python
+import random
+
+random.seed(42)
+print(random.randint(1, 6))
+print(random.choice(["red", "green", "blue"]))
+
+deck = list(range(1, 53))
+random.shuffle(deck)
+hand = random.sample(deck, 5)
+```
+
+```python
+import random
+
+# Weighted picks
+colors = ["common", "rare", "epic"]
+print(random.choices(colors, weights=[80, 15, 5], k=3))
+```
+
+```python
+import secrets
+
+token = secrets.token_urlsafe(16)
+code = secrets.randbelow(1_000_000)
+```
+
+## ⚠️ Pitfalls
+
+- `random` is not cryptographically secure — use `secrets` for auth material.
+- `shuffle` mutates the list; copy first if you need the original order.
+- Global RNG is shared — prefer `random.Random()` in libraries/tests.
+- Seeding makes runs reproducible but predictable.
+
+## 🔗 Related
+
+- [hashlib](/docs/python/hashlib)
+- [statistics](/docs/python/statistics)
+- [lambda](/docs/python/lambda)
+- [lists](/docs/python/lists)

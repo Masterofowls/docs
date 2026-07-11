@@ -1,0 +1,72 @@
+---
+title: Testing Basics
+description: Pytest · Reference cheat sheet
+---
+
+_Pytest · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Pytest discovers and runs tests with rich asserts, fixtures, and plugins. Name files `test_*.py` / `*_test.py`, functions `test_*`. Prefer small focused tests; use fixtures for shared setup.
+
+## 🔧 Core concepts
+
+| Idea | Practice |
+| --- | --- |
+| Arrange–Act–Assert | Setup → call → assert |
+| Discovery | `pytest` walks the tree |
+| Fixtures | Inject deps via args |
+| Markers | Tag slow/integration/unit |
+| Isolation | One behavior per test |
+
+Layers: **unit** (pure functions), **integration** (DB/HTTP), **e2e** (browser — Playwright).
+
+## 💡 Examples
+
+**Minimal test:**
+
+```python
+# test_math.py
+def add(a, b):
+    return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+```
+
+**Run:**
+
+```shellscript
+pytest -q
+pytest tests/test_api.py -k auth
+pytest -m "not slow"
+```
+
+**Fixture sketch:**
+
+```python
+import pytest
+
+@pytest.fixture
+def client():
+    return {"token": "test-token"}
+
+def test_uses_client(client):
+    assert client["token"]
+```
+
+## ⚠️ Pitfalls
+
+- Don't share mutable state between tests without fixtures + scope care.
+- Over-mocking hides real bugs — mock at boundaries.
+- Huge `conftest.py` becomes hard to reason about — split by package.
+
+## 🔗 Related
+
+- [Fixtures](/docs/pytest/fixtures)
+- [Asserts](/docs/pytest/asserts)
+- [API testing](/docs/pytest/api-testing)
+- [Auth testing](/docs/pytest/auth-testing)
+- [Parametrize](/docs/pytest/parametrize)

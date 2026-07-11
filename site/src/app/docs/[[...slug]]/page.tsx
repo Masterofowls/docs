@@ -12,7 +12,18 @@ import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { BookmarkButton } from '@/components/bookmarks/bookmark-button';
+import { PrintPageButton } from '@/components/docs/print-button';
+import { TrackReading } from '@/components/progress/track-reading';
+import { JsonLd } from '@/components/seo/json-ld';
 import { gitConfig } from '@/lib/shared';
+import {
+  absoluteUrl,
+  defaultOpenGraph,
+  defaultTwitter,
+  SITE_DESCRIPTION,
+  techArticleJsonLd,
+} from '@/lib/seo';
+import { topicBySlug } from '@/lib/gateway/topics';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -21,29 +32,50 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const canonical = absoluteUrl(page.url);
+  const ogImage = getPageImage(page).url;
+  const topic = page.slugs[0] ? topicBySlug(page.slugs[0]) : undefined;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
+      <JsonLd
+        data={techArticleJsonLd({
+          title: page.data.title,
+          description: page.data.description,
+          url: canonical,
+          image: ogImage,
+          topic: topic?.title ?? page.slugs[0] ?? null,
+        })}
+      />
+      <TrackReading
+        url={page.url}
+        title={page.data.title}
+        description={page.data.description}
+        topic={page.slugs[0] ?? null}
+      />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-      <div className="flex flex-row flex-wrap gap-2 items-center border-b pb-6">
+      <div className="flex flex-row flex-wrap items-center gap-2 border-b pb-6 print:hidden">
         <BookmarkButton
           url={page.url}
           title={page.data.title}
           description={page.data.description}
         />
         <MarkdownCopyButton markdownUrl={markdownUrl} />
+        <PrintPageButton />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
       <DocsBody>
-        <MDX
-          components={getMDXComponents({
-            a: createRelativeLink(source, page),
-          })}
-        />
+        <div className="docs-cheat-root">
+          <MDX
+            components={getMDXComponents({
+              a: createRelativeLink(source, page),
+            })}
+          />
+        </div>
       </DocsBody>
     </DocsPage>
   );
@@ -53,16 +85,48 @@ export async function generateStaticParams() {
   return source.generateParams();
 }
 
-export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<'/docs/[[...slug]]'>,
+): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
+  const title = page.data.title;
+  const description = page.data.description || SITE_DESCRIPTION;
+  const canonical = absoluteUrl(page.url);
+  const ogImage = getPageImage(page).url;
+  const topic = page.slugs[0] ? topicBySlug(page.slugs[0]) : undefined;
+  const enrichedTitle = topic ? `${title} — ${topic.title} cheat sheet` : title;
+
   return {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: getPageImage(page).url,
+    title,
+    description,
+    keywords: [
+      title,
+      topic?.title,
+      'cheat sheet',
+      'reference',
+      ...(page.slugs ?? []),
+    ].filter(Boolean) as string[],
+    alternates: {
+      canonical,
     },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: defaultOpenGraph({
+      title: enrichedTitle,
+      description,
+      url: canonical,
+      images: [ogImage],
+      type: 'article',
+    }),
+    twitter: defaultTwitter({
+      title: enrichedTitle,
+      description,
+      images: [ogImage],
+    }),
   };
 }

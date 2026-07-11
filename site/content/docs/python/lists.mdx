@@ -15,15 +15,45 @@ A `list` is an ordered, mutable sequence. Use for collections that grow, shrink,
 
 ## 🔧 Core concepts
 
+**Create / access**
+
 | Operation | Example |
 | --- | --- |
 | Create | `[1, 2]`, `list(iterable)`, `[]` |
-| Index / slice | `xs[0]`, `xs[-1]`, `xs[1:3]` |
-| Append / extend | `xs.append(x)`, `xs.extend(ys)`, `xs += ys` |
-| Insert / remove | `xs.insert(i, x)`, `xs.pop()`, `xs.remove(x)` |
-| Search | `x in xs`, `xs.index(x)`, `xs.count(x)` |
-| Sort | `xs.sort(key=..., reverse=...)`, `sorted(xs)` |
-| Copy | `xs.copy()`, `xs[:]`, `list(xs)` (shallow) |
+| Index / slice | `xs[0]`, `xs[-1]`, `xs[1:3]`, `xs[i:j:k]` |
+| Assign slice | `xs[1:3] = [9, 8]`; can change length |
+| Unpack | `a, *mid, z = xs` |
+
+**Instance methods**
+
+| Method | Mutates? | Notes |
+| --- | --- | --- |
+| `append(x)` | yes | Add one at end — O(1) amort. |
+| `extend(it)` | yes | Add all from iterable; `xs += it` |
+| `insert(i, x)` | yes | Insert before index `i` — O(n) |
+| `pop([i])` | yes | Remove/return at `i` (default last) |
+| `remove(x)` | yes | Remove first `== x`; `ValueError` if missing |
+| `clear()` | yes | Remove all |
+| `index(x[, start[, stop]])` | no | First index; `ValueError` if missing |
+| `count(x)` | no | Occurrences of `x` |
+| `sort(*, key=None, reverse=False)` | yes | In-place; returns `None` |
+| `reverse()` | yes | In-place reverse |
+| `copy()` | no | Shallow copy (`xs[:]` / `list(xs)`) |
+
+**Builtins that operate on lists / sequences**
+
+| Builtin | Notes |
+| --- | --- |
+| `len(xs)` | Length |
+| `x in xs` / `x not in xs` | Membership — O(n) |
+| `min` / `max` / `sum` | Over elements; `sum` needs numbers |
+| `sorted(xs, *, key=…, reverse=…)` | New sorted list |
+| `reversed(xs)` | Reverse iterator |
+| `enumerate(xs, start=0)` | `(i, x)` pairs |
+| `zip(*seqs)` | Parallel tuples (stops at shortest) |
+| `all` / `any` | Truth of all / any elements |
+| `map(fn, xs)` / `filter(fn, xs)` | Lazy; wrap with `list(...)` |
+| `slice` assignment / `del xs[i]` / `del xs[a:b]` | Delete or replace ranges |
 
 Lists are dynamic arrays; append/pop at the end is amortized O(1). Insert/delete at the front is O(n).
 
@@ -75,14 +105,14 @@ q.popleft()                # FIFO — prefer deque over list.pop(0)
 - `xs + ys` creates a new list; `xs.extend(ys)` mutates in place.
 - `xs *= n` and `[[] ] * n` share references for mutable elements.
 - `list.sort` returns `None` — use `sorted` when you need a new list.
-- Shallow copy does not deep-copy nested lists — see [copy / deepcopy](copy_deepcopy).
+- Shallow copy does not deep-copy nested lists — see [copy / deepcopy](/docs/python/copy-deepcopy).
 - Prefer `deque` for frequent left pops; lists are poor queues.
 
 ## 🔗 Related
 
-- [Tuples](tuples)
-- [Sets](sets)
-- [Slicing](slicing)
-- [Comprehensions](comprehensions)
-- [Unpacking](unpacking)
-- [Examples: merge lists](Examples/merge_lists)
+- [Tuples](/docs/python/tuples)
+- [Sets](/docs/python/sets)
+- [Slicing](/docs/python/slicing)
+- [Comprehensions](/docs/python/comprehensions)
+- [Unpacking](/docs/python/unpacking)
+- [Examples: merge lists](/docs/python/examples/merge-lists)

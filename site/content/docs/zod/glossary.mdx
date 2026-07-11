@@ -1,0 +1,64 @@
+---
+title: Glossary
+description: Zod · Reference cheat sheet
+---
+
+# Glossary
+
+_Zod · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of Zod schema, parsing, and type-inference terms.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Coercion | Converting input types before validation (`z.coerce`). |
+| Discriminated union | `z.discriminatedUnion` selecting a schema by a tag field. |
+| Effect | Pipeline step such as transform, refine, or preprocess. |
+| Infer | Extracting a TypeScript type from a schema (`z.infer`). |
+| Issue | Single validation problem inside a `ZodError`. |
+| Literal | Schema matching one exact value. |
+| Parse | Validate and return data, throwing on failure. |
+| Pipe | Connect schema output into another schema. |
+| Refine | Custom predicate adding constraints beyond built-ins. |
+| Safe parse | Non-throwing parse returning a result object. |
+| Schema | Runtime validator object created by Zod builders. |
+| Strip | Default object behavior removing unknown keys. |
+| Transform | Map a validated value to a new output. |
+| Tuple | Fixed-length array schema with per-index types. |
+| ZodError | Error class aggregating validation issues. |
+
+## 💡 Examples
+
+**Discriminated union sketch:**
+
+```ts
+const Event = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("click"), x: z.number() }),
+  z.object({ type: z.literal("nav"), href: z.string() }),
+]);
+```
+
+**Result narrowing:**
+
+```ts
+const r = Event.safeParse(input);
+if (r.success) console.log(r.data.type);
+```
+
+## ⚠️ Pitfalls
+
+- Glossary terms may differ slightly across Zod major versions.
+- `z.any()` disables safety — prefer `z.unknown()` then narrow.
+
+## 🔗 Related
+
+- [getting_started.md](/docs/zod/getting-started)
+- [safeparse.md](/docs/zod/safeparse)
+- [infer_types.md](/docs/zod/infer-types)
+- [README.md](/docs/zod)

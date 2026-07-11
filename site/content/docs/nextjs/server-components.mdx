@@ -1,0 +1,87 @@
+---
+title: Server Components
+description: Next.js · Reference cheat sheet
+---
+
+# Server Components
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+In the App Router, components are Server Components by default. They render on the server, can access backend resources directly, and send a compact RSC payload to the client.
+
+## 🔧 Core concepts
+
+| Kind | Directive | Can use |
+| --- | --- | --- |
+| Server Component | (default) | `async`, DB, secrets, `fetch` with cache |
+| Client Component | `'use client'` | hooks, events, browser APIs |
+
+| Rule | Detail |
+| --- | --- |
+| Pass data down | Server → Client via serializable props |
+| Import direction | Client can import Client; Server can import both |
+| No server secrets | Never pass secrets as Client props |
+
+**Server-only APIs:** `fs`, DB clients, private env vars, `cookies()`, `headers()`.
+
+## 💡 Examples
+
+**Async Server Component:**
+
+```tsx
+async function Users() {
+  const res = await fetch("https://api.example.com/users", {
+    next: { revalidate: 60 },
+  });
+  const users = await res.json();
+  return <ul>{users.map((u: { id: string; name: string }) => (
+    <li key={u.id}>{u.name}</li>
+  ))}</ul>;
+}
+```
+
+**Client boundary:**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export function Counter() {
+  const [n, setN] = useState(0);
+  return <button onClick={() => setN(n + 1)}>{n}</button>;
+}
+```
+
+**Compose both:**
+
+```tsx
+// app/page.tsx (Server)
+import { Counter } from "./Counter";
+
+export default function Page() {
+  return (
+    <main>
+      <h1>Dashboard</h1>
+      <Counter />
+    </main>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Putting `'use client'` at the top of a large tree ships more JS than needed — push the boundary down.
+- Non-serializable props (functions, class instances) cannot cross the server→client boundary.
+- `useEffect` / `onClick` in a Server Component is a build error.
+
+## 🔗 Related
+
+- [app_router.md](/docs/nextjs/app-router)
+- [caching.md](/docs/nextjs/caching)
+- [env.md](/docs/nextjs/env)
+- [route_handlers.md](/docs/nextjs/route-handlers)

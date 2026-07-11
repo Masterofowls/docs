@@ -1,0 +1,61 @@
+# Typography
+
+_Tailwind · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Typography utilities control font family, size, weight, line-height, letter-spacing, alignment, and text decoration.
+
+## 🔧 Core concepts
+
+| Utility | Role |
+| --- | --- |
+| `font-sans` / `font-serif` / `font-mono` | Family |
+| `text-xs` … `text-9xl` | Font size (+ default line-height) |
+| `font-thin` … `font-black` | Weight |
+| `leading-*` | Line height |
+| `tracking-*` | Letter spacing |
+| `text-left` / `center` / `right` | Alignment |
+| `truncate` / `line-clamp-*` | Overflow |
+| `underline` / `no-underline` | Decoration |
+
+| Prose | Notes |
+| --- | --- |
+| `@tailwindcss/typography` | Beautiful markdown/`prose` classes |
+| `prose dark:prose-invert` | Article styling |
+
+## 💡 Examples
+
+**Heading + body:**
+
+```html
+<h1 class="text-3xl font-bold tracking-tight text-zinc-900">Title</h1>
+<p class="mt-2 text-base leading-7 text-zinc-600">Supporting paragraph.</p>
+```
+
+**Truncate:**
+
+```html
+<p class="max-w-xs truncate">A very long single-line label that will ellipsis</p>
+```
+
+**Clamp lines:**
+
+```html
+<p class="line-clamp-3">Multi-line preview text…</p>
+```
+
+## ⚠️ Pitfalls
+
+- Default `text-*` sizes include line-height — overriding only size can look uneven.
+- System font stacks may not match brand — extend `theme.fontFamily`.
+- `truncate` requires overflow hidden + width constraint to take effect.
+
+## 🔗 Related
+
+- [colors.md](./colors.md)
+- [plugins.md](./plugins.md)
+- [spacing_sizing.md](./spacing_sizing.md)
+- [custom_config.md](./custom_config.md)

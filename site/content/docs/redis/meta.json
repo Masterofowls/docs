@@ -1,0 +1,19 @@
+{
+  "title": "Redis",
+  "description": "Cache, data structures, pub/sub",
+  "icon": "Zap",
+  "root": true,
+  "pages": [
+    "index",
+    "cli-basics",
+    "expiry-ttl",
+    "getting-started",
+    "glossary",
+    "hashes",
+    "lists-sets",
+    "persistence",
+    "pubsub",
+    "sorted-sets",
+    "strings"
+  ]
+}

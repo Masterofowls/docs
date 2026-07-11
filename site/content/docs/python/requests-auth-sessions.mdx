@@ -1,0 +1,78 @@
+---
+title: "Requests Auth & Sessions"
+description: Python · Reference cheat sheet
+---
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Reuse connections and credentials with `requests.Session`. Attach Basic/Bearer/token auth, cookies, and default headers once per client.
+
+## 🔧 Core concepts
+
+| Piece | Role |
+| --- | --- |
+| `Session` | Pool + cookie jar + defaults |
+| `auth=(user, pass)` | HTTP Basic |
+| `headers["Authorization"]` | Bearer / API keys |
+| `cookies=` / jar | Session cookies |
+| `hooks` | Response callbacks |
+
+Theory: a Session is a stateful client. Prefer one Session per service in long-running processes; create short-lived Sessions in scripts with `with`.
+
+## 💡 Examples
+
+**Bearer session:**
+
+```python
+import os
+import requests
+
+s = requests.Session()
+s.headers.update({
+    "Accept": "application/json",
+    "Authorization": f"Bearer {os.environ['API_TOKEN']}",
+})
+r = s.get("https://api.example.com/v1/me", timeout=10)
+r.raise_for_status()
+print(r.json())
+```
+
+**Login then reuse cookies:**
+
+```python
+with requests.Session() as s:
+    s.post(
+        "https://example.com/login",
+        data={"username": "ada", "password": "x"},
+        timeout=10,
+    ).raise_for_status()
+    dash = s.get("https://example.com/dashboard", timeout=10)
+    print(dash.status_code)
+```
+
+**Basic auth:**
+
+```python
+r = requests.get(
+    "https://httpbin.org/basic-auth/ada/secret",
+    auth=("ada", "secret"),
+    timeout=10,
+)
+print(r.status_code)
+```
+
+## ⚠️ Pitfalls
+
+- Don't put secrets in query strings — use headers.
+- Sessions are not fork-safe — recreate after `os.fork`.
+- Update `Authorization` when tokens rotate.
+
+## 🔗 Related
+
+- [Requests](/docs/python/requests-http)
+- [Requests errors](/docs/python/requests-errors-retries)
+- [Dotenv](/docs/python/dotenv)

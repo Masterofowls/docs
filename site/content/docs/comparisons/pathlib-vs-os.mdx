@@ -1,0 +1,68 @@
+---
+title: pathlib vs os.path
+description: Comparisons · Reference cheat sheet
+---
+
+# pathlib vs os.path
+
+_Comparisons · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Choose **pathlib** for most new Python path logic (object-oriented, readable). Use **os.path** / `os` when maintaining legacy code or needing specific `os` side effects (cwd, env, process).
+
+## 🔧 Core concepts
+
+| Dimension | pathlib | os / os.path |
+| --- | --- | --- |
+| Style | Objects (`Path`) | Strings |
+| Join | `/` operator, `joinpath` | `os.path.join` |
+| Exists / mkdir | `path.exists()`, `mkdir()` | `os.path.exists`, `os.mkdir` |
+| Glob | `path.glob` / `rglob` | `glob.glob` |
+| Read/write | `read_text` / `write_text` | open + join paths |
+| Best for | New code, clarity | Legacy, thin wrappers |
+
+**When to use pathlib:** new scripts, apps, anything that manipulates many paths.
+
+**When to use os.path:** drop-in maintenance, or APIs that already require strings and `os.*` process calls.
+
+## 💡 Examples
+
+**pathlib:**
+
+```python
+from pathlib import Path
+
+root = Path.cwd() / "data"
+root.mkdir(parents=True, exist_ok=True)
+for p in root.glob("*.csv"):
+    print(p.read_text(encoding="utf-8")[:80])
+```
+
+**os.path:**
+
+```python
+import os
+
+root = os.path.join(os.getcwd(), "data")
+os.makedirs(root, exist_ok=True)
+for name in os.listdir(root):
+    if name.endswith(".csv"):
+        path = os.path.join(root, name)
+        with open(path, encoding="utf-8") as f:
+            print(f.read(80))
+```
+
+## ⚠️ Pitfalls
+
+- Mixing `Path` and strings casually works often (`os.fspath`) but be consistent at API boundaries.
+- `Path` on Windows vs POSIX differs for anchors — test both if you ship cross-platform.
+- `os.path` won't stop you from forgetting `exist_ok` / parents the way pathlib habits encourage.
+
+## 🔗 Related
+
+- [Python/os.md](/docs/comparisons/../python/os) (if present)
+- [Python/getting_started.md](/docs/comparisons/../python/getting-started)
+- [README.md](/docs/comparisons)

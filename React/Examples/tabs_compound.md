@@ -1,0 +1,74 @@
+# Tabs Compound
+
+_React · Example / how-to_
+
+---
+
+## 📋 Overview
+
+Minimal compound tabs with React context and ARIA roles.
+
+## 🔧 Core concepts
+
+| Part | Role |
+| --- | --- |
+| `Tabs` | State provider |
+| `Tab` | `role="tab"` |
+| `TabPanel` | `role="tabpanel"` |
+
+## 💡 Examples
+
+```tsx
+import React, { createContext, useContext, useState } from 'react';
+
+const Ctx = createContext<{
+  value: string;
+  setValue: (v: string) => void;
+} | null>(null);
+
+export function Tabs({
+  defaultValue,
+  children,
+}: {
+  defaultValue: string;
+  children: React.ReactNode;
+}) {
+  const [value, setValue] = useState(defaultValue);
+  return <Ctx.Provider value={{ value, setValue }}>{children}</Ctx.Provider>;
+}
+
+export function Tab({ id, children }: { id: string; children: React.ReactNode }) {
+  const ctx = useContext(Ctx)!;
+  const selected = ctx.value === id;
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={selected}
+      onClick={() => ctx.setValue(id)}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function TabPanel({ id, children }: { id: string; children: React.ReactNode }) {
+  const ctx = useContext(Ctx)!;
+  if (ctx.value !== id) return null;
+  return (
+    <div role="tabpanel" hidden={ctx.value !== id}>
+      {children}
+    </div>
+  );
+}
+```
+
+## ⚠️ Pitfalls
+
+- Wire `aria-controls` / `id` pairs for production a11y.
+- Keyboard arrows (left/right) expected on real tablists.
+
+## 🔗 Related
+
+- [Composition patterns](../composition_patterns.md)
+- [Context](../context.md)

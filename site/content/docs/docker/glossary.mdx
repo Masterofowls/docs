@@ -1,0 +1,61 @@
+---
+title: Glossary
+description: Docker · Reference cheat sheet
+---
+
+# Glossary
+
+_Docker · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Alphabetical glossary of Docker image, container, and Compose terms.
+
+## 🔧 Core concepts
+
+| Term | Definition |
+| --- | --- |
+| Bind mount | Host directory mounted into a container path. |
+| Bridge network | Default single-host virtual network for containers. |
+| Build context | Files sent to the daemon for `docker build`. |
+| Compose | YAML-driven multi-container application tool. |
+| Container | Runnable instance of an image with its own filesystem layer. |
+| Digest | Content-addressed `sha256:` image identity. |
+| EntryPoint | Primary executable configuration for a container. |
+| Image | Immutable layered snapshot used to create containers. |
+| Layer | Filesystem diff produced by a Dockerfile instruction. |
+| Multi-stage | Build pattern with multiple `FROM` stages. |
+| Registry | Remote store for images (Docker Hub, GHCR, ECR…). |
+| Tag | Mutable human label for an image (`:1.2.0`, `:latest`). |
+| Volume | Persistent Docker-managed storage mount. |
+| `.dockerignore` | Excludes files from the build context. |
+
+## 💡 Examples
+
+**Name anatomy:**
+
+```
+ghcr.io/acme/api:1.4.0
+└ registry ┘ └image┘ └tag┘
+```
+
+**Quick lifecycle:**
+
+```shellscript
+docker build -t demo:1 .
+docker run --rm demo:1
+```
+
+## ⚠️ Pitfalls
+
+- “Container stopped” still exists until removed — check `docker ps -a`.
+- Tag ≠ immutable identity — digests do.
+
+## 🔗 Related
+
+- [getting_started.md](/docs/docker/getting-started)
+- [dockerfile.md](/docs/docker/dockerfile)
+- [compose.md](/docs/docker/compose)
+- [README.md](/docs/docker)

@@ -7,9 +7,13 @@
     "icons:pwa": "node scripts/generate-pwa-icons.mjs",
     "note:new": "node scripts/new-note.mjs",
     "mcp": "node mcp/server.mjs",
+    "check:links": "node scripts/check-related-links.mjs",
     "predev": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
     "prebuild": "node scripts/generate-pwa-icons.mjs && node scripts/sync-content.mjs && fumadocs-mdx",
     "build": "next build",
+    "build:pages": "node scripts/build-pages.mjs",
+    "deploy:cf": "npm run build:pages && wrangler pages deploy out --project-name=code-reference-docs --commit-dirty=true",
+    "pages:deploy": "wrangler pages deploy out --project-name=code-reference-docs --commit-dirty=true",
     "dev": "next dev",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
@@ -17,34 +21,35 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
     "cnfast": "^0.0.8",
+    "flexsearch": "^0.8.212",
     "fumadocs-core": "16.11.1",
     "fumadocs-mdx": "15.1.0",
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.11.1",
+    "hast-util-to-jsx-runtime": "^2.3.6",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "flexsearch": "^0.8.212",
-    "zod": "^4.4.3",
-    "class-variance-authority": "^0.7.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
     "remark-rehype": "^11.1.2",
-    "hast-util-to-jsx-runtime": "^2.3.6",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
+    "@types/hast": "^3.0.4",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.2.10",
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
-    "eslint": "^9.39.4",
-    "eslint-config-next": "16.2.10",
-    "@types/hast": "^3.0.4"
+    "wrangler": "^4.110.0"
   }
 }

@@ -10,3 +10,65 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+/* Cheat mode: denser tables, hide long prose under Overview */
+html[data-cheat='1'] .docs-cheat-root p {
+  display: none;
+}
+
+html[data-cheat='1'] .docs-cheat-root li {
+  margin-block: 0.15rem;
+}
+
+html[data-cheat='1'] .docs-cheat-root table {
+  font-size: 0.8125rem;
+}
+
+html[data-cheat='1'] .docs-cheat-root th,
+html[data-cheat='1'] .docs-cheat-root td {
+  padding-block: 0.35rem;
+}
+
+html[data-cheat='1'] .docs-cheat-root pre {
+  font-size: 0.75rem;
+}
+
+html[data-cheat='1'] .docs-cheat-root h2 {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Docs sidebar header: title + icon actions share one row without crowding */
+#nd-sidebar [data-sidebar-header],
+#nd-sidebar > div:first-child,
+aside [class*='sidebar'] > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+aside a[href='/'],
+aside a[href$='/docs'],
+aside a[href$='/docs/'] {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media print {
+  header,
+  nav,
+  aside,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main,
+  article {
+    max-width: none !important;
+  }
+}

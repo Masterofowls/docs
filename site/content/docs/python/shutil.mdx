@@ -1,0 +1,87 @@
+---
+title: Shutil
+description: Python · Reference cheat sheet
+---
+
+# Shutil
+
+_Python · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+`shutil` is high-level file operations: copy, move, delete trees, find executables, and check disk space. Prefer it over hand-rolled recursive delete/copy. Pair with `pathlib` for path construction.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `shutil.copy(src, dst)` | Copy file (data + mode) |
+| `shutil.copy2(src, dst)` | Copy + metadata |
+| `shutil.copytree(src, dst)` | Recursive directory copy |
+| `shutil.move(src, dst)` | Move / rename across devices |
+| `shutil.rmtree(path)` | Delete directory tree |
+| `shutil.which(cmd)` | Resolve executable on `PATH` |
+| `shutil.disk_usage(path)` | `total`, `used`, `free` bytes |
+| `shutil.make_archive` | Zip/tar helpers |
+
+## 💡 Examples
+
+**Copy and move:**
+
+```python
+import shutil
+from pathlib import Path
+
+src = Path("report.txt")
+shutil.copy(src, "backup/report.txt")       # file → file/dir
+shutil.copy2(src, "backup/report_meta.txt")
+shutil.move("backup/report.txt", "archive/report.txt")
+```
+
+**Remove a tree safely:**
+
+```python
+import shutil
+from pathlib import Path
+
+build = Path("build")
+if build.exists():
+    shutil.rmtree(build)
+build.mkdir()
+```
+
+**which + disk_usage:**
+
+```python
+import shutil
+
+print(shutil.which("python"), shutil.which("git"))
+usage = shutil.disk_usage(".")
+print(f"free={usage.free / 1e9:.1f} GB of {usage.total / 1e9:.1f} GB")
+```
+
+**copytree with dirs_exist_ok (3.8+):**
+
+```python
+import shutil
+
+shutil.copytree("templates", "out/templates", dirs_exist_ok=True)
+```
+
+## ⚠️ Pitfalls
+
+- `rmtree` is irreversible — confirm the path; no recycle bin.
+- `copy` overwrites existing destination files without asking.
+- `copytree` fails if `dst` exists unless `dirs_exist_ok=True`.
+- `which` returns `None` if not found — check before `subprocess`.
+- On Windows, open files can block `rmtree` / `move`.
+
+## 🔗 Related
+
+- [Pathlib](/docs/python/pathlib)
+- [Files I/O](/docs/python/files-io)
+- [Os](/docs/python/os)
+- [Tempfile](/docs/python/tempfile)
+- [Glob](/docs/python/glob-module)

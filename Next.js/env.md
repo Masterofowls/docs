@@ -1,0 +1,62 @@
+# Environment Variables
+
+_Next.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Next.js loads `.env*` files and exposes variables to Node (server) and, with a prefix, to the browser bundle. Never ship secrets with the public prefix.
+
+## 🔧 Core concepts
+
+| File | Typical use |
+| --- | --- |
+| `.env` | Default for all environments |
+| `.env.local` | Local secrets (gitignored) |
+| `.env.development` / `.env.production` | Env-specific defaults |
+| `.env*.local` | Overrides; highest priority locally |
+
+| Access | Visibility |
+| --- | --- |
+| `process.env.MY_SECRET` | Server only |
+| `process.env.NEXT_PUBLIC_*` | Inlined into client JS |
+| `NEXT_PUBLIC_*` in Edge/Middleware | Available if set at build/runtime per host |
+
+## 💡 Examples
+
+**`.env.local`:**
+
+```bash
+DATABASE_URL=postgres://...
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+**Server usage:**
+
+```ts
+const url = process.env.DATABASE_URL;
+if (!url) throw new Error("DATABASE_URL is required");
+```
+
+**Client usage:**
+
+```tsx
+"use client";
+export function Banner() {
+  return <p>{process.env.NEXT_PUBLIC_APP_URL}</p>;
+}
+```
+
+## ⚠️ Pitfalls
+
+- Changing env vars often requires restarting `next dev` / rebuilding.
+- `NEXT_PUBLIC_` values are baked in at build time for many hosts — treat them as public.
+- Don't put API keys in `NEXT_PUBLIC_*` even "temporarily".
+
+## 🔗 Related
+
+- [server_components.md](./server_components.md)
+- [deployment.md](./deployment.md)
+- [middleware.md](./middleware.md)
+- [caching.md](./caching.md)

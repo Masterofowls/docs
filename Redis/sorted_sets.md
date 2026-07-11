@@ -1,0 +1,59 @@
+# Sorted Sets
+
+_Redis · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Sorted sets (ZSETs) store unique members with a floating-point score. Ideal for leaderboards, time indexes, and range queries by score or rank.
+
+## 🔧 Core concepts
+
+| Command | Role |
+| --- | --- |
+| `ZADD key score member` | Add/update |
+| `ZRANGE` | By rank (low→high) |
+| `ZREVRANGE` | By rank high→low |
+| `ZRANGEBYSCORE` | By score range |
+| `ZRANK` / `ZREVRANK` | Rank of member |
+| `ZSCORE` | Score of member |
+| `ZINCRBY` | Increment score |
+| `ZREM` | Remove member |
+| `ZCARD` / `ZCOUNT` | Counts |
+
+| Use case | Score idea |
+| --- | --- |
+| Leaderboard | Points |
+| Schedule | Unix timestamp |
+| Rate window | Event time |
+
+## 💡 Examples
+
+**Leaderboard:**
+
+```bash
+ZADD lb:game 100 alice 250 bob 180 cara
+ZREVRANGE lb:game 0 2 WITHSCORES
+ZINCRBY lb:game 20 alice
+```
+
+**Due jobs by time:**
+
+```bash
+ZADD queue:due 1735689600 job:1
+ZRANGEBYSCORE queue:due -inf +inf LIMIT 0 10
+```
+
+## ⚠️ Pitfalls
+
+- Members are unique — re-`ZADD` updates the score.
+- Large ranges without `LIMIT` can return huge payloads.
+- Lexicographical commands (`ZRANGEBYLEX`) require same score — easy to misuse.
+
+## 🔗 Related
+
+- [lists_sets.md](./lists_sets.md)
+- [expiry_ttl.md](./expiry_ttl.md)
+- [cli_basics.md](./cli_basics.md)
+- [getting_started.md](./getting_started.md)

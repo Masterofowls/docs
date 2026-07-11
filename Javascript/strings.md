@@ -8,12 +8,57 @@ Strings are immutable UTF-16 sequences. Prefer template literals, `includes`/`st
 
 ## 🔧 Core concepts
 
-- **Create**: `'...'`, `"..."`, `` `template ${expr}` ``, `String.raw`.
-- **Length**: `str.length` counts UTF-16 code units.
-- **Access**: `str[i]`, `str.at(-1)`, `str.codePointAt(i)`.
-- **Search**: `includes`, `indexOf`, `startsWith`, `endsWith`, `match`, `matchAll`.
-- **Transform**: `slice`, `substring`, `split`, `trim`, `padStart`, `toUpperCase`, `normalize`.
-- **Replace**: `replace`, `replaceAll` (string or global regex).
+**Create / access**
+
+| API | Notes |
+| --- | --- |
+| `'...'`, `"..."`, `` `tmpl ${x}` `` | Prefer templates for interpolation |
+| `String(x)`, `String.raw`…`` | Coerce; raw skips escape processing |
+| `str.length` | UTF-16 **code units** |
+| `str[i]`, `str.at(i)`, `str.charAt(i)` | `at` supports negatives |
+| `charCodeAt` / `codePointAt` | Unit vs full code point |
+
+**Search / match**
+
+| Method | Notes |
+| --- | --- |
+| `includes(sub, from?)` | Boolean substring |
+| `indexOf` / `lastIndexOf` | Index or `-1` |
+| `startsWith` / `endsWith` | Prefix / suffix (pos optional) |
+| `search(re)` | First regex match index |
+| `match(re)` | Match array or `null` |
+| `matchAll(re)` | Iterator of all matches (`/g` required) |
+
+**Slice / split / join**
+
+| Method | Notes |
+| --- | --- |
+| `slice(start?, end?)` | Supports negatives; preferred |
+| `substring(a, b)` | Swaps if `a > b`; no negatives |
+| `substr(start, len)` | Legacy — avoid |
+| `split(sep\|re, limit?)` | → array; empty sep → chars |
+| `Array` `.join(sep)` | Inverse of `split` |
+
+**Case / trim / pad / repeat**
+
+| Method | Notes |
+| --- | --- |
+| `toLowerCase` / `toUpperCase` | Locale-insensitive |
+| `toLocaleLowerCase` / `…UpperCase` | Locale-aware |
+| `trim` / `trimStart` / `trimEnd` | Whitespace (Unicode) |
+| `padStart(n, fill?)` / `padEnd` | Pad to length `n` |
+| `repeat(n)` | Concatenate `n` times |
+
+**Replace / normalize / unicode**
+
+| Method | Notes |
+| --- | --- |
+| `replace(pat, rep\|fn)` | First match only if string/`/g` missing |
+| `replaceAll(pat, rep\|fn)` | All; string or global regex |
+| `normalize("NFC"\|"NFD"\|…)` | Unicode normalization forms |
+| `localeCompare(other, locales?, opts?)` | Collation compare → −1/0/1 |
+| `for...of str` | Iterates **code points** |
+| `[...str]` / `Array.from(str)` | Code-point array |
 
 ```js
 const name = "Ada";

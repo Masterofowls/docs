@@ -1,0 +1,69 @@
+---
+title: API Client Test
+description: Pytest · Example / how-to
+---
+
+_Pytest · Example / how-to_
+
+---
+
+## 📋 Overview
+
+CRUD smoke for a JSON API with `requests` and unique ids so parallel runs stay isolated.
+
+## 🔧 Core concepts
+
+| Step | Check |
+| --- | --- |
+| POST | 201 + id |
+| GET | Same fields |
+| PATCH | Changed field |
+| DELETE | 204 / gone |
+
+## 💡 Examples
+
+```python
+import os
+import uuid
+import requests
+import pytest
+
+BASE = os.getenv("API_URL", "http://127.0.0.1:8000")
+
+@pytest.fixture
+def item_payload():
+    return {"title": f"note-{uuid.uuid4().hex[:8]}", "done": False}
+
+def test_item_crud(item_payload):
+    created = requests.post(f"{BASE}/api/items", json=item_payload, timeout=5)
+    assert created.status_code in (200, 201)
+    item_id = created.json()["id"]
+
+    got = requests.get(f"{BASE}/api/items/{item_id}", timeout=5)
+    assert got.status_code == 200
+    assert got.json()["title"] == item_payload["title"]
+
+    patched = requests.patch(
+        f"{BASE}/api/items/{item_id}",
+        json={"done": True},
+        timeout=5,
+    )
+    assert patched.status_code == 200
+    assert patched.json()["done"] is True
+
+    deleted = requests.delete(f"{BASE}/api/items/{item_id}", timeout=5)
+    assert deleted.status_code in (200, 204)
+
+    missing = requests.get(f"{BASE}/api/items/{item_id}", timeout=5)
+    assert missing.status_code == 404
+```
+
+## ⚠️ Pitfalls
+
+- Parallel runs need unique titles/ids (`uuid`).
+- Teardown if mid-test fails — use `try/finally` or yield fixtures.
+
+## 🔗 Related
+
+- [API testing](/docs/pytest/api-testing)
+- [Auth testing](/docs/pytest/auth-testing)

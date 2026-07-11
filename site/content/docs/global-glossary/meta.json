@@ -1,0 +1,10 @@
+{
+  "title": "Global Glossary",
+  "description": "Cross-stack interview terms",
+  "icon": "BookOpen",
+  "root": true,
+  "pages": [
+    "index",
+    "global-glossary"
+  ]
+}

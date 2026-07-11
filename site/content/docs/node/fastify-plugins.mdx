@@ -1,0 +1,75 @@
+---
+title: Fastify Plugins
+description: Node.js · Reference cheat sheet
+---
+
+# Fastify Plugins
+
+_Node.js · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Fastify organizes features as plugins. Each plugin gets an encapsulated context (decorators, hooks, routes) unless you break encapsulation deliberately.
+
+## 🔧 Core concepts
+
+| API | Role |
+| --- | --- |
+| `fastify.register(plugin, opts)` | Load plugin |
+| `fp` (`fastify-plugin`) | Share decorations with parent |
+| `decorate` / `decorateRequest` | Attach utilities |
+| `prefix` option | Mount routes under a path |
+
+| Pattern | Use when |
+| --- | --- |
+| Encapsulated plugin | Isolate routes/hooks per feature |
+| `fastify-plugin` wrapper | Share DB client, auth, config |
+| Nested `register` | Create contexts (e.g. `/v1` vs `/admin`) |
+
+## 💡 Examples
+
+**Feature plugin:**
+
+```js
+async function usersPlugin(fastify, opts) {
+  fastify.get("/", async () => []);
+}
+await fastify.register(usersPlugin, { prefix: "/users" });
+```
+
+**Shared decoration with `fp`:**
+
+```js
+import fp from "fastify-plugin";
+
+async function dbPlugin(fastify) {
+  fastify.decorate("db", { query: async () => [] });
+}
+export default fp(dbPlugin);
+```
+
+**Nested context:**
+
+```js
+await fastify.register(async (scope) => {
+  scope.addHook("preHandler", async (req) => {
+    /* admin-only */
+  });
+  scope.get("/stats", async () => ({ ok: true }));
+}, { prefix: "/admin" });
+```
+
+## ⚠️ Pitfalls
+
+- Forgetting `fastify-plugin` means parent routes cannot see `fastify.db`.
+- Circular plugin dependencies are hard to debug — keep a clear register order.
+- Registering the same plugin twice can duplicate routes/hooks.
+
+## 🔗 Related
+
+- [fastify_basics.md](/docs/node/fastify-basics)
+- [express_middleware.md](/docs/node/express-middleware)
+- [env_config.md](/docs/node/env-config)
+- [packaging.md](/docs/node/packaging)

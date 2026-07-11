@@ -72,4 +72,4 @@ console.log(oldWay === newWay); // true
 - [hello_world.md](./hello_world.md)
 - [variables_let_const.md](./variables_let_const.md)
 - [typeof_basics.md](./typeof_basics.md)
-- [string.md](./string.md)
+- [strings](./strings.md)

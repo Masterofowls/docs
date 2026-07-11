@@ -2,6 +2,8 @@
   "title": "Examples",
   "pages": [
     "index",
+    "api-client-test",
+    "login-auth-test",
     "parametrize-ids",
     "tmp-path-files"
   ]

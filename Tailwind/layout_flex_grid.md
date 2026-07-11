@@ -1,0 +1,65 @@
+# Layout: Flex & Grid
+
+_Tailwind · Reference cheat sheet_
+
+---
+
+## 📋 Overview
+
+Flexbox and CSS Grid utilities cover most app layouts: toolbars, sidebars, card grids, and centering.
+
+## 🔧 Core concepts
+
+| Flex | Grid |
+| --- | --- |
+| `flex`, `inline-flex` | `grid`, `inline-grid` |
+| `flex-row` / `flex-col` | `grid-cols-*` |
+| `items-*` / `justify-*` | `gap-*`, `col-span-*` |
+| `flex-1`, `grow`, `shrink-0` | `grid-rows-*`, `row-span-*` |
+| `flex-wrap` | `auto-rows-*`, `auto-cols-*` |
+
+| Alignment | Meaning |
+| --- | --- |
+| `items-center` | Cross-axis center (flex) |
+| `justify-between` | Main-axis space between |
+| `place-items-center` | Grid item centering shorthand |
+
+## 💡 Examples
+
+**Centered hero content:**
+
+```html
+<div class="flex min-h-screen items-center justify-center">
+  <p>Centered</p>
+</div>
+```
+
+**Sidebar + main:**
+
+```html
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r">Sidebar</aside>
+  <main class="flex-1 p-6">Main</main>
+</div>
+```
+
+**Responsive grid:**
+
+```html
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div>1</div><div>2</div><div>3</div><div>4</div>
+</div>
+```
+
+## ⚠️ Pitfalls
+
+- `flex-1` children can overflow — add `min-w-0` for truncating text in flex rows.
+- Mixing heavy nested grids without `gap` becomes brittle — prefer simpler structures.
+- Absolute positioning (`absolute inset-0`) escapes flex/grid flow — intentional only.
+
+## 🔗 Related
+
+- [responsive.md](./responsive.md)
+- [spacing_sizing.md](./spacing_sizing.md)
+- [utility_classes.md](./utility_classes.md)
+- [getting_started.md](./getting_started.md)

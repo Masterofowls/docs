@@ -5,7 +5,9 @@
   "root": true,
   "pages": [
     "index",
+    "api-testing",
     "async",
+    "auth-testing",
     "config",
     "coverage",
     "custom-matchers",
@@ -19,6 +21,7 @@
     "setup-teardown",
     "snapshots",
     "spies",
+    "testing-basics",
     "timers",
     "typescript",
     "watch-mode",
