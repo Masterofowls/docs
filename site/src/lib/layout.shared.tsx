@@ -19,6 +19,10 @@ export function baseOptions(): BaseLayoutProps {
         url: '/docs/global-glossary/global-glossary',
       },
       {
+        text: 'Method diff',
+        url: '/method-diff',
+      },
+      {
         text: 'Search',
         url: '/search',
       },

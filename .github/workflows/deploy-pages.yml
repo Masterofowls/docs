@@ -1,8 +1,11 @@
-name: Deploy docs to GitHub Pages
+# Deploy docs to GitHub Pages (mirror)
+
+# Primary production deploy is Cloudflare Pages — see deploy-cloudflare.yml
+# and https://code-reference-docs.pages.dev
+
+name: Deploy docs to GitHub Pages (mirror)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

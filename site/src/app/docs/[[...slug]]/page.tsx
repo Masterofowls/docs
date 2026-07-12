@@ -55,6 +55,11 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
+      <div className="print-only docs-print-header mb-4 border-b border-fd-border pb-3 text-sm">
+        <strong>{page.data.title}</strong>
+        {topic ? <div className="text-fd-muted-foreground">{topic.title} cheat sheet</div> : null}
+        <div className="text-xs text-fd-muted-foreground">{canonical}</div>
+      </div>
       <div className="flex flex-row flex-wrap items-center gap-2 border-b pb-6 print:hidden">
         <BookmarkButton
           url={page.url}

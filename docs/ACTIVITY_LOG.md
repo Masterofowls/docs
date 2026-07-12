@@ -1,5 +1,13 @@
 # Activity Log
 
+## 2026-07-12 00:45:00 -07:00
+- Added **Method diff** page (`/method-diff`) — side-by-side cross-stack method comparison (Python str ↔ JS String, list ↔ Array, dict ↔ Object, set ↔ Set) with preset pairs and custom selectors.
+- Enhanced **cheat mode + print/PDF** — compact `@media print` stylesheet (dense tables, hide prose/Examples/Pitfalls); print button applies cheat layout automatically.
+- Set **Cloudflare Pages as primary deploy** — new `.github/workflows/deploy-cloudflare.yml` on push to `main`; GH Pages workflow is manual mirror only. Updated README + AGENTS.md.
+
+## 2026-07-11 21:22:00 -07:00
+- Deployed to Cloudflare Pages production (12,334 files; search index 5.42 MiB). Methods pages live at https://code-reference-docs.pages.dev/docs/python/methods/ etc.
+
 ## 2026-07-11 13:55:00 -07:00
 - Added **Methods** reference cheat sheets for Python, JavaScript, TypeScript, CSS, SQL, React, and Django (`*/Methods/` — 34 pages + 7 index READMEs). Generator: `site/scripts/gen-methods-notes.mjs`. Synced 883 notes.
 

@@ -79,6 +79,12 @@ export default function HomePage() {
             Global glossary
           </Link>
           <Link
+            href="/method-diff"
+            className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
+          >
+            Method diff
+          </Link>
+          <Link
             href="/search"
             className="rounded-full border border-fd-border px-5 py-2.5 text-sm font-medium"
           >
